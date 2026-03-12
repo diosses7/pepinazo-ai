@@ -1,9 +1,16 @@
 {
   "name": "pepinazo-ai",
   "version": "1.0.0",
-  "private": true,
+  "description": "Pepinazo AI server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "openai": "^4.0.0",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
   }
 }
