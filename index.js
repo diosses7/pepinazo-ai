@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Pepinazo AI está funcionando");
+  res.send("Pepinazo AI funcionando 🚀");
 });
 
 const PORT = process.env.PORT || 3000;
