@@ -1,22 +1,13 @@
-import express from "express";
-import OpenAI from "openai";
-import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
+const express = require("express");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-  res.send("Pepinazo AI funcionando");
+  res.send("Pepinazo AI esta vivo");
 });
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo");
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto " + PORT);
 });
