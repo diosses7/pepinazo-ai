@@ -6,6 +6,10 @@ require("dotenv").config();
 
 
 
+const OpenAI = require("openai");
+
+
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -18,7 +22,15 @@ app.use(express.json());
 
 
 
-app.get("/", function(req, res) {
+const openai = new OpenAI({
+
+  apiKey: process.env.OPENAI_API_KEY,
+
+});
+
+
+
+app.get("/", (req, res) => {
 
   res.send("Pepinazo AI está vivo");
 
@@ -26,44 +38,51 @@ app.get("/", function(req, res) {
 
 
 
-app.post("/chat", function(req, res) {
-
-
-
-  const message = req.body.message;
-
-
-
-  if (!message) {
-
-    return res.status(400).json({ error: "Falta el mensaje" });
-
-  }
-
-
+app.post("/chat", async (req, res) => {
 
   try {
 
-    return res.json({
+    const userMessage = req.body.message;
 
-      reply: "Pepinazo recibió tu mensaje: " + message
+
+
+    const completion = await openai.chat.completions.create({
+
+      model: "gpt-4.1-mini",
+
+      messages: [
+
+        { role: "system", content: "Eres Pepinazo AI" },
+
+        { role: "user", content: userMessage },
+
+      ],
+
+    });
+
+
+
+    res.json({
+
+      reply: completion.choices[0].message.content,
 
     });
 
   } catch (error) {
 
-    return res.status(500).json({ error: "Error interno" });
+    console.error(error);
+
+    res.status(500).send("Error en /chat");
 
   }
 
-
-
 });
 
 
 
-app.listen(PORT, function() {
+app.listen(PORT, () => {
 
-  console.log("Servidor corriendo en puerto " + PORT);
+  console.log("Servidor corriendo");
 
 });
+
