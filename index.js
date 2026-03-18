@@ -30,14 +30,6 @@ const openai = new OpenAI({
 
 
 
-app.get("/", (req, res) => {
-
-  res.send("Pepinazo AI está vivo");
-
-});
-
-
-
 app.post("/chat", async (req, res) => {
 
   try {
@@ -70,9 +62,7 @@ app.post("/chat", async (req, res) => {
 
             role: "system",
 
-            content:
-
-              "Eres Pepinazo AI, un asistente inteligente, claro, útil y directo.",
+            content: "Eres Pepinazo AI, un asistente inteligente, claro, útil y directo.",
 
           },
 
@@ -102,7 +92,7 @@ app.post("/chat", async (req, res) => {
 
     } else {
 
-      reply = `Proveedor no reconocido`;
+      reply = "Proveedor no reconocido";
 
     }
 
@@ -112,7 +102,7 @@ app.post("/chat", async (req, res) => {
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Error en /chat:", error);
 
     res.status(500).json({
 
