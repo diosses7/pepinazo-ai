@@ -7,26 +7,39 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Ruta raíz: sirve el frontend
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.post("/chat", async (req, res) => {
+// Ruta principal de chat
+app.post("/api/chat", async (req, res) => {
   try {
     const { message, provider } = req.body;
 
-    if (!message || typeof message !== "string") {
+    // Validación básica del mensaje
+    if (!message || typeof message !== "string" || !message.trim()) {
       return res.status(400).json({ reply: "Mensaje inválido." });
     }
 
-    const selectedProvider = provider || "openai";
+    const cleanMessage = message.trim();
+    const selectedProvider = (provider || "openai").toLowerCase().trim();
 
-    // --- OpenAI ---
+    // -----------------------------
+    // Proveedor: OpenAI
+    // -----------------------------
     if (selectedProvider === "openai") {
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({
+          reply: "Falta configurar OPENAI_API_KEY en el servidor.",
+        });
+      }
+
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -38,7 +51,7 @@ app.post("/chat", async (req, res) => {
             },
             {
               role: "user",
-              content: message,
+              content: cleanMessage,
             },
           ],
         },
@@ -50,15 +63,27 @@ app.post("/chat", async (req, res) => {
         }
       );
 
-      return res.json({ reply: response.data.choices[0].message.content });
+      return res.json({
+        reply:
+          response.data?.choices?.[0]?.message?.content?.trim() ||
+          "No se recibió respuesta de OpenAI.",
+      });
     }
 
-    // --- Perplexity ---
+    // -----------------------------
+    // Proveedor: Perplexity
+    // -----------------------------
     if (selectedProvider === "perplexity") {
+      if (!process.env.PERPLEXITY_API_KEY) {
+        return res.status(500).json({
+          reply: "Falta configurar PERPLEXITY_API_KEY en el servidor.",
+        });
+      }
+
       const response = await axios.post(
         "https://api.perplexity.ai/chat/completions",
         {
-          model: "sonar",
+          model: "sonar-pro",
           messages: [
             {
               role: "system",
@@ -66,7 +91,7 @@ app.post("/chat", async (req, res) => {
             },
             {
               role: "user",
-              content: message,
+              content: cleanMessage,
             },
           ],
         },
@@ -78,21 +103,33 @@ app.post("/chat", async (req, res) => {
         }
       );
 
-      return res.json({ reply: response.data.choices[0].message.content });
+      return res.json({
+        reply:
+          response.data?.choices?.[0]?.message?.content?.trim() ||
+          "No se recibió respuesta de Perplexity.",
+      });
     }
 
-    // --- Claude ---
+    // -----------------------------
+    // Proveedor: Claude
+    // -----------------------------
     if (selectedProvider === "claude") {
+      if (!process.env.CLAUDE_API_KEY) {
+        return res.status(500).json({
+          reply: "Falta configurar CLAUDE_API_KEY en el servidor.",
+        });
+      }
+
       const response = await axios.post(
         "https://api.anthropic.com/v1/messages",
         {
-          model: "claude-sonnet-4-20250514",
+          model: "claude-3-5-sonnet-20241022",
           max_tokens: 1024,
           system: "Eres Pepinazo AI, un asistente útil, claro y directo.",
           messages: [
             {
               role: "user",
-              content: message,
+              content: cleanMessage,
             },
           ],
         },
@@ -105,14 +142,29 @@ app.post("/chat", async (req, res) => {
         }
       );
 
-      return res.json({ reply: response.data.content[0].text });
+      const claudeReply =
+        response.data?.content
+          ?.filter((item) => item.type === "text")
+          ?.map((item) => item.text)
+          ?.join("\n")
+          ?.trim() || "No se recibió respuesta de Claude.";
+
+      return res.json({ reply: claudeReply });
     }
 
+    // Proveedor no válido
     return res.status(400).json({ reply: "Proveedor no válido." });
   } catch (error) {
-    console.error("Error en /chat:", error.response?.data || error.message);
+    console.error(
+      "Error en /api/chat:",
+      error.response?.data || error.message || error
+    );
+
     return res.status(500).json({
-      reply: "Hubo un error al procesar la solicitud.",
+      reply:
+        error.response?.data?.error?.message ||
+        error.response?.data?.message ||
+        "Hubo un error al procesar la solicitud.",
     });
   }
 });
