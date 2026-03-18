@@ -1,185 +1,133 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Pepinazo AI</title>
-
   <style>
-
     body {
-
       font-family: Arial, sans-serif;
-
       max-width: 800px;
-
       margin: 40px auto;
-
       padding: 20px;
-
     }
-
-
 
     h1 {
-
       margin-bottom: 20px;
-
     }
-
-
 
     #chat {
-
       border: 1px solid #ccc;
-
       padding: 15px;
-
       min-height: 300px;
-
+      max-height: 500px;
       margin-bottom: 15px;
-
       white-space: pre-wrap;
-
+      overflow-y: auto;
     }
-
-
 
     .fila {
-
       display: flex;
-
       gap: 10px;
-
     }
-
-
 
     input {
-
       flex: 1;
-
       padding: 10px;
-
       font-size: 16px;
-
     }
-
-
 
     button {
-
       padding: 10px 16px;
-
       font-size: 16px;
-
       cursor: pointer;
-
     }
 
-
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     .user {
-
       margin-bottom: 12px;
-
     }
-
-
 
     .bot {
-
       margin-bottom: 20px;
-
     }
-
   </style>
-
 </head>
-
 <body>
-
   <h1>Pepinazo AI</h1>
-
-
 
   <div id="chat"></div>
 
-
-
   <div class="fila">
-
     <input id="msg" placeholder="Escribe mensaje" />
-
-    <button onclick="enviar()">Enviar</button>
-
+    <button id="btn" onclick="enviar()">Enviar</button>
   </div>
 
-
-
   <script>
+    function agregarMensaje(tipo, autor, texto) {
+      const chat = document.getElementById("chat");
+      const div = document.createElement("div");
+      div.className = tipo;
+
+      const strong = document.createElement("strong");
+      strong.textContent = autor + ": ";
+
+      const span = document.createElement("span");
+      span.textContent = texto;
+
+      div.appendChild(strong);
+      div.appendChild(span);
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
 
     async function enviar() {
-
       const input = document.getElementById("msg");
-
-      const chat = document.getElementById("chat");
-
+      const btn = document.getElementById("btn");
       const message = input.value.trim();
-
-
 
       if (!message) return;
 
-
-
-      chat.innerHTML += `<div class="user"><strong>Tú:</strong> ${message}</div>`;
-
+      agregarMensaje("user", "Tú", message);
       input.value = "";
-
-
+      input.disabled = true;
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
 
       try {
-
         const r = await fetch("/chat", {
-
           method: "POST",
-
           headers: {
-
-            "Content-Type": "application/json"
-
+            "Content-Type": "application/json",
           },
-
-          body: JSON.stringify({ message })
-
+          body: JSON.stringify({ message }),
         });
 
-
+        if (!r.ok) {
+          throw new Error("Error del servidor");
+        }
 
         const data = await r.json();
-
-
-
-        chat.innerHTML += `<div class="bot"><strong>Pepinazo:</strong> ${data.reply || "Sin respuesta"}</div>`;
-
-        chat.scrollTop = chat.scrollHeight;
-
+        agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
       } catch (error) {
-
-        chat.innerHTML += `<div class="bot"><strong>Error:</strong> No se pudo conectar con el servidor.</div>`;
-
+        agregarMensaje("bot", "Error", "No se pudo conectar con el servidor.");
+      } finally {
+        input.disabled = false;
+        btn.disabled = false;
+        btn.textContent = "Enviar";
+        input.focus();
       }
-
     }
 
+    document.getElementById("msg").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        enviar();
+      }
+    });
   </script>
-
 </body>
-
 </html>
