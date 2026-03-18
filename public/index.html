@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <title>Pepinazo AI</title>
+
+</head>
+
+<body>
+
+
+
+<h1>Pepinazo AI</h1>
+
+
+
+<input id="msg" placeholder="Escribe mensaje">
+
+<button onclick="enviar()">Enviar</button>
+
+
+
+<pre id="res"></pre>
+
+
+
+<script>
+
+async function enviar() {
+
+  const message = document.getElementById("msg").value;
+
+
+
+  const r = await fetch("/chat", {
+
+    method: "POST",
+
+    headers: {
+
+      "Content-Type": "application/json"
+
+    },
+
+    body: JSON.stringify({
+
+      message: message,
+
+      provider: "openai"
+
+    })
+
+  });
+
+
+
+  const data = await r.json();
+
+
+
+  document.getElementById("res").textContent =
+
+    data.reply || JSON.stringify(data);
+
+}
+
+</script>
+
+
+
+</body>
+
+</html>
+
