@@ -20,7 +20,9 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "publico")));
+
+
+app.use(express.static(path.join(__dirname, "público")));
 
 
 
@@ -34,7 +36,7 @@ const openai = new OpenAI({
 
 app.get("/", (req, res) => {
 
-  res.sendFile(path.join(__dirname, "publico", "index.html"));
+  res.sendFile(path.join(__dirname, "público", "index.html"));
 
 });
 
@@ -43,6 +45,8 @@ app.get("/", (req, res) => {
 app.post("/chat", async (req, res) => {
 
   try {
+
+
 
     const { message } = req.body;
 
@@ -86,6 +90,8 @@ app.post("/chat", async (req, res) => {
 
   } catch (error) {
 
+
+
     console.error(error);
 
 
@@ -95,6 +101,8 @@ app.post("/chat", async (req, res) => {
       reply: "Error interno"
 
     });
+
+
 
   }
 
@@ -107,3 +115,4 @@ app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto " + PORT);
 
 });
+
