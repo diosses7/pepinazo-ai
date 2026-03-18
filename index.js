@@ -1,6 +1,10 @@
+
+
 const express = require("express");
 
 const cors = require("cors");
+
+const path = require("path");
 
 const OpenAI = require("openai");
 
@@ -18,7 +22,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.static("publico"));
+app.use(express.static(path.join(__dirname, "public")));
 
 
 
@@ -34,7 +38,7 @@ app.post("/chat", async (req, res) => {
 
   try {
 
-    const { message, provider } = req.body;
+    const { message } = req.body;
 
 
 
@@ -46,59 +50,27 @@ app.post("/chat", async (req, res) => {
 
 
 
-    let reply = "";
+    const completion = await openai.chat.completions.create({
+
+      model: "gpt-4o-mini",
+
+      messages: [
+
+        { role: "system", content: "Eres Pepinazo AI, claro, útil y directo." },
+
+        { role: "user", content: message }
+
+      ]
+
+    });
 
 
 
-    if (provider === "openai" || !provider) {
+    res.json({
 
-      const completion = await openai.chat.completions.create({
+      reply: completion.choices[0].message.content
 
-        model: "gpt-4o-mini",
-
-        messages: [
-
-          {
-
-            role: "system",
-
-            content: "Eres Pepinazo AI, un asistente inteligente, claro, útil y directo.",
-
-          },
-
-          {
-
-            role: "user",
-
-            content: message,
-
-          },
-
-        ],
-
-      });
-
-
-
-      reply = completion.choices[0].message.content;
-
-    } else if (provider === "claude") {
-
-      reply = `Claude aún no conectado: ${message}`;
-
-    } else if (provider === "perplexity") {
-
-      reply = `Perplexity aún no conectado: ${message}`;
-
-    } else {
-
-      reply = "Proveedor no reconocido";
-
-    }
-
-
-
-    res.json({ reply });
+    });
 
   } catch (error) {
 
@@ -108,7 +80,7 @@ app.post("/chat", async (req, res) => {
 
       error: "Error interno",
 
-      details: error.message,
+      details: error.message
 
     });
 
@@ -120,9 +92,7 @@ app.post("/chat", async (req, res) => {
 
 app.listen(PORT, () => {
 
-  console.log("Servidor corriendo en puerto " + PORT);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 
 });
-
-
 
