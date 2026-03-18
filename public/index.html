@@ -26,6 +26,22 @@
       overflow-y: auto;
     }
 
+    .controles {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .controles label {
+      font-weight: bold;
+    }
+
+    .controles select {
+      padding: 8px;
+      font-size: 14px;
+    }
+
     .fila {
       display: flex;
       gap: 10px;
@@ -55,10 +71,25 @@
     .bot {
       margin-bottom: 20px;
     }
+
+    .provider-tag {
+      font-size: 12px;
+      color: #666;
+      margin-left: 6px;
+    }
   </style>
 </head>
 <body>
   <h1>Pepinazo AI</h1>
+
+  <div class="controles">
+    <label for="provider">Modelo:</label>
+    <select id="provider">
+      <option value="openai">OpenAI (GPT-4o Mini)</option>
+      <option value="perplexity">Perplexity (Sonar)</option>
+      <option value="claude">Claude (Sonnet)</option>
+    </select>
+  </div>
 
   <div id="chat"></div>
 
@@ -68,7 +99,7 @@
   </div>
 
   <script>
-    function agregarMensaje(tipo, autor, texto) {
+    function agregarMensaje(tipo, autor, texto, etiqueta) {
       const chat = document.getElementById("chat");
       const div = document.createElement("div");
       div.className = tipo;
@@ -80,6 +111,15 @@
       span.textContent = texto;
 
       div.appendChild(strong);
+
+      if (etiqueta) {
+        const tag = document.createElement("span");
+        tag.className = "provider-tag";
+        tag.textContent = "[" + etiqueta + "]";
+        div.appendChild(tag);
+      }
+
+      div.appendChild(document.createElement("br"));
       div.appendChild(span);
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
@@ -88,7 +128,10 @@
     async function enviar() {
       const input = document.getElementById("msg");
       const btn = document.getElementById("btn");
+      const providerSelect = document.getElementById("provider");
       const message = input.value.trim();
+      const provider = providerSelect.value;
+      const providerName = providerSelect.options[providerSelect.selectedIndex].text;
 
       if (!message) return;
 
@@ -104,7 +147,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message, provider }),
         });
 
         if (!r.ok) {
@@ -112,7 +155,7 @@
         }
 
         const data = await r.json();
-        agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
+        agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta", providerName);
       } catch (error) {
         agregarMensaje("bot", "Error", "No se pudo conectar con el servidor.");
       } finally {

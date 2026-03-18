@@ -1,20 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const OpenAI = require("openai");
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-if (!process.env.OPENAI_API_KEY) {
-  console.error("Falta OPENAI_API_KEY en variables de entorno.");
-  process.exit(1);
-}
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 app.use(cors());
 app.use(express.json());
@@ -26,33 +17,102 @@ app.get("/", (req, res) => {
 
 app.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, provider } = req.body;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({ reply: "Mensaje inválido." });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "Eres Pepinazo AI, claro, útil y directo.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
+    const selectedProvider = provider || "openai";
 
-    res.json({
-      reply: completion.choices[0].message.content,
-    });
+    // --- OpenAI ---
+    if (selectedProvider === "openai") {
+      const response = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "Eres Pepinazo AI, un asistente útil, claro y directo.",
+            },
+            {
+              role: "user",
+              content: message,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          },
+        }
+      );
+
+      return res.json({ reply: response.data.choices[0].message.content });
+    }
+
+    // --- Perplexity ---
+    if (selectedProvider === "perplexity") {
+      const response = await axios.post(
+        "https://api.perplexity.ai/chat/completions",
+        {
+          model: "sonar",
+          messages: [
+            {
+              role: "system",
+              content: "Eres Pepinazo AI, un asistente útil, claro y directo.",
+            },
+            {
+              role: "user",
+              content: message,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+          },
+        }
+      );
+
+      return res.json({ reply: response.data.choices[0].message.content });
+    }
+
+    // --- Claude ---
+    if (selectedProvider === "claude") {
+      const response = await axios.post(
+        "https://api.anthropic.com/v1/messages",
+        {
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          system: "Eres Pepinazo AI, un asistente útil, claro y directo.",
+          messages: [
+            {
+              role: "user",
+              content: message,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.CLAUDE_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+        }
+      );
+
+      return res.json({ reply: response.data.content[0].text });
+    }
+
+    return res.status(400).json({ reply: "Proveedor no válido." });
   } catch (error) {
-    console.error("Error en /chat:", error);
-    res.status(500).json({
-      reply: "Error interno del servidor.",
+    console.error("Error en /chat:", error.response?.data || error.message);
+    return res.status(500).json({
+      reply: "Hubo un error al procesar la solicitud.",
     });
   }
 });
