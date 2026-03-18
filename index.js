@@ -1,5 +1,4 @@
 
-
 const express = require("express");
 
 const cors = require("cors");
@@ -22,7 +21,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "publico")));
 
 
 
@@ -56,9 +55,21 @@ app.post("/chat", async (req, res) => {
 
       messages: [
 
-        { role: "system", content: "Eres Pepinazo AI, claro, útil y directo." },
+        {
 
-        { role: "user", content: message }
+          role: "system",
+
+          content: "Eres Pepinazo AI, claro, útil y directo."
+
+        },
+
+        {
+
+          role: "user",
+
+          content: message
+
+        }
 
       ]
 
@@ -95,4 +106,3 @@ app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 
 });
-
