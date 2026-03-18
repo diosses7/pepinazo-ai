@@ -6,10 +6,6 @@ require("dotenv").config();
 
 
 
-const OpenAI = require("openai");
-
-
-
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -19,14 +15,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 
 app.use(express.json());
-
-
-
-const openai = new OpenAI({
-
-  apiKey: process.env.OPENAI_API_KEY,
-
-});
 
 
 
@@ -42,37 +30,49 @@ app.post("/chat", async (req, res) => {
 
   try {
 
-    const userMessage = req.body.message;
+    const { message, provider } = req.body;
 
 
 
-    const completion = await openai.chat.completions.create({
+    if (!message) {
 
-      model: "gpt-4.1-mini",
+      return res.status(400).json({ error: "Falta el mensaje" });
 
-      messages: [
-
-        { role: "system", content: "Eres Pepinazo AI" },
-
-        { role: "user", content: userMessage },
-
-      ],
-
-    });
+    }
 
 
 
-    res.json({
+    let reply = "";
 
-      reply: completion.choices[0].message.content,
 
-    });
+
+    if (provider === "openai") {
+
+      reply = `OpenAI respondería: ${message}`;
+
+    } else if (provider === "claude") {
+
+      reply = `Claude respondería: ${message}`;
+
+    } else if (provider === "perplexity") {
+
+      reply = `Perplexity respondería: ${message}`;
+
+    } else {
+
+      reply = `Pepinazo recibió tu mensaje: ${message}`;
+
+    }
+
+
+
+    res.json({ reply });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Error en /chat:", error);
 
-    res.status(500).send("Error en /chat");
+    res.status(500).json({ error: "Error interno del servidor" });
 
   }
 
@@ -82,7 +82,6 @@ app.post("/chat", async (req, res) => {
 
 app.listen(PORT, () => {
 
-  console.log("Servidor corriendo");
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 
 });
-
