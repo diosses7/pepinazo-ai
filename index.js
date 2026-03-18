@@ -17,12 +17,17 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// Health check simple
+app.get("/health", (req, res) => {
+  res.json({ ok: true, message: "Pepinazo AI funcionando" });
+});
+
 // Ruta principal de chat
 app.post("/api/chat", async (req, res) => {
   try {
     const { message, provider } = req.body;
 
-    // Validación básica del mensaje
+    // Validación básica
     if (!message || typeof message !== "string" || !message.trim()) {
       return res.status(400).json({ reply: "Mensaje inválido." });
     }
@@ -34,60 +39,57 @@ app.post("/api/chat", async (req, res) => {
     // Proveedor: OpenAI
     // -----------------------------
     if (selectedProvider === "openai") {
-      if (!process.env.OPENAI_API_KEY) {
+      const apiKey = process.env.OPENAI_API_KEY;
+
+      if (!apiKey) {
         return res.status(500).json({
-          reply: "Falta configurar OPENAI_API_KEY en el servidor.",
+          reply: "Falta configurar OPENAI_API_KEY en Render.",
         });
       }
 
       const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
+        "https://api.openai.com/v1/responses",
         {
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: "Eres Pepinazo AI, un asistente útil, claro y directo.",
-            },
-            {
-              role: "user",
-              content: cleanMessage,
-            },
-          ],
+          model: "gpt-4.1-mini",
+          input: cleanMessage,
         },
         {
           headers: {
+            Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           },
+          timeout: 30000,
         }
       );
 
-      return res.json({
-        reply:
-          response.data?.choices?.[0]?.message?.content?.trim() ||
-          "No se recibió respuesta de OpenAI.",
-      });
+      const reply =
+        response.data?.output_text ||
+        response.data?.output?.[0]?.content?.[0]?.text ||
+        "OpenAI no devolvió respuesta.";
+
+      return res.json({ reply });
     }
 
     // -----------------------------
     // Proveedor: Perplexity
     // -----------------------------
     if (selectedProvider === "perplexity") {
-      if (!process.env.PERPLEXITY_API_KEY) {
+      const apiKey = process.env.PERPLEXITY_API_KEY;
+
+      if (!apiKey) {
         return res.status(500).json({
-          reply: "Falta configurar PERPLEXITY_API_KEY en el servidor.",
+          reply: "Falta configurar PERPLEXITY_API_KEY en Render.",
         });
       }
 
       const response = await axios.post(
         "https://api.perplexity.ai/chat/completions",
         {
-          model: "sonar-pro",
+          model: "sonar",
           messages: [
             {
               role: "system",
-              content: "Eres Pepinazo AI, un asistente útil, claro y directo.",
+              content: "Eres Pepinazo AI, un asistente útil, claro y preciso.",
             },
             {
               role: "user",
@@ -97,78 +99,43 @@ app.post("/api/chat", async (req, res) => {
         },
         {
           headers: {
+            Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}`,
           },
+          timeout: 30000,
         }
       );
 
-      return res.json({
-        reply:
-          response.data?.choices?.[0]?.message?.content?.trim() ||
-          "No se recibió respuesta de Perplexity.",
-      });
+      const reply =
+        response.data?.choices?.[0]?.message?.content ||
+        "Perplexity no devolvió respuesta.";
+
+      return res.json({ reply });
     }
 
-    // -----------------------------
-    // Proveedor: Claude
-    // -----------------------------
-    if (selectedProvider === "claude") {
-      if (!process.env.CLAUDE_API_KEY) {
-        return res.status(500).json({
-          reply: "Falta configurar CLAUDE_API_KEY en el servidor.",
-        });
-      }
-
-      const response = await axios.post(
-        "https://api.anthropic.com/v1/messages",
-        {
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 1024,
-          system: "Eres Pepinazo AI, un asistente útil, claro y directo.",
-          messages: [
-            {
-              role: "user",
-              content: cleanMessage,
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.CLAUDE_API_KEY,
-            "anthropic-version": "2023-06-01",
-          },
-        }
-      );
-
-      const claudeReply =
-        response.data?.content
-          ?.filter((item) => item.type === "text")
-          ?.map((item) => item.text)
-          ?.join("\n")
-          ?.trim() || "No se recibió respuesta de Claude.";
-
-      return res.json({ reply: claudeReply });
-    }
-
-    // Proveedor no válido
-    return res.status(400).json({ reply: "Proveedor no válido." });
+    // Provider no soportado
+    return res.status(400).json({
+      reply: "Proveedor no soportado. Usa 'openai' o 'perplexity'.",
+    });
   } catch (error) {
     console.error(
       "Error en /api/chat:",
       error.response?.data || error.message || error
     );
 
+    const apiError =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      "Error interno del servidor.";
+
     return res.status(500).json({
-      reply:
-        error.response?.data?.error?.message ||
-        error.response?.data?.message ||
-        "Hubo un error al procesar la solicitud.",
+      reply: `Error: ${apiError}`,
     });
   }
 });
 
+// Levantar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
 });
+          
