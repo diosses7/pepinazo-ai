@@ -1,4 +1,3 @@
-
 const express = require("express");
 
 const cors = require("cors");
@@ -33,19 +32,19 @@ const openai = new OpenAI({
 
 
 
+app.get("/", (req, res) => {
+
+  res.sendFile(path.join(__dirname, "publico", "index.html"));
+
+});
+
+
+
 app.post("/chat", async (req, res) => {
 
   try {
 
     const { message } = req.body;
-
-
-
-    if (!message) {
-
-      return res.status(400).json({ error: "Falta el mensaje" });
-
-    }
 
 
 
@@ -83,15 +82,17 @@ app.post("/chat", async (req, res) => {
 
     });
 
+
+
   } catch (error) {
 
-    console.error("Error en /chat:", error);
+    console.error(error);
+
+
 
     res.status(500).json({
 
-      error: "Error interno",
-
-      details: error.message
+      reply: "Error interno"
 
     });
 
@@ -103,6 +104,6 @@ app.post("/chat", async (req, res) => {
 
 app.listen(PORT, () => {
 
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log("Servidor corriendo en puerto " + PORT);
 
 });
