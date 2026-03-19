@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,17 +21,16 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // =========================
-// HELPERS
+// HELPERS SUPABASE
 // =========================
 
 function hasSupabaseConfig() {
-return !!SUPABASE_URL && !!SUPABASE_KEY;
+return Boolean(SUPABASE_URL && SUPABASE_KEY);
 }
 
 async function saveMemory(user, message) {
 try {
 if (!hasSupabaseConfig()) {
-console.log("Faltan SUPABASE_URL o SUPABASE_KEY");
 return {
 ok: false,
 status: 500,
@@ -54,8 +54,8 @@ message: message
 
 const body = await response.text();
 
-console.log("SUPABASE STATUS:", response.status);
-console.log("SUPABASE RESPONSE:", body);
+console.log("SUPABASE SAVE STATUS:", response.status);
+console.log("SUPABASE SAVE BODY:", body);
 
 return {
 ok: response.ok,
@@ -63,7 +63,7 @@ status: response.status,
 body
 };
 } catch (error) {
-console.log("SUPABASE ERROR:", error);
+console.log("SUPABASE SAVE ERROR:", error);
 return {
 ok: false,
 status: 500,
@@ -72,7 +72,67 @@ body: String(error)
 }
 }
 
-async function callOpenAI(message) {
+async function getRecentMemory(user, limit = 8) {
+try {
+if (!hasSupabaseConfig()) {
+return [];
+}
+
+const url =
+`${SUPABASE_URL}/rest/v1/memory` +
+`?select=user_id,message,created_at` +
+`&user_id=eq.${encodeURIComponent(user)}` +
+`&order=created_at.desc` +
+`&limit=${limit}`;
+
+const response = await fetch(url, {
+method: "GET",
+headers: {
+apikey: SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`,
+"Content-Type": "application/json"
+}
+});
+
+const text = await response.text();
+
+console.log("SUPABASE READ STATUS:", response.status);
+console.log("SUPABASE READ BODY:", text);
+
+if (!response.ok) {
+return [];
+}
+
+let rows = [];
+try {
+rows = JSON.parse(text);
+} catch (e) {
+console.log("ERROR PARSEANDO MEMORIA:", e);
+return [];
+}
+
+return rows.reverse();
+} catch (error) {
+console.log("SUPABASE READ ERROR:", error);
+return [];
+}
+}
+
+function buildMemoryText(memories) {
+if (!memories || memories.length === 0) {
+return "No hay memoria previa.";
+}
+
+return memories
+.map((item) => `${item.user_id}: ${item.message}`)
+.join("\n");
+}
+
+// =========================
+// OPENAI
+// =========================
+
+async function callOpenAI(message, memoryText) {
 try {
 if (!OPENAI_API_KEY) {
 return "Falta OPENAI_API_KEY en Render.";
@@ -90,13 +150,18 @@ messages: [
 {
 role: "system",
 content:
-"Eres Pepinazo AI. Responde siempre en español, de forma útil, clara, cercana y con un toque de humor inteligente."
+"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, cercano y con humor inteligente suave. Usa la memoria previa solo si aporta valor y no inventes recuerdos."
+},
+{
+role: "system",
+content: `Memoria previa del usuario:\n${memoryText}`
 },
 {
 role: "user",
 content: message
 }
-]
+],
+temperature: 0.7
 })
 });
 
@@ -125,11 +190,12 @@ return "Error al conectar con OpenAI";
 
 app.get("/", (req, res) => {
 const indexPath = path.join(__dirname, "public", "index.html");
-res.sendFile(indexPath, (err) => {
-if (err) {
-res.send("Pepinazo AI running");
+
+if (fs.existsSync(indexPath)) {
+return res.sendFile(indexPath);
 }
-});
+
+return res.send("Pepinazo AI running");
 });
 
 app.get("/test", async (req, res) => {
@@ -142,6 +208,11 @@ return res.send("guardado");
 return res.status(500).send(`error supabase: ${result.status} - ${result.body}`);
 });
 
+app.get("/memory-test", async (req, res) => {
+const memories = await getRecentMemory("user1", 10);
+return res.json(memories);
+});
+
 app.post("/api/chat", async (req, res) => {
 try {
 const { message } = req.body;
@@ -151,11 +222,25 @@ return res.json({ reply: "Mensaje vacío" });
 }
 
 const cleanMessage = message.trim();
-const reply = await callOpenAI(cleanMessage);
+const userId = "user1";
 
-const saveResult = await saveMemory("user1", cleanMessage);
-if (!saveResult.ok) {
-console.log("No se pudo guardar memoria:", saveResult.status, saveResult.body);
+// 1. leer memoria reciente
+const memories = await getRecentMemory(userId, 8);
+const memoryText = buildMemoryText(memories);
+
+// 2. preguntar a OpenAI con memoria
+const reply = await callOpenAI(cleanMessage, memoryText);
+
+// 3. guardar mensaje usuario
+const saveUser = await saveMemory(userId, cleanMessage);
+if (!saveUser.ok) {
+console.log("No se pudo guardar mensaje del usuario:", saveUser.status, saveUser.body);
+}
+
+// 4. guardar respuesta asistente
+const saveAssistant = await saveMemory("assistant", reply);
+if (!saveAssistant.ok) {
+console.log("No se pudo guardar respuesta del asistente:", saveAssistant.status, saveAssistant.body);
 }
 
 return res.json({ reply });
