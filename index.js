@@ -2,13 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const fetch = require("node-fetch");
+const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
-const PORT = process.env.PORT || 3000;
+app.use(express.static(path.join(__dirname, "public")));
 
 // =========================
 // VARIABLES DE ENTORNO
@@ -19,14 +20,22 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // =========================
-// GUARDAR MEMORIA EN SUPABASE
+// HELPERS
 // =========================
+
+function hasSupabaseConfig() {
+return !!SUPABASE_URL && !!SUPABASE_KEY;
+}
 
 async function saveMemory(user, message) {
 try {
-if (!SUPABASE_URL || !SUPABASE_KEY) {
+if (!hasSupabaseConfig()) {
 console.log("Faltan SUPABASE_URL o SUPABASE_KEY");
-return false;
+return {
+ok: false,
+status: 500,
+body: "Faltan variables de entorno de Supabase"
+};
 }
 
 const response = await fetch(`${SUPABASE_URL}/rest/v1/memory`, {
@@ -43,21 +52,25 @@ message: message
 })
 });
 
-const data = await response.text();
+const body = await response.text();
 
 console.log("SUPABASE STATUS:", response.status);
-console.log("SUPABASE RESPONSE:", data);
+console.log("SUPABASE RESPONSE:", body);
 
-return response.ok;
+return {
+ok: response.ok,
+status: response.status,
+body
+};
 } catch (error) {
 console.log("SUPABASE ERROR:", error);
-return false;
+return {
+ok: false,
+status: 500,
+body: String(error)
+};
 }
 }
-
-// =========================
-// LLAMADA A OPENAI
-// =========================
 
 async function callOpenAI(message) {
 try {
@@ -76,7 +89,8 @@ model: "gpt-4.1-mini",
 messages: [
 {
 role: "system",
-content: "Eres Pepinazo AI. Responde siempre en español, de forma útil, clara, cercana y con un toque de humor inteligente."
+content:
+"Eres Pepinazo AI. Responde siempre en español, de forma útil, clara, cercana y con un toque de humor inteligente."
 },
 {
 role: "user",
@@ -88,8 +102,13 @@ content: message
 
 const data = await response.json();
 
+if (!response.ok) {
+console.log("OPENAI HTTP ERROR:", data);
+return "Error OpenAI";
+}
+
 if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-console.log("OPENAI ERROR:", data);
+console.log("OPENAI RESPONSE ERROR:", data);
 return "Error OpenAI";
 }
 
@@ -101,30 +120,27 @@ return "Error al conectar con OpenAI";
 }
 
 // =========================
-// RUTA RAÍZ
+// RUTAS
 // =========================
 
 app.get("/", (req, res) => {
+const indexPath = path.join(__dirname, "public", "index.html");
+res.sendFile(indexPath, (err) => {
+if (err) {
 res.send("Pepinazo AI running");
+}
+});
 });
 
-// =========================
-// TEST DE SUPABASE
-// =========================
-
 app.get("/test", async (req, res) => {
-const ok = await saveMemory("user1", "mensaje de prueba");
+const result = await saveMemory("user1", "mensaje de prueba");
 
-if (ok) {
+if (result.ok) {
 return res.send("guardado");
 }
 
-return res.send("error supabase");
+return res.status(500).send(`error supabase: ${result.status} - ${result.body}`);
 });
-
-// =========================
-// CHAT
-// =========================
 
 app.post("/api/chat", async (req, res) => {
 try {
@@ -135,20 +151,22 @@ return res.json({ reply: "Mensaje vacío" });
 }
 
 const cleanMessage = message.trim();
-
 const reply = await callOpenAI(cleanMessage);
 
-await saveMemory("user1", cleanMessage);
+const saveResult = await saveMemory("user1", cleanMessage);
+if (!saveResult.ok) {
+console.log("No se pudo guardar memoria:", saveResult.status, saveResult.body);
+}
 
 return res.json({ reply });
 } catch (error) {
 console.log("CHAT ERROR:", error);
-return res.json({ reply: "Error en servidor" });
+return res.status(500).json({ reply: "Error en servidor" });
 }
 });
 
 // =========================
-// INICIO SERVIDOR
+// START
 // =========================
 
 app.listen(PORT, () => {
