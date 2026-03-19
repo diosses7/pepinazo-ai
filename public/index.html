@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pepinazo AI</title>
-
 <style>
 body {
 font-family: Arial, sans-serif;
@@ -34,21 +33,35 @@ margin-bottom: 10px;
 align-items: center;
 }
 
+.controles label {
+font-weight: bold;
+}
+
+.controles select {
+padding: 8px;
+font-size: 14px;
+}
+
 .fila {
 display: flex;
 gap: 10px;
 }
 
-input {
+#msg {
 flex: 1;
 padding: 10px;
 font-size: 16px;
 }
 
-button {
+#btn {
 padding: 10px 16px;
 font-size: 16px;
 cursor: pointer;
+}
+
+#btn:disabled {
+opacity: 0.6;
+cursor: not-allowed;
 }
 
 .user {
@@ -66,17 +79,14 @@ margin-left: 6px;
 }
 </style>
 </head>
-
 <body>
-
 <h1>Pepinazo AI</h1>
 
 <div class="controles">
-<label>Modelo:</label>
-
+<label for="provider">Modelo:</label>
 <select id="provider">
-<option value="openai">OpenAI</option>
-<option value="perplexity">Perplexity</option>
+<option value="openai">OpenAI (GPT-4o Mini)</option>
+<option value="perplexity">Perplexity (Sonar)</option>
 </select>
 </div>
 
@@ -84,94 +94,94 @@ margin-left: 6px;
 
 <div class="fila">
 <input id="msg" placeholder="Escribe mensaje" />
-<button onclick="enviar()">Enviar</button>
+<button id="btn" type="button" onclick="enviar()">Enviar</button>
 </div>
 
-
 <script>
+function agregarMensaje(tipo, autor, texto, etiqueta) {
+const chat = document.getElementById("chat");
+const div = document.createElement("div");
+div.className = tipo;
 
-function agregar(tipo, autor, texto) {
+const strong = document.createElement("strong");
+strong.textContent = autor + ": ";
 
-const chat = document.getElementById("chat")
+const span = document.createElement("span");
+span.textContent = texto;
 
-const div = document.createElement("div")
+div.appendChild(strong);
 
-div.className = tipo
-
-div.innerHTML = "<b>" + autor + ":</b><br>" + texto
-
-chat.appendChild(div)
-
-chat.scrollTop = chat.scrollHeight
-
+if (etiqueta) {
+const tag = document.createElement("span");
+tag.className = "provider-tag";
+tag.textContent = "[" + etiqueta + "]";
+div.appendChild(tag);
 }
 
-
+div.appendChild(document.createElement("br"));
+div.appendChild(span);
+chat.appendChild(div);
+chat.scrollTop = chat.scrollHeight;
+}
 
 async function enviar() {
+const input = document.getElementById("msg");
+const btn = document.getElementById("btn");
+const providerSelect = document.getElementById("provider");
 
-const input = document.getElementById("msg")
+const message = input.value.trim();
+const provider = providerSelect.value;
+const providerName =
+providerSelect.options[providerSelect.selectedIndex].text;
 
-const provider = document.getElementById("provider").value
+if (!message) return;
 
-const message = input.value.trim()
-
-if (!message) return
-
-
-
-agregar("user", "Tú", message)
-
-input.value = ""
-
+agregarMensaje("user", "Tú", message);
+input.value = "";
+input.disabled = true;
+btn.disabled = true;
+btn.textContent = "Enviando...";
 
 try {
-
 const r = await fetch("/api/chat", {
-
 method: "POST",
-
 headers: {
-
 "Content-Type": "application/json"
-
 },
+body: JSON.stringify({ message, provider })
+});
 
-body: JSON.stringify({
+const data = await r.json();
 
-message,
-
-provider
-
-})
-
-})
-
-
-const data = await r.json()
-
-
-agregar("bot", "Pepinazo", data.reply)
-
-
-} catch (e) {
-
-agregar("bot", "Error", "No se pudo conectar con el servidor")
-
+if (!r.ok) {
+throw new Error(data.reply || "Error del servidor");
 }
 
+agregarMensaje(
+"bot",
+"Pepinazo",
+data.reply || "Sin respuesta",
+providerName
+);
+} catch (error) {
+agregarMensaje(
+"bot",
+"Error",
+error.message || "No se pudo conectar con el servidor."
+);
+} finally {
+input.disabled = false;
+btn.disabled = false;
+btn.textContent = "Enviar";
+input.focus();
+}
 }
 
-
-document
-.getElementById("msg")
-.addEventListener("keydown", e => {
-
-if (e.key === "Enter") enviar()
-
-})
-
+document.getElementById("msg").addEventListener("keydown", function (event) {
+if (event.key === "Enter") {
+enviar();
+}
+});
 </script>
-
 </body>
 </html>
