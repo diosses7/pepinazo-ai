@@ -11,17 +11,13 @@ const PORT = process.env.PORT || 3000;
 
 
 // =========================
-// SUPABASE CONFIG
+// SUPABASE
 // =========================
 
 const SUPABASE_URL = "https://ccgiqdhssnveaalbnrlh.supabase.co";
 
-const SUPABASE_KEY = "sb_publishable_REEMPLAZAR_POR_TU_KEY";
+const SUPABASE_KEY = "sb_publishable_REEMPLAZAR";
 
-
-// =========================
-// GUARDAR MEMORIA
-// =========================
 
 async function saveMemory(user, message) {
 
@@ -43,7 +39,7 @@ message: message
 
 } catch (err) {
 
-console.log("Error guardando memoria", err);
+console.log(err);
 
 }
 
@@ -69,10 +65,7 @@ Authorization: `Bearer ${apiKey}`,
 body: JSON.stringify({
 model: "gpt-4.1-mini",
 messages: [
-{
-role: "user",
-content: message
-}
+{ role: "user", content: message }
 ]
 })
 }
@@ -80,18 +73,24 @@ content: message
 
 const data = await response.json();
 
-if (!data.choices) {
-console.log(data);
-return "Error OpenAI";
-}
-
 return data.choices[0].message.content;
 
 }
 
 
 // =========================
-// CHAT API
+// ROOT
+// =========================
+
+app.get("/", (req, res) => {
+
+res.send("Pepinazo AI running");
+
+});
+
+
+// =========================
+// CHAT
 // =========================
 
 app.post("/api/chat", async (req, res) => {
@@ -99,10 +98,6 @@ app.post("/api/chat", async (req, res) => {
 try {
 
 const { message } = req.body;
-
-if (!message) {
-return res.json({ reply: "Mensaje vacío" });
-}
 
 const reply = await callOpenAI(message);
 
@@ -112,11 +107,7 @@ res.json({ reply });
 
 } catch (err) {
 
-console.log(err);
-
-res.json({
-reply: "Error en servidor"
-});
+res.json({ reply: "Error" });
 
 }
 
@@ -124,11 +115,9 @@ reply: "Error en servidor"
 
 
 // =========================
-// START
-// =========================
 
 app.listen(PORT, () => {
 
-console.log("Server running on port", PORT);
+console.log("Server running");
 
 });
