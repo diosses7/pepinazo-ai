@@ -83,8 +83,19 @@ return data.choices[0].message.content;
 // =========================
 
 app.get("/", (req, res) => {
-
 res.send("Pepinazo AI running");
+});
+
+
+// =========================
+// TEST
+// =========================
+
+app.get("/test", async (req, res) => {
+
+await saveMemory("user1", "mensaje de prueba");
+
+res.send("guardado");
 
 });
 
@@ -114,10 +125,6 @@ res.json({ reply: "Error" });
 });
 
 
-// =========================
-
 app.listen(PORT, () => {
-
 console.log("Server running");
-
 });
