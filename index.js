@@ -1,186 +1,134 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
-const axios = require("axios");
-require("dotenv").config();
+const fetch = require("node-fetch");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Memoria simple en RAM
-// Guarda la conversación actual mientras el servidor siga encendido.
-// Si Render reinicia o redeploya, esta memoria se borra.
-let conversationHistory = [];
-
-// Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-// Ruta raíz
-app.get("/", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+const PORT = process.env.PORT || 3000;
 
-// Health check
-app.get("/health", (req, res) => {
-res.json({ ok: true, message: "Pepinazo AI funcionando" });
-});
 
-// Ruta principal de chat
-app.post("/api/chat", async (req, res) => {
+// =========================
+// SUPABASE CONFIG
+// =========================
+
+const SUPABASE_URL = "https://ccgiqdhssnveaalbnrlh.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_REEMPLAZAR_POR_TU_KEY";
+
+
+// =========================
+// GUARDAR MEMORIA
+// =========================
+
+async function saveMemory(user, message) {
+
 try {
-const { message, provider } = req.body;
 
-if (!message || typeof message !== "string" || !message.trim()) {
-return res.status(400).json({ reply: "Mensaje inválido." });
-}
-
-const cleanMessage = message.trim();
-const selectedProvider = (provider || "openai").toLowerCase().trim();
-
-// Permite reiniciar memoria escribiendo /reset
-if (cleanMessage === "/reset") {
-conversationHistory = [];
-return res.json({ reply: "Memoria reiniciada. Partimos de cero, como proyecto estatal en año electoral." });
-}
-
-// Guardar mensaje del usuario en memoria
-conversationHistory.push({
-role: "user",
-content: cleanMessage
+await fetch(`${SUPABASE_URL}/rest/v1/memory`, {
+method: "POST",
+headers: {
+apikey: SUPABASE_KEY,
+Authorization: `Bearer ${SUPABASE_KEY}`,
+"Content-Type": "application/json",
+Prefer: "return=minimal"
+},
+body: JSON.stringify({
+user_id: user,
+message: message
+})
 });
 
-// Limitar memoria para no crecer infinito
-// 1 mensaje del usuario + 1 del asistente = 2 entradas aprox por turno
-if (conversationHistory.length > 20) {
-conversationHistory = conversationHistory.slice(-20);
+} catch (err) {
+
+console.log("Error guardando memoria", err);
+
 }
 
-// -----------------------------
-// Proveedor: OpenAI
-// -----------------------------
-if (selectedProvider === "openai") {
+}
+
+
+// =========================
+// OPENAI
+// =========================
+
+async function callOpenAI(message) {
+
 const apiKey = process.env.OPENAI_API_KEY;
 
-if (!apiKey) {
-return res.status(500).json({
-reply: "Falta configurar OPENAI_API_KEY en Render."
-});
-}
-
-const response = await axios.post(
+const response = await fetch(
 "https://api.openai.com/v1/chat/completions",
 {
+method: "POST",
+headers: {
+Authorization: `Bearer ${apiKey}`,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
 model: "gpt-4.1-mini",
 messages: [
 {
-role: "system",
-content:
-"Eres Pepinazo AI. Responde siempre en español. Tu estilo es claro, directo, útil, cercano, con humor inteligente y un toque de ironía elegante. No seas pesado ni exagerado. Explica simple, pero con personalidad. Si el usuario pide algo técnico, sé preciso. Si el usuario conversa, responde natural y cálido. Ayudas a crear negocios, analizar inversiones, construir sistemas y tomar decisiones inteligentes. Nunca digas que eres un asistente genérico. Tu nombre es Pepinazo."
-},
-...conversationHistory
-],
-temperature: 0.7
-},
-{
-headers: {
-Authorization: `Bearer ${apiKey}`,
-"Content-Type": "application/json"
-},
-timeout: 30000
+role: "user",
+content: message
 }
-);
-
-const reply =
-response.data?.choices?.[0]?.message?.content?.trim() ||
-"OpenAI no devolvió respuesta.";
-
-// Guardar respuesta del asistente en memoria
-conversationHistory.push({
-role: "assistant",
-content: reply
-});
-
-if (conversationHistory.length > 20) {
-conversationHistory = conversationHistory.slice(-20);
-}
-
-return res.json({ reply });
-}
-
-// -----------------------------
-// Proveedor: Perplexity
-// -----------------------------
-if (selectedProvider === "perplexity") {
-const apiKey = process.env.PERPLEXITY_API_KEY;
-
-if (!apiKey) {
-return res.status(500).json({
-reply: "Falta configurar PERPLEXITY_API_KEY en Render."
-});
-}
-
-const response = await axios.post(
-"https://api.perplexity.ai/chat/completions",
-{
-model: "sonar",
-messages: [
-{
-role: "system",
-content:
-"Eres Pepinazo AI. Responde siempre en español, de forma clara, útil, directa y con humor inteligente. Mantén contexto de la conversación y responde como un socio estratégico, no como chatbot genérico."
-},
-...conversationHistory
 ]
-},
-{
-headers: {
-Authorization: `Bearer ${apiKey}`,
-"Content-Type": "application/json"
-},
-timeout: 30000
+})
 }
 );
 
-const reply =
-response.data?.choices?.[0]?.message?.content?.trim() ||
-"Perplexity no devolvió respuesta.";
+const data = await response.json();
 
-// Guardar respuesta del asistente en memoria
-conversationHistory.push({
-role: "assistant",
-content: reply
-});
-
-if (conversationHistory.length > 20) {
-conversationHistory = conversationHistory.slice(-20);
+if (!data.choices) {
+console.log(data);
+return "Error OpenAI";
 }
 
-return res.json({ reply });
+return data.choices[0].message.content;
+
 }
 
-return res.status(400).json({
-reply: "Proveedor no soportado. Usa 'openai' o 'perplexity'."
-});
-} catch (error) {
-console.error(
-"Error en /api/chat:",
-error.response?.data || error.message || error
-);
 
-const apiError =
-error.response?.data?.error?.message ||
-error.response?.data?.message ||
-"Error interno del servidor.";
+// =========================
+// CHAT API
+// =========================
 
-return res.status(500).json({
-reply: `Error: ${apiError}`
-});
+app.post("/api/chat", async (req, res) => {
+
+try {
+
+const { message } = req.body;
+
+if (!message) {
+return res.json({ reply: "Mensaje vacío" });
 }
+
+const reply = await callOpenAI(message);
+
+await saveMemory("user1", message);
+
+res.json({ reply });
+
+} catch (err) {
+
+console.log(err);
+
+res.json({
+reply: "Error en servidor"
 });
 
-// Levantar servidor
+}
+
+});
+
+
+// =========================
+// START
+// =========================
+
 app.listen(PORT, () => {
-console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+
+console.log("Server running on port", PORT);
+
 });
