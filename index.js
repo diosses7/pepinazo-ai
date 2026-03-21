@@ -1,21 +1,22 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const fetch = require("node-fetch");
 const path = require("path");
 const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// =========================
+// MIDDLEWARES
+// =========================
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // =========================
 // VARIABLES DE ENTORNO
 // =========================
-
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -23,47 +24,54 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY;
 // =========================
 // HELPERS
 // =========================
-
 function hasSupabaseConfig() {
 return Boolean(SUPABASE_URL && SUPABASE_KEY);
+}
+
+function safeJsonParse(text, fallback = null) {
+try {
+return JSON.parse(text);
+} catch {
+return fallback;
+}
+}
+
+function normalizeText(value) {
+return String(value || "").trim();
 }
 
 // =========================
 // FILTROS DE MEMORIA
 // =========================
-
 function shouldSaveMemory(message) {
-if (!message) return false;
+const text = normalizeText(message).toLowerCase();
+if (!text) return false;
+if (text.length < 12) return false;
 
-const text = message.toLowerCase().trim();
-
-const blacklist = [
+const exactBlacklist = new Set([
 "hola",
 "ok",
+"oki",
 "gracias",
 "jaj",
+"jaja",
 "jeje",
-"test",
-"probando",
-"123",
 "hi",
 "hello",
-"👍"
-];
+"👍",
+"👌",
+"dale"
+]);
 
-if (text.length < 15) return false;
-
-for (const word of blacklist) {
-if (text.includes(word)) return false;
-}
+if (exactBlacklist.has(text)) return false;
 
 return true;
 }
 
 function shouldSaveLongMemory(message) {
-if (!message) return false;
-
-const text = message.toLowerCase().trim();
+const text = normalizeText(message).toLowerCase();
+if (!text) return false;
+if (text.length < 20) return false;
 
 const keywords = [
 "quiero",
@@ -71,42 +79,35 @@ const keywords = [
 "recordar",
 "importante",
 "objetivo",
-"config",
-"configuracion",
-"configuración",
-"decisión",
-"decision",
-"usar",
-"proyecto",
+"configurar",
 "regla",
-"guardar",
-"no guardar",
 "preferencia",
 "siempre",
 "nunca",
 "desde ahora",
-"pepínazo",
 "pepinazo",
 "memoria",
 "supabase",
 "openai",
-"perplexity"
+"perplexity",
+"claude",
+"proyecto",
+"app",
+"inversion",
+"inversión",
+"estrategia",
+"roadmap",
+"guardar esto",
+"guarda esto"
 ];
 
-if (text.length < 20) return false;
-
-for (const k of keywords) {
-if (text.includes(k)) return true;
-}
-
-return false;
+return keywords.some((k) => text.includes(k));
 }
 
 // =========================
-// SUPABASE SAVE
+// SUPABASE - INSERTAR
 // =========================
-
-async function insertRow(table, user, message) {
+async function insertRow(table, userId, message) {
 try {
 if (!hasSupabaseConfig()) {
 return {
@@ -125,15 +126,15 @@ Authorization: `Bearer ${SUPABASE_KEY}`,
 Prefer: "return=representation"
 },
 body: JSON.stringify({
-user_id: user,
-message: message
+user_id: userId,
+message
 })
 });
 
 const body = await response.text();
 
-console.log(`SUPABASE INSERT ${table} STATUS:`, response.status);
-console.log(`SUPABASE INSERT ${table} BODY:`, body);
+console.log(`INSERT SUPABASE ${table} STATUS:`, response.status);
+console.log(`INSERT SUPABASE ${table} BODY:`, body);
 
 return {
 ok: response.ok,
@@ -141,7 +142,7 @@ status: response.status,
 body
 };
 } catch (error) {
-console.log(`SUPABASE INSERT ${table} ERROR:`, error);
+console.log(`INSERT SUPABASE ${table} ERROR:`, error);
 return {
 ok: false,
 status: 500,
@@ -150,36 +151,33 @@ body: String(error)
 }
 }
 
-async function saveMemory(user, message) {
+async function saveMemory(userId, message) {
 if (!shouldSaveMemory(message)) {
-console.log("NO SE GUARDA EN memory:", message);
+console.log("NO SE GUARDA EN memoria:", message);
 return { ok: true, skipped: true };
 }
-
-return insertRow("memory", user, message);
+return insertRow("memoria", userId, message);
 }
 
-async function saveLongMemory(user, message) {
+async function saveLongMemory(userId, message) {
 if (!shouldSaveLongMemory(message)) {
-console.log("NO SE GUARDA EN memory_long:", message);
+console.log("NO SE GUARDA EN memoria_larga:", message);
 return { ok: true, skipped: true };
 }
-
-return insertRow("memory_long", user, message);
+return insertRow("memoria_larga", userId, message);
 }
 
 // =========================
-// SUPABASE READ
+// SUPABASE - LEER
 // =========================
-
-async function readTable(table, user, limit = 8) {
+async function readTable(table, userId, limit = 8) {
 try {
 if (!hasSupabaseConfig()) return [];
 
 const url =
 `${SUPABASE_URL}/rest/v1/${table}` +
 `?select=user_id,message,created_at` +
-`&user_id=eq.${encodeURIComponent(user)}` +
+`&user_id=eq.${encodeURIComponent(userId)}` +
 `&order=created_at.desc` +
 `&limit=${limit}`;
 
@@ -194,51 +192,48 @@ Authorization: `Bearer ${SUPABASE_KEY}`,
 
 const text = await response.text();
 
-console.log(`SUPABASE READ ${table} STATUS:`, response.status);
-console.log(`SUPABASE READ ${table} BODY:`, text);
+console.log(`READ SUPABASE ${table} STATUS:`, response.status);
+console.log(`READ SUPABASE ${table} BODY:`, text);
 
-if (!response.ok) {
-return [];
-}
+if (!response.ok) return [];
 
-const rows = JSON.parse(text);
-return rows.reverse();
+const rows = safeJsonParse(text, []);
+return Array.isArray(rows) ? rows.reverse() : [];
 } catch (error) {
-console.log(`SUPABASE READ ${table} ERROR:`, error);
+console.log(`READ SUPABASE ${table} ERROR:`, error);
 return [];
 }
 }
 
-async function getRecentMemory(user, limit = 8) {
-return readTable("memory", user, limit);
+async function getRecentMemory(userId, limit = 8) {
+return readTable("memoria", userId, limit);
 }
 
-async function getLongMemory(user, limit = 8) {
-return readTable("memory_long", user, limit);
+async function getLongMemory(userId, limit = 8) {
+return readTable("memoria_larga", userId, limit);
 }
 
 function buildMemoryText(shortMemories, longMemories) {
-const shortText = shortMemories.length
-? shortMemories.map((m) => `${m.user_id}: ${m.message}`).join("\n")
-: "Sin memoria reciente.";
-
 const longText = longMemories.length
-? longMemories.map((m) => `${m.user_id}: ${m.message}`).join("\n")
+? longMemories.map((row) => row.message).join("\n")
 : "Sin memoria importante.";
 
-return `
-MEMORIA IMPORTANTE:
-${longText}
+const shortText = shortMemories.length
+? shortMemories.map((row) => row.message).join("\n")
+: "Sin memoria reciente.";
 
-MEMORIA RECIENTE:
-${shortText}
-`.trim();
+return [
+"MEMORIA IMPORTANTE:",
+longText,
+"",
+"MEMORIA RECIENTE:",
+shortText
+].join("\n");
 }
 
 // =========================
 // OPENAI
 // =========================
-
 async function callOpenAI(message, memoryText) {
 try {
 if (!OPENAI_API_KEY) {
@@ -255,12 +250,12 @@ body: JSON.stringify({
 model: "gpt-4.1-mini",
 messages: [
 {
-role: "system",
+role: "developer",
 content:
-"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, cercano y con humor inteligente suave. Usa la memoria solo si aporta valor y no inventes recuerdos."
+"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
 },
 {
-role: "system",
+role: "developer",
 content: memoryText
 },
 {
@@ -272,29 +267,38 @@ temperature: 0.7
 })
 });
 
-const data = await response.json();
+const rawText = await response.text();
+
+console.log("OPENAI STATUS:", response.status);
+console.log("OPENAI BODY:", rawText);
+
+const data = safeJsonParse(rawText, {});
 
 if (!response.ok) {
-console.log("OPENAI HTTP ERROR:", data);
-return "Error OpenAI";
+const apiError =
+data?.error?.message ||
+rawText ||
+"Error desconocido al consultar OpenAI.";
+return `Error OpenAI: ${apiError}`;
 }
 
-if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-console.log("OPENAI RESPONSE ERROR:", data);
-return "Error OpenAI";
+const content = data?.choices?.[0]?.message?.content;
+
+if (!content || !String(content).trim()) {
+console.log("OPENAI EMPTY CONTENT:", data);
+return "Error OpenAI: respuesta vacía.";
 }
 
-return data.choices[0].message.content;
+return String(content).trim();
 } catch (error) {
-console.log("OPENAI FETCH ERROR:", error);
-return "Error al conectar con OpenAI";
+console.log("ERROR CON OPENAI:", error);
+return "Error al conectar con OpenAI.";
 }
 }
 
 // =========================
 // RUTAS
 // =========================
-
 app.get("/", (req, res) => {
 const indexPath = path.join(__dirname, "public", "index.html");
 
@@ -302,11 +306,20 @@ if (fs.existsSync(indexPath)) {
 return res.sendFile(indexPath);
 }
 
-return res.send("Pepinazo AI running");
+return res.send("Pepinazo AI en funcionamiento");
 });
 
-app.get("/test", async (req, res) => {
-const result = await saveMemory("user1", "mensaje de prueba importante");
+app.get("/health", (req, res) => {
+return res.json({
+ok: true,
+service: "pepinazo-ai",
+openai_configured: Boolean(OPENAI_API_KEY),
+supabase_configured: hasSupabaseConfig()
+});
+});
+
+app.get("/prueba", async (req, res) => {
+const result = await saveMemory("usuario1", "USER: mensaje de prueba importante");
 
 if (result.ok) {
 return res.send("guardado");
@@ -315,64 +328,75 @@ return res.send("guardado");
 return res.status(500).send(`error supabase: ${result.status} - ${result.body}`);
 });
 
-app.get("/memory-test", async (req, res) => {
-const shortMemories = await getRecentMemory("user1", 20);
-const longMemories = await getLongMemory("user1", 20);
+app.get("/prueba-de-memoria", async (req, res) => {
+const shortMemories = await getRecentMemory("usuario1", 20);
+const longMemories = await getLongMemory("usuario1", 20);
 
 return res.json({
-memory: shortMemories,
-memory_long: longMemories
+memoria: shortMemories,
+memoria_larga: longMemories
 });
 });
 
 app.post("/api/chat", async (req, res) => {
 try {
-const { message } = req.body;
+const { message } = req.body || {};
 
-if (!message || !message.trim()) {
-return res.json({ reply: "Mensaje vacío" });
+if (!message || !String(message).trim()) {
+return res.json({ reply: "Mensaje vacío." });
 }
 
-const cleanMessage = message.trim();
-const userId = "user1";
+const cleanMessage = String(message).trim();
+const userId = "usuario1";
 
-// 1. Leer memorias
+// 1) Leer memoria
 const shortMemories = await getRecentMemory(userId, 8);
 const longMemories = await getLongMemory(userId, 8);
 const memoryText = buildMemoryText(shortMemories, longMemories);
 
-// 2. Obtener respuesta
+// 2) Obtener respuesta del modelo
 const reply = await callOpenAI(cleanMessage, memoryText);
 
-// 3. Guardar mensaje del usuario en memoria corta
-const saveUserShort = await saveMemory(userId, cleanMessage);
+// 3) Guardar mensaje usuario en memoria corta
+const saveUserShort = await saveMemory(userId, `USER: ${cleanMessage}`);
 if (!saveUserShort.ok) {
-console.log("No se pudo guardar user en memory:", saveUserShort.status, saveUserShort.body);
+console.log(
+"No se pudo guardar usuario en memoria corta:",
+saveUserShort.status,
+saveUserShort.body
+);
 }
 
-// 4. Guardar mensaje del usuario en memoria larga si aplica
+// 4) Guardar mensaje usuario en memoria larga si aplica
 const saveUserLong = await saveLongMemory(userId, cleanMessage);
 if (!saveUserLong.ok) {
-console.log("No se pudo guardar user en memory_long:", saveUserLong.status, saveUserLong.body);
+console.log(
+"No se pudo guardar usuario en memoria larga:",
+saveUserLong.status,
+saveUserLong.body
+);
 }
 
-// 5. Guardar respuesta del asistente en memoria corta
-const saveAssistantShort = await saveMemory("assistant", reply);
+// 5) Guardar respuesta asistente en memoria corta
+const saveAssistantShort = await saveMemory(userId, `ASSISTANT: ${reply}`);
 if (!saveAssistantShort.ok) {
-console.log("No se pudo guardar assistant en memory:", saveAssistantShort.status, saveAssistantShort.body);
+console.log(
+"No se pudo guardar asistente en memoria corta:",
+saveAssistantShort.status,
+saveAssistantShort.body
+);
 }
 
 return res.json({ reply });
 } catch (error) {
-console.log("CHAT ERROR:", error);
-return res.status(500).json({ reply: "Error en servidor" });
+console.log("ERROR DE CHAT:", error);
+return res.status(500).json({ reply: "Error en servidor." });
 }
 });
 
 // =========================
 // START
 // =========================
-
 app.listen(PORT, () => {
-console.log(`Server running on port ${PORT}`);
+console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
