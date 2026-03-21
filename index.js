@@ -156,6 +156,7 @@ if (!shouldSaveMemory(message)) {
 console.log("NO SE GUARDA EN memoria:", message);
 return { ok: true, skipped: true };
 }
+
 return insertRow("memoria", userId, message);
 }
 
@@ -164,6 +165,7 @@ if (!shouldSaveLongMemory(message)) {
 console.log("NO SE GUARDA EN memoria_larga:", message);
 return { ok: true, skipped: true };
 }
+
 return insertRow("memoria_larga", userId, message);
 }
 
@@ -252,7 +254,7 @@ messages: [
 {
 role: "system",
 content:
-"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
+"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Usa la memoria proporcionada cuando exista. No digas que no tienes memoria si el contexto incluye memoria reciente o importante. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
 },
 {
 role: "system",
@@ -319,7 +321,10 @@ supabase_configured: hasSupabaseConfig()
 });
 
 app.get("/prueba", async (req, res) => {
-const result = await saveMemory("usuario1", "mensaje de prueba importante");
+const result = await saveMemory(
+"usuario1",
+"guarda esto prueba memoria nueva numero 12345 importante"
+);
 
 if (result.ok) {
 return res.send("guardado");
@@ -349,15 +354,7 @@ return res.json({ reply: "Mensaje vacío." });
 const cleanMessage = String(message).trim();
 const userId = "usuario1";
 
-// 1) Leer memoria
-const shortMemories = await getRecentMemory(userId, 8);
-const longMemories = await getLongMemory(userId, 8);
-const memoryText = buildMemoryText(shortMemories, longMemories);
-
-// 2) Obtener respuesta del modelo
-const reply = await callOpenAI(cleanMessage, memoryText);
-
-// 3) Guardar mensaje usuario en memoria corta
+// 1) Guardar primero el mensaje del usuario
 const saveUserShort = await saveMemory(userId, cleanMessage);
 if (!saveUserShort.ok) {
 console.log(
@@ -367,7 +364,6 @@ saveUserShort.body
 );
 }
 
-// 4) Guardar mensaje usuario en memoria larga si aplica
 const saveUserLong = await saveLongMemory(userId, cleanMessage);
 if (!saveUserLong.ok) {
 console.log(
@@ -377,7 +373,18 @@ saveUserLong.body
 );
 }
 
-// 5) Guardar respuesta asistente en memoria corta
+// 2) Leer memoria actualizada
+const shortMemories = await getRecentMemory(userId, 8);
+const longMemories = await getLongMemory(userId, 8);
+const memoryText = buildMemoryText(shortMemories, longMemories);
+
+console.log("MEMORY TEXT ENVIADO A OPENAI:");
+console.log(memoryText);
+
+// 3) Obtener respuesta del modelo
+const reply = await callOpenAI(cleanMessage, memoryText);
+
+// 4) Guardar respuesta asistente en memoria corta
 const saveAssistantShort = await saveMemory("asistente", reply);
 if (!saveAssistantShort.ok) {
 console.log(
