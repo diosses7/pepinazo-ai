@@ -57,10 +57,11 @@ return typeof value === "string" && value.trim().length > 0;
 // =========================
 function shouldSaveMemory(message) {
 const text = normalizeText(message).toLowerCase();
-if (!text) return false;
-if (text.length < 12) return false;
 
-const exactBlacklist = new Set([
+if (!text) return false;
+if (text.length < 15) return false;
+
+const blacklist = new Set([
 "hola",
 "ok",
 "oki",
@@ -72,22 +73,29 @@ const exactBlacklist = new Set([
 "hello",
 "👍",
 "👌",
-"dale"
+"dale",
+"si",
+"sí",
+"no",
+"bien",
+"perfecto"
 ]);
 
-if (exactBlacklist.has(text)) return false;
+if (blacklist.has(text)) return false;
+
 return true;
 }
 
 function shouldSaveLongMemory(message) {
 const text = normalizeText(message).toLowerCase();
+
 if (!text) return false;
 if (text.length < 20) return false;
 
 const blockedTopics = [
-"llover",
-"lluvia",
 "clima",
+"lluvia",
+"llover",
 "tiempo",
 "temperatura",
 "pronóstico",
@@ -101,25 +109,30 @@ return false;
 const keywords = [
 "guarda esto",
 "guardar esto",
+"recuerda",
 "recuerda esto",
-"desde ahora",
 "importante",
+"desde ahora",
+"mi nombre",
 "objetivo",
-"configurar",
+"configuración",
+"configuracion",
 "regla",
 "preferencia",
 "siempre",
 "nunca",
+"proyecto",
 "pepinazo",
 "memoria",
+"estrategia",
+"plan",
+"meta",
+"roadmap",
+"app",
 "supabase",
 "openai",
-"perplexity",
 "claude",
-"proyecto",
-"app",
-"estrategia",
-"roadmap"
+"perplexity"
 ];
 
 return keywords.some((k) => text.includes(k));
@@ -356,7 +369,9 @@ if (result.ok) {
 return res.send("guardado");
 }
 
-return res.status(500).send(`Error de Supabase: ${result.status} - ${result.body}`);
+return res
+.status(500)
+.send(`Error de Supabase: ${result.status} - ${result.body}`);
 });
 
 app.get("/prueba-de-memoria", async (req, res) => {
