@@ -64,7 +64,6 @@ const exactBlacklist = new Set([
 ]);
 
 if (exactBlacklist.has(text)) return false;
-
 return true;
 }
 
@@ -107,7 +106,7 @@ return keywords.some((k) => text.includes(k));
 // =========================
 // SUPABASE - INSERTAR
 // =========================
-async function insertRow(table, userId, message) {
+async function insertRow(table, idUsuario, mensaje) {
 try {
 if (!hasSupabaseConfig()) {
 return {
@@ -126,8 +125,8 @@ Authorization: `Bearer ${SUPABASE_KEY}`,
 Prefer: "return=representation"
 },
 body: JSON.stringify({
-user_id: userId,
-message
+id_usuario: idUsuario,
+mensaje
 })
 });
 
@@ -151,35 +150,35 @@ body: String(error)
 }
 }
 
-async function saveMemory(userId, message) {
-if (!shouldSaveMemory(message)) {
-console.log("NO SE GUARDA EN memoria:", message);
+async function saveMemory(idUsuario, mensaje) {
+if (!shouldSaveMemory(mensaje)) {
+console.log("NO SE GUARDA EN memoria:", mensaje);
 return { ok: true, skipped: true };
 }
 
-return insertRow("memoria", userId, message);
+return insertRow("memoria", idUsuario, mensaje);
 }
 
-async function saveLongMemory(userId, message) {
-if (!shouldSaveLongMemory(message)) {
-console.log("NO SE GUARDA EN memoria_larga:", message);
+async function saveLongMemory(idUsuario, mensaje) {
+if (!shouldSaveLongMemory(mensaje)) {
+console.log("NO SE GUARDA EN memoria_larga:", mensaje);
 return { ok: true, skipped: true };
 }
 
-return insertRow("memoria_larga", userId, message);
+return insertRow("memoria_larga", idUsuario, mensaje);
 }
 
 // =========================
 // SUPABASE - LEER
 // =========================
-async function readTable(table, userId, limit = 8) {
+async function readTable(table, idUsuario, limit = 8) {
 try {
 if (!hasSupabaseConfig()) return [];
 
 const url =
 `${SUPABASE_URL}/rest/v1/${table}` +
-`?select=id,user_id,message,created_at` +
-`&user_id=eq.${encodeURIComponent(userId)}` +
+`?select=id,id_usuario,mensaje,created_at` +
+`&id_usuario=eq.${encodeURIComponent(idUsuario)}` +
 `&order=created_at.desc` +
 `&limit=${limit}`;
 
@@ -207,21 +206,21 @@ return [];
 }
 }
 
-async function getRecentMemory(userId, limit = 8) {
-return readTable("memoria", userId, limit);
+async function getRecentMemory(idUsuario, limit = 8) {
+return readTable("memoria", idUsuario, limit);
 }
 
-async function getLongMemory(userId, limit = 8) {
-return readTable("memoria_larga", userId, limit);
+async function getLongMemory(idUsuario, limit = 8) {
+return readTable("memoria_larga", idUsuario, limit);
 }
 
 function buildMemoryText(shortMemories, longMemories) {
 const longText = longMemories.length
-? longMemories.map((row) => row.message).join("\n")
+? longMemories.map((row) => row.mensaje).join("\n")
 : "Sin memoria importante.";
 
 const shortText = shortMemories.length
-? shortMemories.map((row) => row.message).join("\n")
+? shortMemories.map((row) => row.mensaje).join("\n")
 : "Sin memoria reciente.";
 
 return [
@@ -254,7 +253,7 @@ messages: [
 {
 role: "system",
 content:
-"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Usa la memoria proporcionada cuando exista. No digas que no tienes memoria si el contexto incluye memoria reciente o importante. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
+"Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Usa la memoria proporcionada cuando exista. Si hay memoria reciente o importante, úsala de forma concreta. No inventes recuerdos que no estén en el contexto. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
 },
 {
 role: "system",
@@ -273,6 +272,7 @@ const rawText = await response.text();
 
 console.log("OPENAI STATUS:", response.status);
 console.log("OPENAI BODY:", rawText);
+console.log("MEMORY TEXT ENVIADO A OPENAI:", memoryText);
 
 const data = safeJsonParse(rawText, {});
 
@@ -354,7 +354,7 @@ return res.json({ reply: "Mensaje vacío." });
 const cleanMessage = String(message).trim();
 const userId = "usuario1";
 
-// 1) Guardar primero el mensaje del usuario
+// 1. Guardar primero el mensaje del usuario
 const saveUserShort = await saveMemory(userId, cleanMessage);
 if (!saveUserShort.ok) {
 console.log(
@@ -373,19 +373,16 @@ saveUserLong.body
 );
 }
 
-// 2) Leer memoria actualizada
+// 2. Leer memoria actualizada
 const shortMemories = await getRecentMemory(userId, 8);
 const longMemories = await getLongMemory(userId, 8);
 const memoryText = buildMemoryText(shortMemories, longMemories);
 
-console.log("MEMORY TEXT ENVIADO A OPENAI:");
-console.log(memoryText);
-
-// 3) Obtener respuesta del modelo
+// 3. Llamar a OpenAI con memoria ya actualizada
 const reply = await callOpenAI(cleanMessage, memoryText);
 
-// 4) Guardar respuesta asistente en memoria corta
-const saveAssistantShort = await saveMemory("asistente", reply);
+// 4. Guardar respuesta del asistente en memoria corta
+const saveAssistantShort = await saveMemory(userId, `ASISTENTE: ${reply}`);
 if (!saveAssistantShort.ok) {
 console.log(
 "No se pudo guardar asistente en memoria corta:",
