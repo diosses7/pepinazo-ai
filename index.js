@@ -48,6 +48,10 @@ function normalizeText(value) {
 return String(value || "").trim();
 }
 
+function isNonEmptyString(value) {
+return typeof value === "string" && value.trim().length > 0;
+}
+
 // =========================
 // FILTROS DE MEMORIA
 // =========================
@@ -80,7 +84,6 @@ const text = normalizeText(message).toLowerCase();
 if (!text) return false;
 if (text.length < 20) return false;
 
-// Evita guardar consultas temporales como memoria importante
 const blockedTopics = [
 "llover",
 "lluvia",
@@ -305,12 +308,12 @@ return `Error OpenAI: ${apiError}`;
 
 const content = data?.choices?.[0]?.message?.content;
 
-if (!content || !String(content).trim()) {
+if (!isNonEmptyString(content)) {
 console.log("OPENAI EMPTY CONTENT:", data);
 return "Error OpenAI: respuesta vacía.";
 }
 
-return String(content).trim();
+return content.trim();
 } catch (error) {
 console.log("ERROR CON OPENAI:", error);
 return "Error al conectar con OpenAI.";
@@ -370,14 +373,14 @@ app.post("/api/chat", async (req, res) => {
 try {
 const { message } = req.body || {};
 
-if (!message || !String(message).trim()) {
-return res.json({ reply: "Mensaje vacío." });
+if (!isNonEmptyString(message)) {
+return res.status(400).json({ reply: "Mensaje vacío." });
 }
 
-const cleanMessage = String(message).trim();
+const cleanMessage = message.trim();
 const userId = "usuario1";
 
-// 1) Guardar primero el mensaje del usuario
+// 1) Guardar mensaje del usuario
 const saveUserShort = await saveMemory(userId, cleanMessage);
 if (!saveUserShort.ok) {
 console.log(
@@ -401,10 +404,10 @@ const shortMemories = await getRecentMemory(userId, 8);
 const longMemories = await getLongMemory(userId, 8);
 const memoryText = buildMemoryText(shortMemories, longMemories);
 
-// 3) Consultar OpenAI
+// 3) Consultar OpenAI con memoria
 const reply = await callOpenAI(cleanMessage, memoryText);
 
-// 4) Guardar respuesta del asistente
+// 4) Guardar respuesta del asistente en memoria corta
 const saveAssistantShort = await saveMemory(userId, `ASISTENTE: ${reply}`);
 if (!saveAssistantShort.ok) {
 console.log(
@@ -424,6 +427,6 @@ return res.status(500).json({ reply: "Error en servidor." });
 // =========================
 // START
 // =========================
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
