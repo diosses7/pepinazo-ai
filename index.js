@@ -176,7 +176,7 @@ if (!hasSupabaseConfig()) return [];
 
 const url =
 `${SUPABASE_URL}/rest/v1/${table}` +
-`?select=user_id,message,created_at` +
+`?select=id,user_id,message,created_at` +
 `&user_id=eq.${encodeURIComponent(userId)}` +
 `&order=created_at.desc` +
 `&limit=${limit}`;
@@ -250,12 +250,12 @@ body: JSON.stringify({
 model: "gpt-4.1-mini",
 messages: [
 {
-role: "developer",
+role: "system",
 content:
 "Eres Pepinazo AI. Responde siempre en español. Sé útil, claro, directo, cercano y con humor inteligente. Ayuda con estrategia, inversión, automatización, negocios, código y construcción de una super app personal."
 },
 {
-role: "developer",
+role: "system",
 content: memoryText
 },
 {
@@ -319,13 +319,13 @@ supabase_configured: hasSupabaseConfig()
 });
 
 app.get("/prueba", async (req, res) => {
-const result = await saveMemory("usuario1", "USER: mensaje de prueba importante");
+const result = await saveMemory("usuario1", "mensaje de prueba importante");
 
 if (result.ok) {
 return res.send("guardado");
 }
 
-return res.status(500).send(`error supabase: ${result.status} - ${result.body}`);
+return res.status(500).send(`Error de Supabase: ${result.status} - ${result.body}`);
 });
 
 app.get("/prueba-de-memoria", async (req, res) => {
@@ -358,7 +358,7 @@ const memoryText = buildMemoryText(shortMemories, longMemories);
 const reply = await callOpenAI(cleanMessage, memoryText);
 
 // 3) Guardar mensaje usuario en memoria corta
-const saveUserShort = await saveMemory(userId, `USER: ${cleanMessage}`);
+const saveUserShort = await saveMemory(userId, cleanMessage);
 if (!saveUserShort.ok) {
 console.log(
 "No se pudo guardar usuario en memoria corta:",
@@ -378,7 +378,7 @@ saveUserLong.body
 }
 
 // 5) Guardar respuesta asistente en memoria corta
-const saveAssistantShort = await saveMemory(userId, `ASSISTANT: ${reply}`);
+const saveAssistantShort = await saveMemory("asistente", reply);
 if (!saveAssistantShort.ok) {
 console.log(
 "No se pudo guardar asistente en memoria corta:",
