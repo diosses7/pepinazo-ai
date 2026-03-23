@@ -1,1288 +1,1484 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pepinazo AI</title>
-<style>
-:root {
---bg: #050b14;
---bg-2: #0a1220;
---card: #0d1626;
---card-2: #101b2e;
---line: rgba(255,255,255,0.08);
---line-2: rgba(255,255,255,0.05);
---text: #eef4ff;
---muted: #8ea0bf;
---primary: #2f80ff;
---primary-2: #4d98ff;
---success: #1fbf75;
---danger: #d65875;
---danger-2: #f06c88;
---chip: rgba(255,255,255,0.06);
---shadow: 0 18px 45px rgba(0,0,0,0.35);
---radius: 20px;
---radius-sm: 14px;
-}
-
-* {
-box-sizing: border-box;
-}
-
-html, body {
-margin: 0;
-padding: 0;
-font-family: Inter, Arial, sans-serif;
-background:
-radial-gradient(circle at top right, rgba(47,128,255,0.12), transparent 22%),
-radial-gradient(circle at top left, rgba(31,191,117,0.05), transparent 18%),
-linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-color: var(--text);
-min-height: 100vh;
-}
-
-body {
-padding: 22px;
-}
-
-.app {
-max-width: 1380px;
-margin: 0 auto;
-}
-
-.hero {
-display: flex;
-justify-content: space-between;
-align-items: end;
-gap: 16px;
-flex-wrap: wrap;
-margin-bottom: 18px;
-}
-
-.hero h1 {
-margin: 0;
-font-size: 44px;
-letter-spacing: -0.03em;
-line-height: 1;
-}
-
-.hero p {
-margin: 8px 0 0;
-color: var(--muted);
-max-width: 820px;
-line-height: 1.5;
-}
-
-.status-pill {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 11px 16px;
-border-radius: 999px;
-background: rgba(31,191,117,0.12);
-color: #9fe8c6;
-border: 1px solid rgba(31,191,117,0.2);
-font-size: 13px;
-font-weight: 700;
-}
-
-.dot {
-width: 8px;
-height: 8px;
-border-radius: 999px;
-background: var(--success);
-box-shadow: 0 0 14px rgba(31,191,117,0.6);
-}
-
-.glass {
-background: rgba(13,22,38,0.88);
-border: 1px solid var(--line);
-border-radius: var(--radius);
-box-shadow: var(--shadow);
-backdrop-filter: blur(14px);
-}
-
-.topbar {
-padding: 16px;
-display: flex;
-justify-content: space-between;
-gap: 14px;
-flex-wrap: wrap;
-align-items: center;
-margin-bottom: 16px;
-}
-
-.user-box {
-display: flex;
-align-items: center;
-gap: 10px;
-flex-wrap: wrap;
-}
-
-.label {
-color: var(--muted);
-font-size: 14px;
-font-weight: 700;
-}
-
-input, textarea {
-font-family: inherit;
-}
-
-#userId, #msg {
-border: 1px solid var(--line);
-background: rgba(255,255,255,0.04);
-color: var(--text);
-outline: none;
-transition: 0.2s ease;
-}
-
-#userId {
-min-width: 240px;
-padding: 12px 14px;
-border-radius: 14px;
-font-size: 14px;
-}
-
-#msg {
-width: 100%;
-padding: 15px 16px;
-border-radius: 16px;
-font-size: 15px;
-}
-
-#userId:focus, #msg:focus, .modal-input:focus, .modal-textarea:focus {
-border-color: rgba(47,128,255,0.5);
-box-shadow: 0 0 0 3px rgba(47,128,255,0.15);
-}
-
-#userId::placeholder, #msg::placeholder, .modal-input::placeholder, .modal-textarea::placeholder {
-color: #90a0c2;
-}
-
-.toolbar {
-display: flex;
-flex-wrap: wrap;
-gap: 10px;
-margin-bottom: 16px;
-}
-
-button {
-border: none;
-cursor: pointer;
-transition: 0.18s ease;
-font-weight: 700;
-}
-
-.btn {
-padding: 12px 16px;
-border-radius: 14px;
-font-size: 14px;
-background: rgba(255,255,255,0.05);
-color: var(--text);
-border: 1px solid var(--line);
-}
-
-.btn:hover {
-transform: translateY(-1px);
-background: rgba(255,255,255,0.08);
-}
-
-.btn.primary {
-background: linear-gradient(135deg, var(--primary), var(--primary-2));
-border: none;
-color: white;
-}
-
-.btn.primary:hover {
-filter: brightness(1.05);
-}
-
-.btn.danger {
-background: linear-gradient(135deg, var(--danger), var(--danger-2));
-border: none;
-color: white;
-}
-
-.layout {
-display: grid;
-grid-template-columns: 1.55fr 0.95fr;
-gap: 18px;
-}
-
-@media (max-width: 1100px) {
-.layout {
-grid-template-columns: 1fr;
-}
-}
-
-.chat-panel,
-.side-panel {
-padding: 18px;
-min-height: 760px;
-}
-
-.panel-head {
-display: flex;
-justify-content: space-between;
-gap: 10px;
-align-items: start;
-flex-wrap: wrap;
-margin-bottom: 14px;
-}
-
-.panel-head h2 {
-margin: 0;
-font-size: 28px;
-letter-spacing: -0.02em;
-}
-
-.panel-head p {
-margin: 6px 0 0;
-color: var(--muted);
-font-size: 13px;
-line-height: 1.5;
-}
-
-#chat {
-border: 1px solid var(--line);
-background: rgba(255,255,255,0.03);
-border-radius: 18px;
-min-height: 520px;
-max-height: 590px;
-overflow-y: auto;
-padding: 16px;
-scroll-behavior: smooth;
-}
-
-.mensaje {
-display: flex;
-flex-direction: column;
-gap: 6px;
-margin-bottom: 16px;
-}
-
-.autor {
-font-size: 12px;
-font-weight: 800;
-letter-spacing: 0.04em;
-text-transform: uppercase;
-color: var(--muted);
-padding: 0 6px;
-}
-
-.bubble {
-border-radius: 18px;
-padding: 13px 14px;
-max-width: 88%;
-line-height: 1.55;
-white-space: pre-wrap;
-word-break: break-word;
-border: 1px solid transparent;
-}
-
-.usuario {
-align-items: flex-end;
-}
-
-.usuario .autor {
-color: #a7bcff;
-text-align: right;
-}
-
-.usuario .bubble {
-background: rgba(47,128,255,0.16);
-border-color: rgba(47,128,255,0.25);
-}
-
-.bot {
-align-items: flex-start;
-}
-
-.bot .autor {
-color: #ffffff;
-}
-
-.bot .bubble {
-background: rgba(255,255,255,0.045);
-border-color: rgba(255,255,255,0.08);
-}
-
-.error {
-align-items: flex-start;
-}
-
-.error .autor {
-color: #ffacc0;
-}
-
-.error .bubble {
-background: rgba(214,88,117,0.14);
-border-color: rgba(214,88,117,0.22);
-}
-
-.sistema {
-align-items: center;
-}
-
-.sistema .autor {
-color: #d3b3ff;
-}
-
-.sistema .bubble {
-background: rgba(170,120,255,0.12);
-border-color: rgba(170,120,255,0.2);
-max-width: 100%;
-text-align: center;
-}
-
-.input-row {
-display: grid;
-grid-template-columns: 1fr auto;
-gap: 10px;
-margin-top: 14px;
-}
-
-.status-line {
-min-height: 18px;
-margin-top: 10px;
-color: var(--muted);
-font-size: 13px;
-}
-
-.side-top {
-display: flex;
-justify-content: space-between;
-gap: 12px;
-align-items: start;
-flex-wrap: wrap;
-margin-bottom: 10px;
-}
-
-.side-top h2 {
-margin: 0;
-font-size: 22px;
-}
-
-.side-top p {
-margin: 6px 0 0;
-color: var(--muted);
-font-size: 13px;
-}
-
-.filter-bar {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-margin-bottom: 12px;
-}
-
-.filter-btn {
-padding: 9px 12px;
-border-radius: 999px;
-border: 1px solid var(--line);
-background: rgba(255,255,255,0.05);
-color: var(--text);
-font-size: 12px;
-font-weight: 800;
-}
-
-.filter-btn.active {
-background: linear-gradient(135deg, var(--primary), var(--primary-2));
-border-color: transparent;
-color: white;
-}
-
-#sideContent {
-max-height: 615px;
-overflow-y: auto;
-padding-right: 4px;
-}
-
-.section-card {
-background: rgba(255,255,255,0.03);
-border: 1px solid var(--line);
-border-radius: 18px;
-padding: 14px;
-margin-bottom: 12px;
-}
-
-.section-card h3 {
-margin: 0 0 10px;
-font-size: 13px;
-letter-spacing: 0.04em;
-color: #dce5ff;
-text-transform: uppercase;
-}
-
-.summary-box {
-background: rgba(255,255,255,0.035);
-border: 1px solid var(--line);
-border-radius: 14px;
-padding: 12px;
-white-space: pre-wrap;
-line-height: 1.55;
-}
-
-.memory-item,
-.profile-item {
-background: rgba(255,255,255,0.03);
-border: 1px solid var(--line-2);
-border-radius: 14px;
-padding: 12px;
-margin-bottom: 10px;
-}
-
-.memory-text,
-.profile-text {
-line-height: 1.5;
-margin-bottom: 8px;
-word-break: break-word;
-white-space: pre-wrap;
-}
-
-.memory-meta,
-.profile-meta {
-font-size: 12px;
-color: var(--muted);
-margin-bottom: 8px;
-}
-
-.item-actions {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-}
-
-.item-actions button {
-padding: 8px 10px;
-border-radius: 10px;
-font-size: 12px;
-background: rgba(255,255,255,0.05);
-color: var(--text);
-border: 1px solid var(--line);
-}
-
-.item-actions button:hover {
-background: rgba(255,255,255,0.09);
-}
-
-.item-actions .pin {
-background: rgba(31,191,117,0.12);
-color: #9fe8c6;
-border-color: rgba(31,191,117,0.18);
-}
-
-.item-actions .danger {
-background: rgba(214,88,117,0.13);
-color: #ffb5c7;
-border-color: rgba(214,88,117,0.2);
-}
-
-.tag {
-display: inline-flex;
-align-items: center;
-padding: 4px 8px;
-border-radius: 999px;
-background: var(--chip);
-color: #dfe7ff;
-font-size: 11px;
-font-weight: 800;
-margin-left: 6px;
-}
-
-.empty-state {
-color: var(--muted);
-font-size: 14px;
-padding-top: 4px;
-}
-
-.mini {
-margin-top: 12px;
-color: var(--muted);
-font-size: 12px;
-line-height: 1.45;
-}
-
-.modal-backdrop {
-position: fixed;
-inset: 0;
-background: rgba(2, 6, 16, 0.7);
-backdrop-filter: blur(8px);
-display: none;
-align-items: center;
-justify-content: center;
-padding: 18px;
-z-index: 9999;
-}
-
-.modal-backdrop.show {
-display: flex;
-}
-
-.modal {
-width: 100%;
-max-width: 520px;
-border-radius: 22px;
-background: #10192c;
-border: 1px solid var(--line);
-box-shadow: var(--shadow);
-padding: 18px;
-}
-
-.modal h3 {
-margin: 0 0 8px;
-font-size: 22px;
-}
-
-.modal p {
-margin: 0 0 14px;
-color: var(--muted);
-line-height: 1.5;
-font-size: 14px;
-}
-
-.modal-input,
-.modal-textarea {
-width: 100%;
-border-radius: 14px;
-border: 1px solid var(--line);
-background: rgba(255,255,255,0.04);
-color: var(--text);
-padding: 13px 14px;
-outline: none;
-font-size: 14px;
-}
-
-.modal-textarea {
-min-height: 120px;
-resize: vertical;
-}
-
-.modal-actions {
-display: flex;
-justify-content: flex-end;
-gap: 10px;
-margin-top: 14px;
-flex-wrap: wrap;
-}
-
-.footer-note {
-margin-top: 12px;
-color: var(--muted);
-font-size: 12px;
-line-height: 1.45;
-}
-
-::-webkit-scrollbar {
-width: 10px;
-height: 10px;
-}
-
-::-webkit-scrollbar-track {
-background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-background: rgba(255,255,255,0.11);
-border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-background: rgba(255,255,255,0.18);
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pepinazo AI</title>
+  <style>
+    :root {
+      --bg: #060c16;
+      --bg-2: #0b1220;
+      --card: #0f1728;
+      --card-2: #121c31;
+      --line: rgba(255,255,255,0.08);
+      --line-2: rgba(255,255,255,0.05);
+      --text: #edf3ff;
+      --muted: #8a9bbb;
+      --primary: #2f80ff;
+      --primary-2: #5b9cff;
+      --success: #1fbf75;
+      --danger: #d85d77;
+      --danger-2: #f1738f;
+      --chip: rgba(255,255,255,0.06);
+      --shadow: 0 18px 44px rgba(0,0,0,0.34);
+      --radius: 22px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(47,128,255,0.12), transparent 20%),
+        radial-gradient(circle at top left, rgba(31,191,117,0.06), transparent 14%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body {
+      padding: 22px;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 44px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 860px;
+      line-height: 1.5;
+    }
+
+    .glass {
+      background: rgba(15,23,40,0.88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(31,191,117,0.12);
+      border: 1px solid rgba(31,191,117,0.18);
+      color: #9de7c4;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 12px rgba(31,191,117,0.7);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input, textarea {
+      font-family: inherit;
+    }
+
+    #userId, #msg, .modal-input, .modal-textarea, .finance-input {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    #userId {
+      min-width: 220px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    #msg {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 16px;
+      font-size: 15px;
+    }
+
+    .finance-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    #userId:focus,
+    #msg:focus,
+    .modal-input:focus,
+    .modal-textarea:focus,
+    .finance-input:focus {
+      border-color: rgba(47,128,255,0.5);
+      box-shadow: 0 0 0 3px rgba(47,128,255,0.14);
+    }
+
+    #userId::placeholder,
+    #msg::placeholder,
+    .finance-input::placeholder,
+    .modal-input::placeholder,
+    .modal-textarea::placeholder {
+      color: #8ea0c6;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      transition: 0.18s ease;
+      font-weight: 700;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: none;
+      color: white;
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn.danger {
+      background: linear-gradient(135deg, var(--danger), var(--danger-2));
+      border: none;
+      color: white;
+    }
+
+    .btn.small {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.55fr 0.95fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 1120px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-col,
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .chat-panel,
+    .side-panel,
+    .finance-panel {
+      padding: 18px;
+    }
+
+    .panel-head,
+    .side-top,
+    .finance-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .panel-head h2,
+    .side-top h2,
+    .finance-top h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-head p,
+    .side-top p,
+    .finance-top p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #chat {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      min-height: 430px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .mensaje {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .autor {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 6px;
+    }
+
+    .bubble {
+      border-radius: 18px;
+      padding: 13px 14px;
+      max-width: 88%;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid transparent;
+    }
+
+    .usuario {
+      align-items: flex-end;
+    }
+
+    .usuario .autor {
+      color: #a8bcff;
+      text-align: right;
+    }
+
+    .usuario .bubble {
+      background: rgba(47,128,255,0.16);
+      border-color: rgba(47,128,255,0.22);
+    }
+
+    .bot {
+      align-items: flex-start;
+    }
+
+    .bot .autor {
+      color: #ffffff;
+    }
+
+    .bot .bubble {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .error {
+      align-items: flex-start;
+    }
+
+    .error .autor {
+      color: #ffabc0;
+    }
+
+    .error .bubble {
+      background: rgba(216,93,119,0.15);
+      border-color: rgba(216,93,119,0.24);
+    }
+
+    .sistema {
+      align-items: center;
+    }
+
+    .sistema .autor {
+      color: #d4b4ff;
+    }
+
+    .sistema .bubble {
+      background: rgba(170,120,255,0.12);
+      border-color: rgba(170,120,255,0.2);
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .status-line {
+      min-height: 18px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .finance-balance-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .finance-balance-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .finance-balance {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .finance-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .finance-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .finance-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mini-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .mini-card .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .mini-card .v {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .side-top h2 {
+      font-size: 22px;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .filter-btn {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-color: transparent;
+      color: white;
+    }
+
+    #sideContent {
+      max-height: 620px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .section-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .section-card h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      color: #dce5ff;
+      text-transform: uppercase;
+    }
+
+    .summary-box {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .memory-item,
+    .profile-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line-2);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .memory-text,
+    .profile-text {
+      line-height: 1.5;
+      margin-bottom: 8px;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .memory-meta,
+    .profile-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .item-actions button {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .item-actions .pin {
+      background: rgba(31,191,117,0.12);
+      color: #9fe8c6;
+      border-color: rgba(31,191,117,0.18);
+    }
+
+    .item-actions .danger {
+      background: rgba(216,93,119,0.13);
+      color: #ffb3c3;
+      border-color: rgba(216,93,119,0.2);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: #dfe7ff;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 6px;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 14px;
+      padding-top: 4px;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 7, 16, 0.72);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9999;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 540px;
+      border-radius: 22px;
+      background: #10192c;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .modal h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .modal p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .modal-input,
+    .modal-textarea {
+      width: 100%;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 14px;
+    }
+
+    .modal-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.11);
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.18);
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<div class="hero">
-<div>
-<h1>Pepinazo AI</h1>
-<p>
-Memoria persistente, perfil inteligente y panel editable. Ahora sí parece una app seria
-y no un experimento con cafeína.
-</p>
-</div>
-<div class="status-pill">
-<span class="dot"></span>
-Backend conectado
-</div>
-</div>
-
-<div class="topbar glass">
-<div class="user-box">
-<div class="label">User ID</div>
-<input id="userId" type="text" placeholder="ej: diego-1" autocomplete="off" />
-</div>
-<div class="mini">Usa siempre el mismo userId para no fabricar amnesia artificial.</div>
-</div>
-
-<div class="toolbar">
-<button class="btn" onclick="verPerfil()">Ver perfil</button>
-<button class="btn" onclick="verMemoria()">Ver memoria</button>
-<button class="btn" onclick="verPanelMemoria()">Panel memoria</button>
-<button class="btn" onclick="limpiarChat()">Limpiar chat</button>
-<button class="btn danger" onclick="borrarMemoria()">Borrar memoria</button>
-</div>
-
-<div class="layout">
-<div class="chat-panel glass">
-<div class="panel-head">
-<div>
-<h2>Conversación</h2>
-<p>Chat conectado al backend real y usando memoria persistente.</p>
-</div>
-</div>
-
-<div id="chat"></div>
-
-<div class="input-row">
-<input id="msg" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
-<button id="btn" class="btn primary" onclick="enviar()">Enviar</button>
-</div>
-
-<div id="estado" class="status-line"></div>
-
-<div class="footer-note">
-Pepinazo ya conversa con backend real. Ahora sí, el muñeco dejó de ser decoración.
-</div>
-</div>
-
-<div class="side-panel glass">
-<div class="side-top">
-<div>
-<h2 id="sideTitle">Perfil resumen</h2>
-<p>Panel editable de memoria, perfil y resumen maestro.</p>
-</div>
-</div>
-
-<div class="filter-bar">
-<button class="filter-btn active" data-filter="todo" onclick="setFiltro('todo')">Todo</button>
-<button class="filter-btn" data-filter="perfil" onclick="setFiltro('perfil')">Perfil</button>
-<button class="filter-btn" data-filter="reciente" onclick="setFiltro('reciente')">Reciente</button>
-<button class="filter-btn" data-filter="importante" onclick="setFiltro('importante')">Importante</button>
-<button class="filter-btn" data-filter="proyecto" onclick="setFiltro('proyecto')">Proyectos</button>
-<button class="filter-btn" data-filter="objetivo" onclick="setFiltro('objetivo')">Objetivos</button>
-<button class="filter-btn" data-filter="preferencia" onclick="setFiltro('preferencia')">Preferencias</button>
-</div>
-
-<div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
-
-<div class="mini">
-Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra
-amnesia selectiva.
-</div>
-</div>
-</div>
-</div>
-
-<div id="modalBackdrop" class="modal-backdrop">
-<div class="modal">
-<h3 id="modalTitle">Editar</h3>
-<p id="modalDescription">Haz cambios aquí.</p>
-<textarea id="modalTextarea" class="modal-textarea"></textarea>
-<div class="modal-actions">
-<button class="btn" onclick="cerrarModal()">Cancelar</button>
-<button id="modalConfirmBtn" class="btn primary">Guardar</button>
-</div>
-</div>
-</div>
-
-<script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("msg");
-const btn = document.getElementById("btn");
-const estado = document.getElementById("estado");
-const sideTitle = document.getElementById("sideTitle");
-const sideContent = document.getElementById("sideContent");
-const userIdInput = document.getElementById("userId");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const modalTitle = document.getElementById("modalTitle");
-const modalDescription = document.getElementById("modalDescription");
-const modalTextarea = document.getElementById("modalTextarea");
-const modalConfirmBtn = document.getElementById("modalConfirmBtn");
-
-const STORAGE_KEY = "pepinazo_user_id";
-let ultimoPanel = null;
-let filtroActual = "todo";
-
-function getUserId() {
-const value = userIdInput.value.trim();
-return value || "usuario1";
-}
-
-function saveUserId() {
-localStorage.setItem(STORAGE_KEY, getUserId());
-}
-
-function loadUserId() {
-const saved = localStorage.getItem(STORAGE_KEY);
-userIdInput.value = saved || "usuario1";
-}
-
-function setEstado(texto) {
-estado.textContent = texto || "";
-}
-
-function escapeHtml(text) {
-return String(text || "")
-.replaceAll("&", "&amp;")
-.replaceAll("<", "&lt;")
-.replaceAll(">", "&gt;")
-.replaceAll('"', "&quot;")
-.replaceAll("'", "&#039;");
-}
-
-function agregarMensaje(tipo, autor, texto) {
-const wrapper = document.createElement("div");
-wrapper.className = `mensaje ${tipo}`;
-
-const autorEl = document.createElement("div");
-autorEl.className = "autor";
-autorEl.textContent = autor;
-
-const bubble = document.createElement("div");
-bubble.className = "bubble";
-bubble.textContent = texto;
-
-wrapper.appendChild(autorEl);
-wrapper.appendChild(bubble);
-chat.appendChild(wrapper);
-chat.scrollTop = chat.scrollHeight;
-}
-
-function limpiarChat() {
-chat.innerHTML = "";
-agregarMensaje("sistema", "Sistema", `Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta.`);
-}
-
-function setLoading(isLoading) {
-input.disabled = isLoading;
-btn.disabled = isLoading;
-userIdInput.disabled = isLoading;
-
-if (isLoading) {
-btn.textContent = "Pensando...";
-setEstado("Pepinazo está pensando...");
-} else {
-btn.textContent = "Enviar";
-setEstado("");
-input.focus();
-}
-}
-
-function setFiltro(filtro) {
-filtroActual = filtro;
-
-document.querySelectorAll(".filter-btn").forEach((btn) => {
-btn.classList.toggle("active", btn.dataset.filter === filtro);
-});
-
-if (ultimoPanel) {
-renderPanelMemoria(ultimoPanel);
-}
-}
-
-function abrirModal({ title, description, value = "", confirmText = "Guardar", onConfirm }) {
-modalTitle.textContent = title;
-modalDescription.textContent = description;
-modalTextarea.value = value;
-modalConfirmBtn.textContent = confirmText;
-modalBackdrop.classList.add("show");
-modalTextarea.focus();
-
-modalConfirmBtn.onclick = async () => {
-await onConfirm(modalTextarea.value);
-};
-}
-
-function cerrarModal() {
-modalBackdrop.classList.remove("show");
-modalTextarea.value = "";
-modalConfirmBtn.onclick = null;
-}
-
-modalBackdrop.addEventListener("click", (e) => {
-if (e.target === modalBackdrop) {
-cerrarModal();
-}
-});
-
-async function apiFetch(url, options = {}) {
-const response = await fetch(url, options);
-const data = await response.json().catch(() => ({}));
-
-if (!response.ok) {
-const msg = data?.error || data?.reply || "Error del servidor";
-throw new Error(msg);
-}
-
-return data;
-}
-
-function renderPerfilTexto(data) {
-sideTitle.textContent = "Perfil";
-
-const partes = [];
-
-if (data.perfil_resumen?.resumen) {
-partes.push("PERFIL RESUMEN");
-partes.push(data.perfil_resumen.resumen);
-partes.push("");
-}
-
-if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
-partes.push("PERFIL USUARIO");
-for (const item of data.perfil_usuario) {
-partes.push(`- ${item.clave}: ${item.valor}`);
-}
-} else {
-partes.push("Sin perfil guardado.");
-}
-
-sideContent.textContent = partes.join("\n");
-}
-
-function renderMemoriaTexto(data) {
-sideTitle.textContent = "Memoria";
-
-const partes = [];
-
-partes.push("MEMORIA RECIENTE");
-if (Array.isArray(data.memoria) && data.memoria.length) {
-for (const item of data.memoria) {
-partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
-}
-} else {
-partes.push("Sin memoria reciente.");
-}
-
-partes.push("");
-partes.push("MEMORIA IMPORTANTE");
-
-if (Array.isArray(data.memoria_larga) && data.memoria_larga.length) {
-for (const item of data.memoria_larga) {
-partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
-}
-} else {
-partes.push("Sin memoria importante.");
-}
-
-sideContent.textContent = partes.join("\n");
-}
-
-function shouldShowProfileItem(item) {
-if (filtroActual === "todo" || filtroActual === "perfil") return true;
-if (filtroActual === "proyecto" && item.clave === "proyecto") return true;
-if (filtroActual === "objetivo" && item.clave === "objetivo") return true;
-if (filtroActual === "preferencia" && item.clave === "preferencia") return true;
-return false;
-}
-
-function shouldShowRecentItem(item) {
-if (filtroActual === "todo" || filtroActual === "reciente") return true;
-if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
-if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
-if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
-if (filtroActual === "perfil" && item.tipo === "perfil") return true;
-return false;
-}
-
-function shouldShowLongItem(item) {
-if (filtroActual === "todo" || filtroActual === "importante") return true;
-if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
-if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
-if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
-if (filtroActual === "perfil" && item.tipo === "perfil") return true;
-return false;
-}
-
-function renderPanelMemoria(data) {
-ultimoPanel = data;
-sideTitle.textContent = "Panel de memoria";
-
-const perfiles = Array.isArray(data.perfil_usuario)
-? data.perfil_usuario.filter(shouldShowProfileItem)
-: [];
-
-const recientes = Array.isArray(data.memoria_reciente)
-? data.memoria_reciente.filter(shouldShowRecentItem)
-: [];
-
-const importantes = Array.isArray(data.memoria_importante)
-? data.memoria_importante.filter(shouldShowLongItem)
-: [];
-
-let html = "";
-
-html += `
-<div class="section-card">
-<h3>User ID</h3>
-<div>${escapeHtml(data.userId || getUserId())}</div>
-</div>
-`;
-
-if (data.perfil_resumen?.resumen && (filtroActual === "todo" || filtroActual === "perfil")) {
-html += `
-<div class="section-card">
-<h3>Perfil maestro</h3>
-<div class="summary-box">${escapeHtml(data.perfil_resumen.resumen)}</div>
-<div class="item-actions" style="margin-top:10px;">
-<button onclick="verPanelMemoria()">Refrescar</button>
-</div>
-</div>
-`;
-}
-
-if (
-filtroActual === "todo" ||
-filtroActual === "perfil" ||
-filtroActual === "proyecto" ||
-filtroActual === "objetivo" ||
-filtroActual === "preferencia"
-) {
-html += `<div class="section-card"><h3>Perfil estable</h3>`;
-
-if (perfiles.length) {
-for (const item of perfiles) {
-html += `
-<div class="profile-item">
-<div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
-<div class="profile-meta">ID: ${item.id || ""}</div>
-<div class="item-actions">
-<button onclick="editarPerfil(${item.id}, ${JSON.stringify(item.valor)})">Editar</button>
-<button class="danger" onclick="confirmarBorrado('perfil_usuario', ${item.id})">Borrar</button>
-</div>
-</div>
-`;
-}
-} else {
-html += `<div class="empty-state">No hay registros para este filtro.</div>`;
-}
-
-html += `</div>`;
-}
-
-if (
-filtroActual === "todo" ||
-filtroActual === "reciente" ||
-filtroActual === "proyecto" ||
-filtroActual === "objetivo" ||
-filtroActual === "preferencia" ||
-filtroActual === "perfil"
-) {
-html += `<div class="section-card"><h3>Memoria reciente</h3>`;
-
-if (recientes.length) {
-for (const item of recientes) {
-html += `
-<div class="memory-item">
-<div class="memory-text">${escapeHtml(item.mensaje)}</div>
-<div class="memory-meta">
-ID: ${item.id || ""}
-<span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
-</div>
-<div class="item-actions">
-<button onclick="editarMemoria('memoria', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
-<button class="pin" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
-<button class="danger" onclick="confirmarBorrado('memoria', ${item.id})">Borrar</button>
-</div>
-</div>
-`;
-}
-} else {
-html += `<div class="empty-state">No hay memoria reciente para este filtro.</div>`;
-}
-
-html += `</div>`;
-}
-
-if (
-filtroActual === "todo" ||
-filtroActual === "importante" ||
-filtroActual === "proyecto" ||
-filtroActual === "objetivo" ||
-filtroActual === "preferencia" ||
-filtroActual === "perfil"
-) {
-html += `<div class="section-card"><h3>Memoria importante</h3>`;
-
-if (importantes.length) {
-for (const item of importantes) {
-html += `
-<div class="memory-item">
-<div class="memory-text">${escapeHtml(item.mensaje)}</div>
-<div class="memory-meta">
-ID: ${item.id || ""}
-<span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
-</div>
-<div class="item-actions">
-<button onclick="editarMemoria('memoria_larga', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
-<button class="danger" onclick="confirmarBorrado('memoria_larga', ${item.id})">Borrar</button>
-</div>
-</div>
-`;
-}
-} else {
-html += `<div class="empty-state">No hay memoria importante para este filtro.</div>`;
-}
-
-html += `</div>`;
-}
-
-sideContent.innerHTML = html;
-}
-
-async function enviar() {
-const message = input.value.trim();
-if (!message) return;
-
-saveUserId();
-const userId = getUserId();
-
-agregarMensaje("usuario", "Tú", message);
-input.value = "";
-setLoading(true);
-
-try {
-const data = await apiFetch("/api/chat", {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({ message, userId })
-});
-
-agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
-
-if (data.profile_summary) {
-sideTitle.textContent = "Perfil resumen";
-sideContent.textContent = data.profile_summary;
-}
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo conectar con el servidor.");
-} finally {
-setLoading(false);
-}
-}
-
-async function verPerfil() {
-saveUserId();
-const userId = getUserId();
-setEstado("Cargando perfil...");
-
-try {
-const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-renderPerfilTexto(data);
-} catch (error) {
-sideTitle.textContent = "Perfil";
-sideContent.textContent = error.message || "No se pudo cargar el perfil.";
-} finally {
-setEstado("");
-}
-}
-
-async function verMemoria() {
-saveUserId();
-const userId = getUserId();
-setEstado("Cargando memoria...");
-
-try {
-const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-renderMemoriaTexto(data);
-} catch (error) {
-sideTitle.textContent = "Memoria";
-sideContent.textContent = error.message || "No se pudo cargar la memoria.";
-} finally {
-setEstado("");
-}
-}
-
-async function verPanelMemoria() {
-saveUserId();
-const userId = getUserId();
-setEstado("Cargando panel de memoria...");
-
-try {
-const data = await apiFetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
-renderPanelMemoria(data);
-} catch (error) {
-sideTitle.textContent = "Panel de memoria";
-sideContent.textContent = error.message || "No se pudo cargar el panel.";
-} finally {
-setEstado("");
-}
-}
-
-async function borrarMemoria() {
-abrirModal({
-title: "Borrar toda la memoria",
-description: `Se borrará toda la memoria de ${getUserId()}. Esto incluye memoria reciente, importante, perfil y resumen.`,
-value: "",
-confirmText: "Borrar todo",
-onConfirm: async () => {
-setEstado("Borrando memoria...");
-
-try {
-await apiFetch(`/memory-clear?userId=${encodeURIComponent(getUserId())}`, {
-method: "DELETE"
-});
-
-agregarMensaje("sistema", "Sistema", `Memoria borrada para ${getUserId()}.`);
-sideTitle.textContent = "Memoria / Perfil";
-sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
-cerrarModal();
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo borrar la memoria.");
-} finally {
-setEstado("");
-}
-}
-});
-
-modalTextarea.style.display = "none";
-}
-
-function confirmarBorrado(table, id) {
-abrirModal({
-title: "Confirmar borrado",
-description: `¿Seguro que quieres borrar este registro de ${table}?`,
-value: "",
-confirmText: "Borrar",
-onConfirm: async () => {
-setEstado("Borrando registro...");
-
-try {
-await apiFetch(`/memory/${table}/${id}?userId=${encodeURIComponent(getUserId())}`, {
-method: "DELETE"
-});
-
-cerrarModal();
-await verPanelMemoria();
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo borrar el registro.");
-} finally {
-setEstado("");
-}
-}
-});
-
-modalTextarea.style.display = "none";
-}
-
-async function editarPerfil(id, valorActual) {
-modalTextarea.style.display = "block";
-
-abrirModal({
-title: "Editar perfil",
-description: "Modifica este valor del perfil sin romper la memoria existente.",
-value: valorActual,
-confirmText: "Guardar cambios",
-onConfirm: async (nuevoValor) => {
-const clean = nuevoValor.trim();
-if (!clean) return;
-
-setEstado("Editando perfil...");
-
-try {
-await apiFetch(`/memory/profile/${id}`, {
-method: "PATCH",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-valor: clean,
-userId: getUserId()
-})
-});
-
-cerrarModal();
-await verPanelMemoria();
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo editar el perfil.");
-} finally {
-setEstado("");
-}
-}
-});
-}
-
-async function editarMemoria(table, id, valorActual) {
-modalTextarea.style.display = "block";
-
-abrirModal({
-title: "Editar recuerdo",
-description: "Cambia este recuerdo directamente desde el panel.",
-value: valorActual,
-confirmText: "Guardar cambios",
-onConfirm: async (nuevoValor) => {
-const clean = nuevoValor.trim();
-if (!clean) return;
-
-setEstado("Editando memoria...");
-
-try {
-await apiFetch(`/memory/message/${table}/${id}`, {
-method: "PATCH",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-mensaje: clean
-})
-});
-
-cerrarModal();
-await verPanelMemoria();
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo editar la memoria.");
-} finally {
-setEstado("");
-}
-}
-});
-}
-
-async function fijarMemoria(sourceTable, id) {
-setEstado("Fijando recuerdo importante...");
-
-try {
-await apiFetch(`/memory/pin`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-sourceTable,
-id,
-userId: getUserId()
-})
-});
-
-await verPanelMemoria();
-} catch (error) {
-agregarMensaje("error", "Error", error.message || "No se pudo fijar la memoria.");
-} finally {
-setEstado("");
-}
-}
-
-input.addEventListener("keydown", function (event) {
-if (event.key === "Enter" && !btn.disabled) {
-enviar();
-}
-});
-
-userIdInput.addEventListener("change", saveUserId);
-userIdInput.addEventListener("blur", saveUserId);
-
-loadUserId();
-
-agregarMensaje(
-"bot",
-"Pepinazo",
-`Hola. Ya estoy conectado al backend y listo para conversar contigo. User ID actual: ${getUserId()}.`
-);
-</script>
+  <div class="app">
+    <div class="hero">
+      <div>
+        <h1>Pepinazo AI</h1>
+        <p>
+          Memoria persistente, perfil inteligente y panel editable. Ahora sí parece una app seria
+          y no un experimento con cafeína.
+        </p>
+      </div>
+      <div class="status-pill">
+        <span class="dot"></span>
+        Backend conectado
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="user-box">
+        <div class="label">User ID</div>
+        <input id="userId" type="text" placeholder="ej: diego-1" autocomplete="off" />
+      </div>
+      <div class="mini">Usa siempre el mismo userId para no fabricar amnesia artificial.</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="verPerfil()">Ver perfil</button>
+      <button class="btn" onclick="verMemoria()">Ver memoria</button>
+      <button class="btn" onclick="verPanelMemoria()">Panel memoria</button>
+      <button class="btn" onclick="limpiarChat()">Limpiar chat</button>
+      <button class="btn danger" onclick="borrarMemoria()">Borrar memoria</button>
+    </div>
+
+    <div class="layout">
+      <div class="left-col">
+        <div class="chat-panel glass">
+          <div class="panel-head">
+            <div>
+              <h2>Conversación</h2>
+              <p>Chat conectado al backend real y usando memoria persistente.</p>
+            </div>
+          </div>
+
+          <div id="chat"></div>
+
+          <div class="input-row">
+            <input id="msg" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
+            <button id="btn" class="btn primary" onclick="enviar()">Enviar</button>
+          </div>
+
+          <div id="estado" class="status-line"></div>
+
+          <div class="footer-note">
+            Pepinazo ya conversa con backend real. Ahora sí, el muñeco dejó de ser decoración.
+          </div>
+        </div>
+
+        <div class="finance-panel glass">
+          <div class="finance-top">
+            <div>
+              <h2>Pepinazo Finance</h2>
+              <p>Registro rápido manual de caja, depósitos y retiros, con look más tipo app financiera.</p>
+            </div>
+          </div>
+
+          <div class="finance-balance-card">
+            <div class="finance-balance-label">Balance actual</div>
+            <div class="finance-balance" id="moneyTotal">$0</div>
+            <div class="finance-sub">Lleva tu control económico simple mientras el monstruo sigue mutando.</div>
+
+            <div class="finance-actions">
+              <button class="btn primary" onclick="abrirDeposito()">Depositar</button>
+              <button class="btn" onclick="abrirRetiro()">Retirar</button>
+            </div>
+          </div>
+
+          <div class="finance-mini-grid">
+            <div class="mini-card">
+              <div class="k">Total depósitos</div>
+              <div class="v" id="moneyDeposits">$0</div>
+            </div>
+            <div class="mini-card">
+              <div class="k">Total retiros</div>
+              <div class="v" id="moneyWithdrawals">$0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="side-panel glass">
+          <div class="side-top">
+            <div>
+              <h2 id="sideTitle">Perfil resumen</h2>
+              <p>Panel editable de memoria, perfil y resumen maestro.</p>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <button class="filter-btn active" data-filter="todo" onclick="setFiltro('todo')">Todo</button>
+            <button class="filter-btn" data-filter="perfil" onclick="setFiltro('perfil')">Perfil</button>
+            <button class="filter-btn" data-filter="reciente" onclick="setFiltro('reciente')">Reciente</button>
+            <button class="filter-btn" data-filter="importante" onclick="setFiltro('importante')">Importante</button>
+            <button class="filter-btn" data-filter="proyecto" onclick="setFiltro('proyecto')">Proyectos</button>
+            <button class="filter-btn" data-filter="objetivo" onclick="setFiltro('objetivo')">Objetivos</button>
+            <button class="filter-btn" data-filter="preferencia" onclick="setFiltro('preferencia')">Preferencias</button>
+          </div>
+
+          <div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
+
+          <div class="mini">
+            Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra
+            amnesia selectiva.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="modalTitle">Editar</h3>
+      <p id="modalDescription">Haz cambios aquí.</p>
+      <textarea id="modalTextarea" class="modal-textarea"></textarea>
+      <div class="modal-actions">
+        <button class="btn" onclick="cerrarModal()">Cancelar</button>
+        <button id="modalConfirmBtn" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("msg");
+    const btn = document.getElementById("btn");
+    const estado = document.getElementById("estado");
+    const sideTitle = document.getElementById("sideTitle");
+    const sideContent = document.getElementById("sideContent");
+    const userIdInput = document.getElementById("userId");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalTextarea = document.getElementById("modalTextarea");
+    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+
+    const STORAGE_KEY = "pepinazo_user_id";
+    const FINANCE_KEY = "pepinazo_finance_state";
+
+    let ultimoPanel = null;
+    let filtroActual = "todo";
+    let financeState = {
+      balance: 0,
+      deposits: 0,
+      withdrawals: 0
+    };
+
+    function getUserId() {
+      const value = userIdInput.value.trim();
+      return value || "usuario1";
+    }
+
+    function saveUserId() {
+      localStorage.setItem(STORAGE_KEY, getUserId());
+    }
+
+    function loadUserId() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      userIdInput.value = saved || "usuario1";
+    }
+
+    function formatMoney(value) {
+      return "$" + Number(value || 0).toLocaleString("es-CL");
+    }
+
+    function loadFinanceState() {
+      try {
+        const saved = localStorage.getItem(FINANCE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          financeState = {
+            balance: Number(parsed.balance || 0),
+            deposits: Number(parsed.deposits || 0),
+            withdrawals: Number(parsed.withdrawals || 0)
+          };
+        }
+      } catch {
+        financeState = {
+          balance: 0,
+          deposits: 0,
+          withdrawals: 0
+        };
+      }
+      renderFinance();
+    }
+
+    function saveFinanceState() {
+      localStorage.setItem(FINANCE_KEY, JSON.stringify(financeState));
+    }
+
+    function renderFinance() {
+      const balanceEl = document.getElementById("moneyTotal");
+      const depositsEl = document.getElementById("moneyDeposits");
+      const withdrawalsEl = document.getElementById("moneyWithdrawals");
+
+      if (balanceEl) balanceEl.textContent = formatMoney(financeState.balance);
+      if (depositsEl) depositsEl.textContent = formatMoney(financeState.deposits);
+      if (withdrawalsEl) withdrawalsEl.textContent = formatMoney(financeState.withdrawals);
+    }
+
+    function setEstado(texto) {
+      estado.textContent = texto || "";
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function agregarMensaje(tipo, autor, texto) {
+      const wrapper = document.createElement("div");
+      wrapper.className = `mensaje ${tipo}`;
+
+      const autorEl = document.createElement("div");
+      autorEl.className = "autor";
+      autorEl.textContent = autor;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = texto;
+
+      wrapper.appendChild(autorEl);
+      wrapper.appendChild(bubble);
+      chat.appendChild(wrapper);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function limpiarChat() {
+      chat.innerHTML = "";
+      agregarMensaje("sistema", "Sistema", `Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta.`);
+    }
+
+    function setLoading(isLoading) {
+      input.disabled = isLoading;
+      btn.disabled = isLoading;
+      userIdInput.disabled = isLoading;
+
+      if (isLoading) {
+        btn.textContent = "Pensando...";
+        setEstado("Pepinazo está pensando...");
+      } else {
+        btn.textContent = "Enviar";
+        setEstado("");
+        input.focus();
+      }
+    }
+
+    function setFiltro(filtro) {
+      filtroActual = filtro;
+
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.filter === filtro);
+      });
+
+      if (ultimoPanel) {
+        renderPanelMemoria(ultimoPanel);
+      }
+    }
+
+    function abrirModal({ title, description, value = "", confirmText = "Guardar", onConfirm, inputType = "textarea" }) {
+      modalTitle.textContent = title;
+      modalDescription.textContent = description;
+      modalTextarea.style.display = "block";
+      modalTextarea.value = value;
+      modalTextarea.className = inputType === "input" ? "modal-input" : "modal-textarea";
+      modalConfirmBtn.textContent = confirmText;
+      modalBackdrop.classList.add("show");
+      modalTextarea.focus();
+
+      modalConfirmBtn.onclick = async () => {
+        await onConfirm(modalTextarea.value);
+      };
+    }
+
+    function cerrarModal() {
+      modalBackdrop.classList.remove("show");
+      modalTextarea.value = "";
+      modalTextarea.className = "modal-textarea";
+      modalTextarea.style.display = "block";
+      modalConfirmBtn.onclick = null;
+    }
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) {
+        cerrarModal();
+      }
+    });
+
+    async function apiFetch(url, options = {}) {
+      const response = await fetch(url, options);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const msg = data?.error || data?.reply || "Error del servidor";
+        throw new Error(msg);
+      }
+
+      return data;
+    }
+
+    function renderPerfilTexto(data) {
+      sideTitle.textContent = "Perfil";
+
+      const partes = [];
+
+      if (data.perfil_resumen?.resumen) {
+        partes.push("PERFIL RESUMEN");
+        partes.push(data.perfil_resumen.resumen);
+        partes.push("");
+      }
+
+      if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
+        partes.push("PERFIL USUARIO");
+        for (const item of data.perfil_usuario) {
+          partes.push(`- ${item.clave}: ${item.valor}`);
+        }
+      } else {
+        partes.push("Sin perfil guardado.");
+      }
+
+      sideContent.textContent = partes.join("\n");
+    }
+
+    function renderMemoriaTexto(data) {
+      sideTitle.textContent = "Memoria";
+
+      const partes = [];
+
+      partes.push("MEMORIA RECIENTE");
+      if (Array.isArray(data.memoria) && data.memoria.length) {
+        for (const item of data.memoria) {
+          partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+        }
+      } else {
+        partes.push("Sin memoria reciente.");
+      }
+
+      partes.push("");
+      partes.push("MEMORIA IMPORTANTE");
+
+      if (Array.isArray(data.memoria_larga) && data.memoria_larga.length) {
+        for (const item of data.memoria_larga) {
+          partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+        }
+      } else {
+        partes.push("Sin memoria importante.");
+      }
+
+      sideContent.textContent = partes.join("\n");
+    }
+
+    function shouldShowProfileItem(item) {
+      if (filtroActual === "todo" || filtroActual === "perfil") return true;
+      if (filtroActual === "proyecto" && item.clave === "proyecto") return true;
+      if (filtroActual === "objetivo" && item.clave === "objetivo") return true;
+      if (filtroActual === "preferencia" && item.clave === "preferencia") return true;
+      return false;
+    }
+
+    function shouldShowRecentItem(item) {
+      if (filtroActual === "todo" || filtroActual === "reciente") return true;
+      if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
+      if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
+      if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
+      if (filtroActual === "perfil" && item.tipo === "perfil") return true;
+      return false;
+    }
+
+    function shouldShowLongItem(item) {
+      if (filtroActual === "todo" || filtroActual === "importante") return true;
+      if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
+      if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
+      if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
+      if (filtroActual === "perfil" && item.tipo === "perfil") return true;
+      return false;
+    }
+
+    function renderPanelMemoria(data) {
+      ultimoPanel = data;
+      sideTitle.textContent = "Panel de memoria";
+
+      const perfiles = Array.isArray(data.perfil_usuario)
+        ? data.perfil_usuario.filter(shouldShowProfileItem)
+        : [];
+
+      const recientes = Array.isArray(data.memoria_reciente)
+        ? data.memoria_reciente.filter(shouldShowRecentItem)
+        : [];
+
+      const importantes = Array.isArray(data.memoria_importante)
+        ? data.memoria_importante.filter(shouldShowLongItem)
+        : [];
+
+      let html = "";
+
+      html += `
+        <div class="section-card">
+          <h3>User ID</h3>
+          <div>${escapeHtml(data.userId || getUserId())}</div>
+        </div>
+      `;
+
+      if (data.perfil_resumen?.resumen && (filtroActual === "todo" || filtroActual === "perfil")) {
+        html += `
+          <div class="section-card">
+            <h3>Perfil maestro</h3>
+            <div class="summary-box">${escapeHtml(data.perfil_resumen.resumen)}</div>
+            <div class="item-actions" style="margin-top:10px;">
+              <button onclick="verPanelMemoria()">Refrescar</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (
+        filtroActual === "todo" ||
+        filtroActual === "perfil" ||
+        filtroActual === "proyecto" ||
+        filtroActual === "objetivo" ||
+        filtroActual === "preferencia"
+      ) {
+        html += `<div class="section-card"><h3>Perfil estable</h3>`;
+
+        if (perfiles.length) {
+          for (const item of perfiles) {
+            html += `
+              <div class="profile-item">
+                <div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
+                <div class="profile-meta">ID: ${item.id || ""}</div>
+                <div class="item-actions">
+                  <button onclick="editarPerfil(${item.id}, ${JSON.stringify(item.valor)})">Editar</button>
+                  <button class="danger" onclick="confirmarBorrado('perfil_usuario', ${item.id})">Borrar</button>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          html += `<div class="empty-state">No hay registros para este filtro.</div>`;
+        }
+
+        html += `</div>`;
+      }
+
+      if (
+        filtroActual === "todo" ||
+        filtroActual === "reciente" ||
+        filtroActual === "proyecto" ||
+        filtroActual === "objetivo" ||
+        filtroActual === "preferencia" ||
+        filtroActual === "perfil"
+      ) {
+        html += `<div class="section-card"><h3>Memoria reciente</h3>`;
+
+        if (recientes.length) {
+          for (const item of recientes) {
+            html += `
+              <div class="memory-item">
+                <div class="memory-text">${escapeHtml(item.mensaje)}</div>
+                <div class="memory-meta">
+                  ID: ${item.id || ""}
+                  <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
+                </div>
+                <div class="item-actions">
+                  <button onclick="editarMemoria('memoria', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+                  <button class="pin" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
+                  <button class="danger" onclick="confirmarBorrado('memoria', ${item.id})">Borrar</button>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          html += `<div class="empty-state">No hay memoria reciente para este filtro.</div>`;
+        }
+
+        html += `</div>`;
+      }
+
+      if (
+        filtroActual === "todo" ||
+        filtroActual === "importante" ||
+        filtroActual === "proyecto" ||
+        filtroActual === "objetivo" ||
+        filtroActual === "preferencia" ||
+        filtroActual === "perfil"
+      ) {
+        html += `<div class="section-card"><h3>Memoria importante</h3>`;
+
+        if (importantes.length) {
+          for (const item of importantes) {
+            html += `
+              <div class="memory-item">
+                <div class="memory-text">${escapeHtml(item.mensaje)}</div>
+                <div class="memory-meta">
+                  ID: ${item.id || ""}
+                  <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
+                </div>
+                <div class="item-actions">
+                  <button onclick="editarMemoria('memoria_larga', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+                  <button class="danger" onclick="confirmarBorrado('memoria_larga', ${item.id})">Borrar</button>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          html += `<div class="empty-state">No hay memoria importante para este filtro.</div>`;
+        }
+
+        html += `</div>`;
+      }
+
+      sideContent.innerHTML = html;
+    }
+
+    function abrirDeposito() {
+      abrirModal({
+        title: "Registrar depósito",
+        description: "Ingresa el monto que quieres sumar al registro financiero.",
+        value: "",
+        confirmText: "Depositar",
+        inputType: "input",
+        onConfirm: async (valor) => {
+          const monto = Number(String(valor).replace(/[^\d.-]/g, ""));
+          if (!monto || monto <= 0) return;
+
+          financeState.balance += monto;
+          financeState.deposits += monto;
+          saveFinanceState();
+          renderFinance();
+          cerrarModal();
+        }
+      });
+    }
+
+    function abrirRetiro() {
+      abrirModal({
+        title: "Registrar retiro",
+        description: "Ingresa el monto que quieres restar del registro financiero.",
+        value: "",
+        confirmText: "Retirar",
+        inputType: "input",
+        onConfirm: async (valor) => {
+          const monto = Number(String(valor).replace(/[^\d.-]/g, ""));
+          if (!monto || monto <= 0) return;
+
+          financeState.balance -= monto;
+          financeState.withdrawals += monto;
+          saveFinanceState();
+          renderFinance();
+          cerrarModal();
+        }
+      });
+    }
+
+    async function enviar() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      saveUserId();
+      const userId = getUserId();
+
+      agregarMensaje("usuario", "Tú", message);
+      input.value = "";
+      setLoading(true);
+
+      try {
+        const data = await apiFetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message, userId })
+        });
+
+        agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
+
+        if (data.profile_summary) {
+          sideTitle.textContent = "Perfil resumen";
+          sideContent.textContent = data.profile_summary;
+        }
+      } catch (error) {
+        agregarMensaje("error", "Error", error.message || "No se pudo conectar con el servidor.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function verPerfil() {
+      saveUserId();
+      const userId = getUserId();
+      setEstado("Cargando perfil...");
+
+      try {
+        const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+        renderPerfilTexto(data);
+      } catch (error) {
+        sideTitle.textContent = "Perfil";
+        sideContent.textContent = error.message || "No se pudo cargar el perfil.";
+      } finally {
+        setEstado("");
+      }
+    }
+
+    async function verMemoria() {
+      saveUserId();
+      const userId = getUserId();
+      setEstado("Cargando memoria...");
+
+      try {
+        const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+        renderMemoriaTexto(data);
+      } catch (error) {
+        sideTitle.textContent = "Memoria";
+        sideContent.textContent = error.message || "No se pudo cargar la memoria.";
+      } finally {
+        setEstado("");
+      }
+    }
+
+    async function verPanelMemoria() {
+      saveUserId();
+      const userId = getUserId();
+      setEstado("Cargando panel de memoria...");
+
+      try {
+        const data = await apiFetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
+        renderPanelMemoria(data);
+      } catch (error) {
+        sideTitle.textContent = "Panel de memoria";
+        sideContent.textContent = error.message || "No se pudo cargar el panel.";
+      } finally {
+        setEstado("");
+      }
+    }
+
+    async function borrarMemoria() {
+      modalTextarea.style.display = "none";
+
+      abrirModal({
+        title: "Borrar toda la memoria",
+        description: `Se borrará toda la memoria de ${getUserId()}. Esto incluye memoria reciente, importante, perfil y resumen.`,
+        value: "",
+        confirmText: "Borrar todo",
+        onConfirm: async () => {
+          setEstado("Borrando memoria...");
+
+          try {
+            await apiFetch(`/memory-clear?userId=${encodeURIComponent(getUserId())}`, {
+              method: "DELETE"
+            });
+
+            agregarMensaje("sistema", "Sistema", `Memoria borrada para ${getUserId()}.`);
+            sideTitle.textContent = "Memoria / Perfil";
+            sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
+            cerrarModal();
+          } catch (error) {
+            agregarMensaje("error", "Error", error.message || "No se pudo borrar la memoria.");
+          } finally {
+            setEstado("");
+          }
+        }
+      });
+    }
+
+    function confirmarBorrado(table, id) {
+      modalTextarea.style.display = "none";
+
+      abrirModal({
+        title: "Confirmar borrado",
+        description: `¿Seguro que quieres borrar este registro de ${table}?`,
+        value: "",
+        confirmText: "Borrar",
+        onConfirm: async () => {
+          setEstado("Borrando registro...");
+
+          try {
+            await apiFetch(`/memory/${table}/${id}?userId=${encodeURIComponent(getUserId())}`, {
+              method: "DELETE"
+            });
+
+            cerrarModal();
+            await verPanelMemoria();
+          } catch (error) {
+            agregarMensaje("error", "Error", error.message || "No se pudo borrar el registro.");
+          } finally {
+            setEstado("");
+          }
+        }
+      });
+    }
+
+    async function editarPerfil(id, valorActual) {
+      modalTextarea.style.display = "block";
+
+      abrirModal({
+        title: "Editar perfil",
+        description: "Modifica este valor del perfil sin romper la memoria existente.",
+        value: valorActual,
+        confirmText: "Guardar cambios",
+        onConfirm: async (nuevoValor) => {
+          const clean = nuevoValor.trim();
+          if (!clean) return;
+
+          setEstado("Editando perfil...");
+
+          try {
+            await apiFetch(`/memory/profile/${id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                valor: clean,
+                userId: getUserId()
+              })
+            });
+
+            cerrarModal();
+            await verPanelMemoria();
+          } catch (error) {
+            agregarMensaje("error", "Error", error.message || "No se pudo editar el perfil.");
+          } finally {
+            setEstado("");
+          }
+        }
+      });
+    }
+
+    async function editarMemoria(table, id, valorActual) {
+      modalTextarea.style.display = "block";
+
+      abrirModal({
+        title: "Editar recuerdo",
+        description: "Cambia este recuerdo directamente desde el panel.",
+        value: valorActual,
+        confirmText: "Guardar cambios",
+        onConfirm: async (nuevoValor) => {
+          const clean = nuevoValor.trim();
+          if (!clean) return;
+
+          setEstado("Editando memoria...");
+
+          try {
+            await apiFetch(`/memory/message/${table}/${id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                mensaje: clean
+              })
+            });
+
+            cerrarModal();
+            await verPanelMemoria();
+          } catch (error) {
+            agregarMensaje("error", "Error", error.message || "No se pudo editar la memoria.");
+          } finally {
+            setEstado("");
+          }
+        }
+      });
+    }
+
+    async function fijarMemoria(sourceTable, id) {
+      setEstado("Fijando recuerdo importante...");
+
+      try {
+        await apiFetch(`/memory/pin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            sourceTable,
+            id,
+            userId: getUserId()
+          })
+        });
+
+        await verPanelMemoria();
+      } catch (error) {
+        agregarMensaje("error", "Error", error.message || "No se pudo fijar la memoria.");
+      } finally {
+        setEstado("");
+      }
+    }
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !btn.disabled) {
+        enviar();
+      }
+    });
+
+    userIdInput.addEventListener("change", saveUserId);
+    userIdInput.addEventListener("blur", saveUserId);
+
+    loadUserId();
+    loadFinanceState();
+
+    agregarMensaje(
+      "bot",
+      "Pepinazo",
+      `Hola. Ya estoy conectado al backend y listo para conversar contigo. User ID actual: ${getUserId()}.`
+    );
+  </script>
 </body>
 </html>
