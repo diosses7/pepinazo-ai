@@ -7,7 +7,7 @@
 <style>
 body {
 font-family: Arial, sans-serif;
-max-width: 900px;
+max-width: 1100px;
 margin: 40px auto;
 padding: 20px;
 background: #f7f7f7;
@@ -15,24 +15,92 @@ color: #111;
 }
 
 h1 {
-margin-bottom: 20px;
+margin-bottom: 10px;
+}
+
+.topbar {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+align-items: center;
+margin-bottom: 15px;
+}
+
+.topbar input {
+padding: 10px 12px;
+font-size: 14px;
+border: 1px solid #bbb;
+border-radius: 8px;
+background: #fff;
+}
+
+#userId {
+min-width: 220px;
+}
+
+.acciones {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 15px;
+}
+
+.acciones button,
+#btn {
+padding: 12px 16px;
+font-size: 14px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+background: #111;
+color: white;
+}
+
+.acciones button.secundario {
+background: #444;
+}
+
+.acciones button.peligro {
+background: #b00020;
+}
+
+.acciones button:disabled,
+#btn:disabled {
+opacity: 0.6;
+cursor: not-allowed;
+}
+
+.layout {
+display: grid;
+grid-template-columns: 2fr 1fr;
+gap: 16px;
+}
+
+@media (max-width: 900px) {
+.layout {
+grid-template-columns: 1fr;
+}
+}
+
+.panel {
+border: 1px solid #ccc;
+background: #fff;
+border-radius: 10px;
+padding: 15px;
 }
 
 #chat {
-border: 1px solid #ccc;
-background: #fff;
-padding: 15px;
 min-height: 350px;
 max-height: 550px;
 overflow-y: auto;
 white-space: pre-wrap;
-border-radius: 10px;
-margin-bottom: 15px;
+padding-right: 4px;
 }
 
 .fila {
 display: flex;
 gap: 10px;
+margin-top: 15px;
 }
 
 #msg {
@@ -42,21 +110,6 @@ font-size: 16px;
 border: 1px solid #bbb;
 border-radius: 8px;
 outline: none;
-}
-
-#btn {
-padding: 12px 18px;
-font-size: 16px;
-border: none;
-border-radius: 8px;
-cursor: pointer;
-background: #111;
-color: white;
-}
-
-#btn:disabled {
-opacity: 0.6;
-cursor: not-allowed;
 }
 
 .mensaje {
@@ -83,6 +136,10 @@ color: #111;
 color: #b00020;
 }
 
+.sistema .autor {
+color: #6a1b9a;
+}
+
 .texto {
 line-height: 1.5;
 }
@@ -92,11 +149,83 @@ font-size: 13px;
 color: #666;
 margin-top: 10px;
 }
+
+.estado {
+font-size: 13px;
+color: #444;
+margin-top: 8px;
+min-height: 18px;
+}
+
+#sideTitle {
+margin-top: 0;
+margin-bottom: 12px;
+font-size: 18px;
+}
+
+#sideContent {
+font-size: 14px;
+line-height: 1.5;
+white-space: pre-wrap;
+max-height: 550px;
+overflow-y: auto;
+}
+
+.mini {
+font-size: 12px;
+color: #666;
+margin-top: 8px;
+}
+
+.bloqueSide {
+margin-bottom: 16px;
+padding-bottom: 12px;
+border-bottom: 1px solid #eee;
+}
+
+.bloqueSide:last-child {
+border-bottom: none;
+}
+
+.bloqueSide strong {
+display: block;
+margin-bottom: 6px;
+}
+
+.tag {
+display: inline-block;
+padding: 2px 8px;
+border-radius: 999px;
+font-size: 11px;
+background: #eee;
+margin-left: 6px;
+color: #333;
+}
 </style>
 </head>
 <body>
 <h1>Pepinazo AI</h1>
 
+<div class="topbar">
+<label for="userId"><strong>User ID:</strong></label>
+<input
+id="userId"
+type="text"
+placeholder="ej: diego-1"
+autocomplete="off"
+/>
+</div>
+
+<div class="acciones">
+<button class="secundario" onclick="verPerfil()">Ver perfil</button>
+<button class="secundario" onclick="verMemoria()">Ver memoria</button>
+<button class="secundario" onclick="verPanelMemoria()">Panel memoria</button>
+<button class="secundario" onclick="limpiarChat()">Limpiar chat</button>
+<button class="peligro" onclick="borrarMemoria()">Borrar memoria</button>
+</div>
+
+<div class="layout">
+<div class="panel">
 <div id="chat"></div>
 
 <div class="fila">
@@ -109,14 +238,54 @@ autocomplete="off"
 <button id="btn" onclick="enviar()">Enviar</button>
 </div>
 
+<div id="estado" class="estado"></div>
+
 <div class="hint">
 Pepinazo ya conversa con backend real. Ahora sí, el muñeco dejó de ser decoración.
+</div>
+</div>
+
+<div class="panel">
+<h2 id="sideTitle">Memoria / Perfil</h2>
+<div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
+<div class="mini">
+Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra amnesia selectiva.
+</div>
+</div>
 </div>
 
 <script>
 const chat = document.getElementById("chat");
 const input = document.getElementById("msg");
 const btn = document.getElementById("btn");
+const estado = document.getElementById("estado");
+const sideTitle = document.getElementById("sideTitle");
+const sideContent = document.getElementById("sideContent");
+const userIdInput = document.getElementById("userId");
+
+const STORAGE_KEY = "pepinazo_user_id";
+
+function getUserId() {
+const value = userIdInput.value.trim();
+return value || "usuario1";
+}
+
+function saveUserId() {
+localStorage.setItem(STORAGE_KEY, getUserId());
+}
+
+function loadUserId() {
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) {
+userIdInput.value = saved;
+} else {
+userIdInput.value = "usuario1";
+}
+}
+
+function setEstado(texto) {
+estado.textContent = texto || "";
+}
 
 function agregarMensaje(tipo, autor, texto) {
 const bloque = document.createElement("div");
@@ -136,17 +305,142 @@ chat.appendChild(bloque);
 chat.scrollTop = chat.scrollHeight;
 }
 
+function limpiarChat() {
+chat.innerHTML = "";
+agregarMensaje(
+"sistema",
+"Sistema",
+`Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta, no te emociones tanto.`
+);
+}
+
+function setLoading(isLoading) {
+input.disabled = isLoading;
+btn.disabled = isLoading;
+userIdInput.disabled = isLoading;
+
+if (isLoading) {
+btn.textContent = "Pensando...";
+setEstado("Pepinazo está pensando...");
+} else {
+btn.textContent = "Enviar";
+setEstado("");
+input.focus();
+}
+}
+
+function renderJsonEnSide(title, data) {
+sideTitle.textContent = title;
+sideContent.textContent = JSON.stringify(data, null, 2);
+}
+
+function renderPerfilEnSide(data) {
+sideTitle.textContent = "Perfil";
+const partes = [];
+
+if (data.perfil_resumen?.resumen) {
+partes.push("PERFIL RESUMEN");
+partes.push(data.perfil_resumen.resumen);
+partes.push("");
+}
+
+if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
+partes.push("PERFIL USUARIO");
+for (const item of data.perfil_usuario) {
+partes.push(`- ${item.clave}: ${item.valor}`);
+}
+} else {
+partes.push("Sin perfil guardado.");
+}
+
+sideContent.textContent = partes.join("\n");
+}
+
+function renderMemoriaEnSide(data) {
+sideTitle.textContent = "Memoria";
+const partes = [];
+
+partes.push("MEMORIA RECIENTE");
+if (Array.isArray(data.memoria) && data.memoria.length) {
+for (const item of data.memoria) {
+partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+}
+} else {
+partes.push("Sin memoria reciente.");
+}
+
+partes.push("");
+partes.push("MEMORIA IMPORTANTE");
+
+if (Array.isArray(data.memoria_larga) && data.memoria_larga.length) {
+for (const item of data.memoria_larga) {
+partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+}
+} else {
+partes.push("Sin memoria importante.");
+}
+
+sideContent.textContent = partes.join("\n");
+}
+
+function renderPanelMemoria(data) {
+sideTitle.textContent = "Panel de memoria";
+
+const bloques = [];
+
+bloques.push(`User ID: ${data.userId || getUserId()}`);
+bloques.push("");
+
+if (data.perfil_resumen?.resumen) {
+bloques.push("PERFIL MAESTRO");
+bloques.push(data.perfil_resumen.resumen);
+bloques.push("");
+}
+
+if (data.perfil_estable) {
+bloques.push("PERFIL ESTABLE");
+if (data.perfil_estable.nombre) bloques.push(`Nombre: ${data.perfil_estable.nombre}`);
+if (data.perfil_estable.color_favorito) bloques.push(`Color favorito: ${data.perfil_estable.color_favorito}`);
+if (data.perfil_estable.proyecto_principal) bloques.push(`Proyecto principal: ${data.perfil_estable.proyecto_principal}`);
+if (data.perfil_estable.objetivo_actual) bloques.push(`Objetivo actual: ${data.perfil_estable.objetivo_actual}`);
+if (Array.isArray(data.perfil_estable.preferencias) && data.perfil_estable.preferencias.length) {
+bloques.push(`Preferencias: ${data.perfil_estable.preferencias.join(" | ")}`);
+}
+bloques.push("");
+}
+
+bloques.push("MEMORIA RECIENTE");
+if (Array.isArray(data.memoria_reciente) && data.memoria_reciente.length) {
+for (const item of data.memoria_reciente) {
+bloques.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+}
+} else {
+bloques.push("Sin memoria reciente.");
+}
+
+bloques.push("");
+bloques.push("MEMORIA IMPORTANTE");
+if (Array.isArray(data.memoria_importante) && data.memoria_importante.length) {
+for (const item of data.memoria_importante) {
+bloques.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+}
+} else {
+bloques.push("Sin memoria importante.");
+}
+
+sideContent.textContent = bloques.join("\n");
+}
+
 async function enviar() {
 const message = input.value.trim();
-
 if (!message) return;
 
-agregarMensaje("usuario", "Tú", message);
+saveUserId();
+const userId = getUserId();
 
+agregarMensaje("usuario", "Tú", message);
 input.value = "";
-input.disabled = true;
-btn.disabled = true;
-btn.textContent = "Pensando...";
+setLoading(true);
 
 try {
 const response = await fetch("/api/chat", {
@@ -154,7 +448,7 @@ method: "POST",
 headers: {
 "Content-Type": "application/json"
 },
-body: JSON.stringify({ message })
+body: JSON.stringify({ message, userId })
 });
 
 const data = await response.json();
@@ -163,14 +457,98 @@ if (!response.ok) {
 agregarMensaje("error", "Error", data.reply || "Error del servidor");
 } else {
 agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
+
+if (data.profile_summary) {
+sideTitle.textContent = "Perfil resumen";
+sideContent.textContent = data.profile_summary;
+}
 }
 } catch (error) {
 agregarMensaje("error", "Error", "No se pudo conectar con el servidor.");
 } finally {
-input.disabled = false;
-btn.disabled = false;
-btn.textContent = "Enviar";
-input.focus();
+setLoading(false);
+}
+}
+
+async function verPerfil() {
+saveUserId();
+const userId = getUserId();
+setEstado("Cargando perfil...");
+
+try {
+const response = await fetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+const data = await response.json();
+renderPerfilEnSide(data);
+} catch (error) {
+sideTitle.textContent = "Perfil";
+sideContent.textContent = "No se pudo cargar el perfil.";
+} finally {
+setEstado("");
+}
+}
+
+async function verMemoria() {
+saveUserId();
+const userId = getUserId();
+setEstado("Cargando memoria...");
+
+try {
+const response = await fetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+const data = await response.json();
+renderMemoriaEnSide(data);
+} catch (error) {
+sideTitle.textContent = "Memoria";
+sideContent.textContent = "No se pudo cargar la memoria.";
+} finally {
+setEstado("");
+}
+}
+
+async function verPanelMemoria() {
+saveUserId();
+const userId = getUserId();
+setEstado("Cargando panel de memoria...");
+
+try {
+const response = await fetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
+const data = await response.json();
+renderPanelMemoria(data);
+} catch (error) {
+sideTitle.textContent = "Panel de memoria";
+sideContent.textContent = "No se pudo cargar el panel.";
+} finally {
+setEstado("");
+}
+}
+
+async function borrarMemoria() {
+saveUserId();
+const userId = getUserId();
+
+const ok = confirm(`¿Seguro que quieres borrar la memoria de ${userId}?`);
+if (!ok) return;
+
+setEstado("Borrando memoria...");
+
+try {
+const response = await fetch(`/memory-clear?userId=${encodeURIComponent(userId)}`, {
+method: "DELETE"
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+agregarMensaje("error", "Error", "No se pudo borrar la memoria.");
+return;
+}
+
+agregarMensaje("sistema", "Sistema", `Memoria borrada para ${userId}.`);
+sideTitle.textContent = "Memoria / Perfil";
+sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
+} catch (error) {
+agregarMensaje("error", "Error", "No se pudo conectar para borrar memoria.");
+} finally {
+setEstado("");
 }
 }
 
@@ -180,10 +558,15 @@ enviar();
 }
 });
 
+userIdInput.addEventListener("change", saveUserId);
+userIdInput.addEventListener("blur", saveUserId);
+
+loadUserId();
+
 agregarMensaje(
 "bot",
 "Pepinazo",
-"Hola. Ya estoy conectado al backend y listo para conversar contigo."
+`Hola. Ya estoy conectado al backend y listo para conversar contigo. User ID actual: ${getUserId()}.`
 );
 </script>
 </body>
