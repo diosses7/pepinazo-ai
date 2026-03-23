@@ -5,308 +5,614 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pepinazo AI</title>
 <style>
-body {
-font-family: Arial, sans-serif;
-max-width: 1200px;
-margin: 40px auto;
-padding: 20px;
-background: #f7f7f7;
-color: #111;
+:root {
+--bg: #0b1020;
+--panel: #121933;
+--panel-soft: #18213f;
+--panel-border: rgba(255,255,255,0.08);
+--text: #eef2ff;
+--muted: #aab4d6;
+--primary: #6d7cff;
+--primary-2: #8ea0ff;
+--danger: #d14b6a;
+--danger-2: #ef6b86;
+--success: #1fbf75;
+--warning: #f0b14a;
+--chip: rgba(255,255,255,0.08);
+--shadow: 0 10px 30px rgba(0,0,0,0.25);
+--radius: 18px;
+--radius-sm: 12px;
 }
 
-h1 {
-margin-bottom: 10px;
+* {
+box-sizing: border-box;
+}
+
+body {
+margin: 0;
+font-family: Inter, Arial, sans-serif;
+background:
+radial-gradient(circle at top left, rgba(109,124,255,0.18), transparent 28%),
+radial-gradient(circle at top right, rgba(31,191,117,0.08), transparent 20%),
+linear-gradient(180deg, #0b1020 0%, #0d1327 100%);
+color: var(--text);
+min-height: 100vh;
+}
+
+.app {
+max-width: 1320px;
+margin: 0 auto;
+padding: 28px 20px 36px;
+}
+
+.hero {
+display: flex;
+justify-content: space-between;
+align-items: end;
+gap: 16px;
+margin-bottom: 20px;
+flex-wrap: wrap;
+}
+
+.hero h1 {
+margin: 0;
+font-size: 40px;
+line-height: 1;
+letter-spacing: -0.03em;
+}
+
+.hero p {
+margin: 8px 0 0;
+color: var(--muted);
+max-width: 760px;
+line-height: 1.5;
+}
+
+.glass {
+background: rgba(18, 25, 51, 0.82);
+border: 1px solid var(--panel-border);
+backdrop-filter: blur(16px);
+box-shadow: var(--shadow);
+border-radius: var(--radius);
 }
 
 .topbar {
+padding: 16px;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+justify-content: space-between;
+gap: 14px;
+margin-bottom: 18px;
+}
+
+.userbox {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.userbox label {
+color: var(--muted);
+font-size: 14px;
+font-weight: 600;
+}
+
+.userbox input {
+min-width: 240px;
+padding: 12px 14px;
+border-radius: 12px;
+border: 1px solid var(--panel-border);
+background: rgba(255,255,255,0.04);
+color: var(--text);
+outline: none;
+font-size: 14px;
+}
+
+.userbox input::placeholder,
+#msg::placeholder {
+color: #90a0cc;
+}
+
+.status-pill {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+background: rgba(31,191,117,0.12);
+color: #9ee7c4;
+border: 1px solid rgba(31,191,117,0.22);
+padding: 10px 14px;
+border-radius: 999px;
+font-size: 13px;
+font-weight: 600;
+}
+
+.dot {
+width: 8px;
+height: 8px;
+border-radius: 999px;
+background: var(--success);
+box-shadow: 0 0 12px rgba(31,191,117,0.6);
+}
+
+.toolbar {
 display: flex;
 flex-wrap: wrap;
 gap: 10px;
-align-items: center;
-margin-bottom: 15px;
+margin-bottom: 18px;
 }
 
-.topbar input {
-padding: 10px 12px;
-font-size: 14px;
-border: 1px solid #bbb;
-border-radius: 8px;
-background: #fff;
-}
-
-#userId {
-min-width: 220px;
-}
-
-.acciones {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-margin-bottom: 15px;
-}
-
-.acciones button,
-#btn {
-padding: 12px 16px;
-font-size: 14px;
+button {
 border: none;
-border-radius: 8px;
 cursor: pointer;
-background: #111;
+transition: 0.18s ease;
+font-weight: 600;
+font-size: 14px;
+}
+
+.btn {
+background: rgba(255,255,255,0.06);
+color: var(--text);
+border: 1px solid var(--panel-border);
+padding: 12px 16px;
+border-radius: 12px;
+}
+
+.btn:hover {
+transform: translateY(-1px);
+background: rgba(255,255,255,0.1);
+}
+
+.btn.primary {
+background: linear-gradient(135deg, var(--primary), var(--primary-2));
 color: white;
+border: none;
 }
 
-.acciones button.secundario {
-background: #444;
+.btn.primary:hover {
+filter: brightness(1.06);
 }
 
-.acciones button.peligro {
-background: #b00020;
+.btn.danger {
+background: linear-gradient(135deg, var(--danger), var(--danger-2));
+color: white;
+border: none;
 }
 
-.acciones button:disabled,
-#btn:disabled {
-opacity: 0.6;
-cursor: not-allowed;
+.btn.subtle {
+background: rgba(255,255,255,0.04);
 }
 
 .layout {
 display: grid;
-grid-template-columns: 2fr 1fr;
-gap: 16px;
+grid-template-columns: 1.5fr 0.95fr;
+gap: 18px;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1080px) {
 .layout {
 grid-template-columns: 1fr;
 }
 }
 
-.panel {
-border: 1px solid #ccc;
-background: #fff;
-border-radius: 10px;
-padding: 15px;
+.chat-panel,
+.side-panel {
+padding: 18px;
+min-height: 720px;
+}
+
+.panel-head {
+display: flex;
+justify-content: space-between;
+gap: 12px;
+align-items: start;
+margin-bottom: 14px;
+flex-wrap: wrap;
+}
+
+.panel-head h2 {
+margin: 0;
+font-size: 20px;
+}
+
+.panel-head p {
+margin: 6px 0 0;
+color: var(--muted);
+font-size: 13px;
+line-height: 1.45;
 }
 
 #chat {
-min-height: 350px;
-max-height: 550px;
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--panel-border);
+border-radius: 16px;
+min-height: 500px;
+max-height: 560px;
 overflow-y: auto;
-white-space: pre-wrap;
-padding-right: 4px;
-}
-
-.fila {
-display: flex;
-gap: 10px;
-margin-top: 15px;
-}
-
-#msg {
-flex: 1;
-padding: 12px;
-font-size: 16px;
-border: 1px solid #bbb;
-border-radius: 8px;
-outline: none;
+padding: 16px;
+scroll-behavior: smooth;
 }
 
 .mensaje {
-margin-bottom: 18px;
-padding-bottom: 12px;
-border-bottom: 1px solid #eee;
+margin-bottom: 14px;
+display: flex;
+flex-direction: column;
+gap: 6px;
 }
 
-.autor {
-font-weight: bold;
-display: block;
-margin-bottom: 6px;
-}
-
-.usuario .autor {
-color: #0b57d0;
-}
-
-.bot .autor {
-color: #111;
-}
-
-.error .autor {
-color: #b00020;
-}
-
-.sistema .autor {
-color: #6a1b9a;
-}
-
-.texto {
-line-height: 1.5;
-}
-
-.hint {
-font-size: 13px;
-color: #666;
-margin-top: 10px;
-}
-
-.estado {
-font-size: 13px;
-color: #444;
-margin-top: 8px;
-min-height: 18px;
-}
-
-#sideTitle {
-margin-top: 0;
-margin-bottom: 12px;
-font-size: 18px;
-}
-
-#sideContent {
-font-size: 14px;
-line-height: 1.5;
-white-space: pre-wrap;
-max-height: 650px;
-overflow-y: auto;
-}
-
-.mini {
-font-size: 12px;
-color: #666;
-margin-top: 8px;
-}
-
-.side-block {
-border-bottom: 1px solid #eee;
-padding-bottom: 12px;
-margin-bottom: 12px;
-}
-
-.side-block:last-child {
-border-bottom: none;
+.mensaje:last-child {
 margin-bottom: 0;
 }
 
-.side-subtitle {
-font-weight: bold;
-margin-bottom: 8px;
-display: block;
+.bubble {
+max-width: 88%;
+border-radius: 16px;
+padding: 12px 14px;
+line-height: 1.5;
+white-space: pre-wrap;
+word-break: break-word;
+border: 1px solid transparent;
+}
+
+.usuario {
+align-items: flex-end;
+}
+
+.usuario .autor {
+color: #9fb4ff;
+text-align: right;
+}
+
+.usuario .bubble {
+background: rgba(109,124,255,0.16);
+border-color: rgba(109,124,255,0.25);
+}
+
+.bot {
+align-items: flex-start;
+}
+
+.bot .autor {
+color: #ffffff;
+}
+
+.bot .bubble {
+background: rgba(255,255,255,0.04);
+border-color: rgba(255,255,255,0.08);
+}
+
+.error {
+align-items: flex-start;
+}
+
+.error .autor {
+color: #ff9cb2;
+}
+
+.error .bubble {
+background: rgba(209,75,106,0.14);
+border-color: rgba(209,75,106,0.25);
+}
+
+.sistema {
+align-items: center;
+}
+
+.sistema .autor {
+color: #d5b6ff;
+}
+
+.sistema .bubble {
+max-width: 100%;
+background: rgba(164, 120, 255, 0.12);
+border-color: rgba(164,120,255,0.18);
+text-align: center;
+}
+
+.autor {
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 0.02em;
+text-transform: uppercase;
+color: var(--muted);
+padding: 0 4px;
+}
+
+.input-row {
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 10px;
+margin-top: 14px;
+}
+
+#msg {
+width: 100%;
+padding: 14px 16px;
+border-radius: 14px;
+border: 1px solid var(--panel-border);
+background: rgba(255,255,255,0.05);
+color: var(--text);
+outline: none;
+font-size: 15px;
+}
+
+#msg:focus,
+.userbox input:focus {
+border-color: rgba(142,160,255,0.45);
+box-shadow: 0 0 0 3px rgba(109,124,255,0.14);
+}
+
+.status-line {
+min-height: 18px;
+margin-top: 10px;
+font-size: 13px;
+color: var(--muted);
+}
+
+.side-top {
+display: flex;
+justify-content: space-between;
+align-items: start;
+gap: 10px;
+margin-bottom: 12px;
+flex-wrap: wrap;
+}
+
+.side-top h2 {
+margin: 0;
+font-size: 20px;
+}
+
+.side-top p {
+margin: 6px 0 0;
+color: var(--muted);
+font-size: 13px;
+}
+
+.filter-bar {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 12px;
+}
+
+.filter-btn {
+padding: 9px 12px;
+border-radius: 999px;
+border: 1px solid var(--panel-border);
+background: rgba(255,255,255,0.04);
+color: var(--text);
+font-size: 12px;
+font-weight: 700;
+}
+
+.filter-btn.active {
+background: linear-gradient(135deg, var(--primary), var(--primary-2));
+border-color: transparent;
+color: white;
+}
+
+#sideContent {
+max-height: 580px;
+overflow-y: auto;
+padding-right: 4px;
+}
+
+.mini {
+margin-top: 12px;
+color: var(--muted);
+font-size: 12px;
+line-height: 1.45;
+}
+
+.section-card {
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--panel-border);
+border-radius: 16px;
+padding: 14px;
+margin-bottom: 12px;
+}
+
+.section-card h3 {
+margin: 0 0 10px;
+font-size: 14px;
+color: #dce4ff;
+letter-spacing: 0.02em;
+}
+
+.summary-box {
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--panel-border);
+border-radius: 14px;
+padding: 12px;
+white-space: pre-wrap;
+line-height: 1.55;
 }
 
 .memory-item,
 .profile-item {
-border: 1px solid #e6e6e6;
-border-radius: 8px;
-padding: 10px;
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--panel-border);
+border-radius: 14px;
+padding: 12px;
 margin-bottom: 10px;
-background: #fafafa;
 }
 
 .memory-text,
 .profile-text {
-margin-bottom: 8px;
 white-space: pre-wrap;
 word-break: break-word;
+line-height: 1.5;
+margin-bottom: 8px;
 }
 
 .memory-meta,
 .profile-meta {
 font-size: 12px;
-color: #666;
+color: var(--muted);
 margin-bottom: 8px;
 }
 
 .item-actions {
 display: flex;
 flex-wrap: wrap;
-gap: 6px;
+gap: 8px;
 }
 
 .item-actions button {
-padding: 6px 10px;
+padding: 7px 10px;
+border-radius: 10px;
 font-size: 12px;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-background: #333;
-color: white;
+background: rgba(255,255,255,0.06);
+color: var(--text);
+border: 1px solid var(--panel-border);
 }
 
-.item-actions button.peligro {
-background: #b00020;
+.item-actions button:hover {
+background: rgba(255,255,255,0.1);
 }
 
-.item-actions button.secundario {
-background: #555;
+.item-actions button.pin {
+background: rgba(31,191,117,0.12);
+border-color: rgba(31,191,117,0.2);
+color: #aaf0cd;
+}
+
+.item-actions button.danger {
+background: rgba(209,75,106,0.14);
+border-color: rgba(209,75,106,0.24);
+color: #ffb6c5;
 }
 
 .tag {
-display: inline-block;
-padding: 2px 8px;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 4px 9px;
 border-radius: 999px;
 font-size: 11px;
-background: #eee;
-margin-left: 6px;
-color: #333;
+font-weight: 700;
+background: var(--chip);
+color: #dce4ff;
+margin-left: 4px;
 }
 
-.summary-box {
-background: #f3f3f3;
-border-radius: 8px;
-padding: 10px;
-white-space: pre-wrap;
-margin-bottom: 12px;
+.muted {
+color: var(--muted);
+}
+
+.empty-state {
+color: var(--muted);
+font-size: 14px;
+padding: 12px 0 4px;
+}
+
+.footer-note {
+margin-top: 12px;
+color: var(--muted);
+font-size: 12px;
+line-height: 1.45;
+}
+
+::-webkit-scrollbar {
+width: 10px;
+height: 10px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgba(255,255,255,0.12);
+border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: rgba(255,255,255,0.2);
 }
 </style>
 </head>
 <body>
+<div class="app">
+<div class="hero">
+<div>
 <h1>Pepinazo AI</h1>
-
-<div class="topbar">
-<label for="userId"><strong>User ID:</strong></label>
-<input
-id="userId"
-type="text"
-placeholder="ej: diego-1"
-autocomplete="off"
-/>
+<p>
+Memoria persistente, perfil inteligente y panel editable. Ahora sí parece una app seria
+y no un experimento con cafeína.
+</p>
+</div>
+<div class="status-pill">
+<span class="dot"></span>
+Backend conectado
+</div>
 </div>
 
-<div class="acciones">
-<button class="secundario" onclick="verPerfil()">Ver perfil</button>
-<button class="secundario" onclick="verMemoria()">Ver memoria</button>
-<button class="secundario" onclick="verPanelMemoria()">Panel memoria</button>
-<button class="secundario" onclick="limpiarChat()">Limpiar chat</button>
-<button class="peligro" onclick="borrarMemoria()">Borrar memoria</button>
+<div class="topbar glass">
+<div class="userbox">
+<label for="userId">User ID</label>
+<input id="userId" type="text" placeholder="ej: diego-1" autocomplete="off" />
+</div>
+<div class="muted">Usa siempre el mismo userId para no fabricar amnesia artificial.</div>
+</div>
+
+<div class="toolbar">
+<button class="btn" onclick="verPerfil()">Ver perfil</button>
+<button class="btn" onclick="verMemoria()">Ver memoria</button>
+<button class="btn" onclick="verPanelMemoria()">Panel memoria</button>
+<button class="btn subtle" onclick="limpiarChat()">Limpiar chat</button>
+<button class="btn danger" onclick="borrarMemoria()">Borrar memoria</button>
 </div>
 
 <div class="layout">
-<div class="panel">
-<div id="chat"></div>
-
-<div class="fila">
-<input
-id="msg"
-type="text"
-placeholder="Escribe tu mensaje..."
-autocomplete="off"
-/>
-<button id="btn" onclick="enviar()">Enviar</button>
+<div class="chat-panel glass">
+<div class="panel-head">
+<div>
+<h2>Conversación</h2>
+<p>Chat conectado al backend real y usando memoria persistente.</p>
+</div>
 </div>
 
-<div id="estado" class="estado"></div>
+<div id="chat"></div>
 
-<div class="hint">
+<div class="input-row">
+<input id="msg" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
+<button id="btn" class="btn primary" onclick="enviar()">Enviar</button>
+</div>
+
+<div id="estado" class="status-line"></div>
+
+<div class="footer-note">
 Pepinazo ya conversa con backend real. Ahora sí, el muñeco dejó de ser decoración.
 </div>
 </div>
 
-<div class="panel">
+<div class="side-panel glass">
+<div class="side-top">
+<div>
 <h2 id="sideTitle">Memoria / Perfil</h2>
+<p>Panel editable de memoria, perfil y resumen maestro.</p>
+</div>
+</div>
+
+<div class="filter-bar">
+<button class="filter-btn active" data-filter="todo" onclick="setFiltro('todo')">Todo</button>
+<button class="filter-btn" data-filter="perfil" onclick="setFiltro('perfil')">Perfil</button>
+<button class="filter-btn" data-filter="reciente" onclick="setFiltro('reciente')">Reciente</button>
+<button class="filter-btn" data-filter="importante" onclick="setFiltro('importante')">Importante</button>
+<button class="filter-btn" data-filter="proyecto" onclick="setFiltro('proyecto')">Proyectos</button>
+<button class="filter-btn" data-filter="objetivo" onclick="setFiltro('objetivo')">Objetivos</button>
+<button class="filter-btn" data-filter="preferencia" onclick="setFiltro('preferencia')">Preferencias</button>
+</div>
+
 <div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
+
 <div class="mini">
-Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra amnesia selectiva.
+Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra
+amnesia selectiva.
+</div>
 </div>
 </div>
 </div>
@@ -322,6 +628,7 @@ const userIdInput = document.getElementById("userId");
 
 const STORAGE_KEY = "pepinazo_user_id";
 let ultimoPanel = null;
+let filtroActual = "todo";
 
 function getUserId() {
 const value = userIdInput.value.trim();
@@ -351,20 +658,20 @@ return String(text || "")
 }
 
 function agregarMensaje(tipo, autor, texto) {
-const bloque = document.createElement("div");
-bloque.className = `mensaje ${tipo}`;
+const wrapper = document.createElement("div");
+wrapper.className = `mensaje ${tipo}`;
 
-const autorEl = document.createElement("span");
+const autorEl = document.createElement("div");
 autorEl.className = "autor";
 autorEl.textContent = autor;
 
-const textoEl = document.createElement("div");
-textoEl.className = "texto";
-textoEl.textContent = texto;
+const bubble = document.createElement("div");
+bubble.className = "bubble";
+bubble.textContent = texto;
 
-bloque.appendChild(autorEl);
-bloque.appendChild(textoEl);
-chat.appendChild(bloque);
+wrapper.appendChild(autorEl);
+wrapper.appendChild(bubble);
+chat.appendChild(wrapper);
 chat.scrollTop = chat.scrollHeight;
 }
 
@@ -389,6 +696,18 @@ setEstado("Pepinazo está pensando...");
 btn.textContent = "Enviar";
 setEstado("");
 input.focus();
+}
+}
+
+function setFiltro(filtro) {
+filtroActual = filtro;
+
+document.querySelectorAll(".filter-btn").forEach((btn) => {
+btn.classList.toggle("active", btn.dataset.filter === filtro);
+});
+
+if (ultimoPanel) {
+renderPanelMemoria(ultimoPanel);
 }
 }
 
@@ -455,51 +774,105 @@ partes.push("Sin memoria importante.");
 sideContent.textContent = partes.join("\n");
 }
 
+function shouldShowProfileItem(item) {
+if (filtroActual === "todo" || filtroActual === "perfil") return true;
+if (filtroActual === "proyecto" && item.clave === "proyecto") return true;
+if (filtroActual === "objetivo" && item.clave === "objetivo") return true;
+if (filtroActual === "preferencia" && item.clave === "preferencia") return true;
+return false;
+}
+
+function shouldShowRecentItem(item) {
+if (filtroActual === "todo" || filtroActual === "reciente") return true;
+if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
+if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
+if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
+if (filtroActual === "perfil" && item.tipo === "perfil") return true;
+return false;
+}
+
+function shouldShowLongItem(item) {
+if (filtroActual === "todo" || filtroActual === "importante") return true;
+if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
+if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
+if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
+if (filtroActual === "perfil" && item.tipo === "perfil") return true;
+return false;
+}
+
 function renderPanelMemoria(data) {
 ultimoPanel = data;
 sideTitle.textContent = "Panel de memoria";
 
+const perfiles = Array.isArray(data.perfil_usuario)
+? data.perfil_usuario.filter(shouldShowProfileItem)
+: [];
+
+const recientes = Array.isArray(data.memoria_reciente)
+? data.memoria_reciente.filter(shouldShowRecentItem)
+: [];
+
+const importantes = Array.isArray(data.memoria_importante)
+? data.memoria_importante.filter(shouldShowLongItem)
+: [];
+
 let html = "";
 
-html += `<div class="side-block"><strong>User ID:</strong> ${escapeHtml(data.userId || getUserId())}</div>`;
-
-if (data.perfil_resumen?.resumen) {
 html += `
-<div class="side-block">
-<span class="side-subtitle">PERFIL MAESTRO</span>
+<div class="section-card">
+<h3>User ID</h3>
+<div>${escapeHtml(data.userId || getUserId())}</div>
+</div>
+`;
+
+if (data.perfil_resumen?.resumen && (filtroActual === "todo" || filtroActual === "perfil")) {
+html += `
+<div class="section-card">
+<h3>PERFIL MAESTRO</h3>
 <div class="summary-box">${escapeHtml(data.perfil_resumen.resumen)}</div>
-<div class="item-actions">
-<button class="secundario" onclick="verPanelMemoria()">Refrescar</button>
+<div class="item-actions" style="margin-top:10px;">
+<button onclick="verPanelMemoria()">Refrescar</button>
 </div>
 </div>
 `;
 }
 
-html += `<div class="side-block"><span class="side-subtitle">PERFIL ESTABLE</span>`;
+if (
+filtroActual === "todo" ||
+filtroActual === "perfil" ||
+filtroActual === "proyecto" ||
+filtroActual === "objetivo" ||
+filtroActual === "preferencia"
+) {
+html += `<div class="section-card"><h3>PERFIL ESTABLE</h3>`;
 
-if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
-for (const item of data.perfil_usuario) {
+if (perfiles.length) {
+for (const item of perfiles) {
 html += `
 <div class="profile-item">
-<div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
+<div class="profile-text">
+<strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}
+</div>
 <div class="profile-meta">ID: ${item.id || ""}</div>
 <div class="item-actions">
-<button onclick="editarPerfil(${item.id}, '${escapeHtml(item.valor)}')">Editar</button>
-<button class="peligro" onclick="borrarRegistro('perfil_usuario', ${item.id})">Borrar</button>
+<button onclick="editarPerfil(${item.id}, ${JSON.stringify(item.valor)})">Editar</button>
+<button class="danger" onclick="borrarRegistro('perfil_usuario', ${item.id})">Borrar</button>
 </div>
 </div>
 `;
 }
 } else {
-html += `<div>Sin perfil guardado.</div>`;
+html += `<div class="empty-state">No hay registros para este filtro.</div>`;
 }
 
 html += `</div>`;
+}
 
-html += `<div class="side-block"><span class="side-subtitle">MEMORIA RECIENTE</span>`;
+if (filtroActual === "todo" || filtroActual === "reciente" || filtroActual === "proyecto" || filtroActual === "objetivo" || filtroActual === "preferencia" || filtroActual === "perfil") {
+html += `<div class="section-card"><h3>MEMORIA RECIENTE</h3>`;
 
-if (Array.isArray(data.memoria_reciente) && data.memoria_reciente.length) {
-for (const item of data.memoria_reciente) {
+if (recientes.length) {
+for (const item of recientes) {
 html += `
 <div class="memory-item">
 <div class="memory-text">${escapeHtml(item.mensaje)}</div>
@@ -508,23 +881,25 @@ ID: ${item.id || ""}
 <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
 </div>
 <div class="item-actions">
-<button onclick="editarMemoria('memoria', ${item.id}, '${escapeHtml(item.mensaje)}')">Editar</button>
-<button class="secundario" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
-<button class="peligro" onclick="borrarRegistro('memoria', ${item.id})">Borrar</button>
+<button onclick="editarMemoria('memoria', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+<button class="pin" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
+<button class="danger" onclick="borrarRegistro('memoria', ${item.id})">Borrar</button>
 </div>
 </div>
 `;
 }
 } else {
-html += `<div>Sin memoria reciente.</div>`;
+html += `<div class="empty-state">No hay memoria reciente para este filtro.</div>`;
 }
 
 html += `</div>`;
+}
 
-html += `<div class="side-block"><span class="side-subtitle">MEMORIA IMPORTANTE</span>`;
+if (filtroActual === "todo" || filtroActual === "importante" || filtroActual === "proyecto" || filtroActual === "objetivo" || filtroActual === "preferencia" || filtroActual === "perfil") {
+html += `<div class="section-card"><h3>MEMORIA IMPORTANTE</h3>`;
 
-if (Array.isArray(data.memoria_importante) && data.memoria_importante.length) {
-for (const item of data.memoria_importante) {
+if (importantes.length) {
+for (const item of importantes) {
 html += `
 <div class="memory-item">
 <div class="memory-text">${escapeHtml(item.mensaje)}</div>
@@ -533,17 +908,18 @@ ID: ${item.id || ""}
 <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
 </div>
 <div class="item-actions">
-<button onclick="editarMemoria('memoria_larga', ${item.id}, '${escapeHtml(item.mensaje)}')">Editar</button>
-<button class="peligro" onclick="borrarRegistro('memoria_larga', ${item.id})">Borrar</button>
+<button onclick="editarMemoria('memoria_larga', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+<button class="danger" onclick="borrarRegistro('memoria_larga', ${item.id})">Borrar</button>
 </div>
 </div>
 `;
 }
 } else {
-html += `<div>Sin memoria importante.</div>`;
+html += `<div class="empty-state">No hay memoria importante para este filtro.</div>`;
 }
 
 html += `</div>`;
+}
 
 sideContent.innerHTML = html;
 }
