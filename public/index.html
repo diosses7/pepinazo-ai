@@ -7,7 +7,7 @@
 <style>
 body {
 font-family: Arial, sans-serif;
-max-width: 1100px;
+max-width: 1200px;
 margin: 40px auto;
 padding: 20px;
 background: #f7f7f7;
@@ -76,7 +76,7 @@ grid-template-columns: 2fr 1fr;
 gap: 16px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 950px) {
 .layout {
 grid-template-columns: 1fr;
 }
@@ -167,7 +167,7 @@ font-size: 18px;
 font-size: 14px;
 line-height: 1.5;
 white-space: pre-wrap;
-max-height: 550px;
+max-height: 650px;
 overflow-y: auto;
 }
 
@@ -177,19 +177,68 @@ color: #666;
 margin-top: 8px;
 }
 
-.bloqueSide {
-margin-bottom: 16px;
-padding-bottom: 12px;
+.side-block {
 border-bottom: 1px solid #eee;
+padding-bottom: 12px;
+margin-bottom: 12px;
 }
 
-.bloqueSide:last-child {
+.side-block:last-child {
 border-bottom: none;
+margin-bottom: 0;
 }
 
-.bloqueSide strong {
+.side-subtitle {
+font-weight: bold;
+margin-bottom: 8px;
 display: block;
-margin-bottom: 6px;
+}
+
+.memory-item,
+.profile-item {
+border: 1px solid #e6e6e6;
+border-radius: 8px;
+padding: 10px;
+margin-bottom: 10px;
+background: #fafafa;
+}
+
+.memory-text,
+.profile-text {
+margin-bottom: 8px;
+white-space: pre-wrap;
+word-break: break-word;
+}
+
+.memory-meta,
+.profile-meta {
+font-size: 12px;
+color: #666;
+margin-bottom: 8px;
+}
+
+.item-actions {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+}
+
+.item-actions button {
+padding: 6px 10px;
+font-size: 12px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+background: #333;
+color: white;
+}
+
+.item-actions button.peligro {
+background: #b00020;
+}
+
+.item-actions button.secundario {
+background: #555;
 }
 
 .tag {
@@ -200,6 +249,14 @@ font-size: 11px;
 background: #eee;
 margin-left: 6px;
 color: #333;
+}
+
+.summary-box {
+background: #f3f3f3;
+border-radius: 8px;
+padding: 10px;
+white-space: pre-wrap;
+margin-bottom: 12px;
 }
 </style>
 </head>
@@ -264,6 +321,7 @@ const sideContent = document.getElementById("sideContent");
 const userIdInput = document.getElementById("userId");
 
 const STORAGE_KEY = "pepinazo_user_id";
+let ultimoPanel = null;
 
 function getUserId() {
 const value = userIdInput.value.trim();
@@ -276,15 +334,20 @@ localStorage.setItem(STORAGE_KEY, getUserId());
 
 function loadUserId() {
 const saved = localStorage.getItem(STORAGE_KEY);
-if (saved) {
-userIdInput.value = saved;
-} else {
-userIdInput.value = "usuario1";
-}
+userIdInput.value = saved || "usuario1";
 }
 
 function setEstado(texto) {
 estado.textContent = texto || "";
+}
+
+function escapeHtml(text) {
+return String(text || "")
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
 }
 
 function agregarMensaje(tipo, autor, texto) {
@@ -310,7 +373,7 @@ chat.innerHTML = "";
 agregarMensaje(
 "sistema",
 "Sistema",
-`Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta, no te emociones tanto.`
+`Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta.`
 );
 }
 
@@ -329,13 +392,21 @@ input.focus();
 }
 }
 
-function renderJsonEnSide(title, data) {
-sideTitle.textContent = title;
-sideContent.textContent = JSON.stringify(data, null, 2);
+async function apiFetch(url, options = {}) {
+const response = await fetch(url, options);
+const data = await response.json().catch(() => ({}));
+
+if (!response.ok) {
+const msg = data?.error || data?.reply || "Error del servidor";
+throw new Error(msg);
 }
 
-function renderPerfilEnSide(data) {
+return data;
+}
+
+function renderPerfilTexto(data) {
 sideTitle.textContent = "Perfil";
+
 const partes = [];
 
 if (data.perfil_resumen?.resumen) {
@@ -356,8 +427,9 @@ partes.push("Sin perfil guardado.");
 sideContent.textContent = partes.join("\n");
 }
 
-function renderMemoriaEnSide(data) {
+function renderMemoriaTexto(data) {
 sideTitle.textContent = "Memoria";
+
 const partes = [];
 
 partes.push("MEMORIA RECIENTE");
@@ -384,51 +456,96 @@ sideContent.textContent = partes.join("\n");
 }
 
 function renderPanelMemoria(data) {
+ultimoPanel = data;
 sideTitle.textContent = "Panel de memoria";
 
-const bloques = [];
+let html = "";
 
-bloques.push(`User ID: ${data.userId || getUserId()}`);
-bloques.push("");
+html += `<div class="side-block"><strong>User ID:</strong> ${escapeHtml(data.userId || getUserId())}</div>`;
 
 if (data.perfil_resumen?.resumen) {
-bloques.push("PERFIL MAESTRO");
-bloques.push(data.perfil_resumen.resumen);
-bloques.push("");
+html += `
+<div class="side-block">
+<span class="side-subtitle">PERFIL MAESTRO</span>
+<div class="summary-box">${escapeHtml(data.perfil_resumen.resumen)}</div>
+<div class="item-actions">
+<button class="secundario" onclick="verPanelMemoria()">Refrescar</button>
+</div>
+</div>
+`;
 }
 
-if (data.perfil_estable) {
-bloques.push("PERFIL ESTABLE");
-if (data.perfil_estable.nombre) bloques.push(`Nombre: ${data.perfil_estable.nombre}`);
-if (data.perfil_estable.color_favorito) bloques.push(`Color favorito: ${data.perfil_estable.color_favorito}`);
-if (data.perfil_estable.proyecto_principal) bloques.push(`Proyecto principal: ${data.perfil_estable.proyecto_principal}`);
-if (data.perfil_estable.objetivo_actual) bloques.push(`Objetivo actual: ${data.perfil_estable.objetivo_actual}`);
-if (Array.isArray(data.perfil_estable.preferencias) && data.perfil_estable.preferencias.length) {
-bloques.push(`Preferencias: ${data.perfil_estable.preferencias.join(" | ")}`);
+html += `<div class="side-block"><span class="side-subtitle">PERFIL ESTABLE</span>`;
+
+if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
+for (const item of data.perfil_usuario) {
+html += `
+<div class="profile-item">
+<div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
+<div class="profile-meta">ID: ${item.id || ""}</div>
+<div class="item-actions">
+<button onclick="editarPerfil(${item.id}, '${escapeHtml(item.valor)}')">Editar</button>
+<button class="peligro" onclick="borrarRegistro('perfil_usuario', ${item.id})">Borrar</button>
+</div>
+</div>
+`;
 }
-bloques.push("");
+} else {
+html += `<div>Sin perfil guardado.</div>`;
 }
 
-bloques.push("MEMORIA RECIENTE");
+html += `</div>`;
+
+html += `<div class="side-block"><span class="side-subtitle">MEMORIA RECIENTE</span>`;
+
 if (Array.isArray(data.memoria_reciente) && data.memoria_reciente.length) {
 for (const item of data.memoria_reciente) {
-bloques.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+html += `
+<div class="memory-item">
+<div class="memory-text">${escapeHtml(item.mensaje)}</div>
+<div class="memory-meta">
+ID: ${item.id || ""}
+<span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
+</div>
+<div class="item-actions">
+<button onclick="editarMemoria('memoria', ${item.id}, '${escapeHtml(item.mensaje)}')">Editar</button>
+<button class="secundario" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
+<button class="peligro" onclick="borrarRegistro('memoria', ${item.id})">Borrar</button>
+</div>
+</div>
+`;
 }
 } else {
-bloques.push("Sin memoria reciente.");
+html += `<div>Sin memoria reciente.</div>`;
 }
 
-bloques.push("");
-bloques.push("MEMORIA IMPORTANTE");
+html += `</div>`;
+
+html += `<div class="side-block"><span class="side-subtitle">MEMORIA IMPORTANTE</span>`;
+
 if (Array.isArray(data.memoria_importante) && data.memoria_importante.length) {
 for (const item of data.memoria_importante) {
-bloques.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
+html += `
+<div class="memory-item">
+<div class="memory-text">${escapeHtml(item.mensaje)}</div>
+<div class="memory-meta">
+ID: ${item.id || ""}
+<span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
+</div>
+<div class="item-actions">
+<button onclick="editarMemoria('memoria_larga', ${item.id}, '${escapeHtml(item.mensaje)}')">Editar</button>
+<button class="peligro" onclick="borrarRegistro('memoria_larga', ${item.id})">Borrar</button>
+</div>
+</div>
+`;
 }
 } else {
-bloques.push("Sin memoria importante.");
+html += `<div>Sin memoria importante.</div>`;
 }
 
-sideContent.textContent = bloques.join("\n");
+html += `</div>`;
+
+sideContent.innerHTML = html;
 }
 
 async function enviar() {
@@ -443,7 +560,7 @@ input.value = "";
 setLoading(true);
 
 try {
-const response = await fetch("/api/chat", {
+const data = await apiFetch("/api/chat", {
 method: "POST",
 headers: {
 "Content-Type": "application/json"
@@ -451,20 +568,14 @@ headers: {
 body: JSON.stringify({ message, userId })
 });
 
-const data = await response.json();
-
-if (!response.ok) {
-agregarMensaje("error", "Error", data.reply || "Error del servidor");
-} else {
 agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
 
 if (data.profile_summary) {
 sideTitle.textContent = "Perfil resumen";
 sideContent.textContent = data.profile_summary;
 }
-}
 } catch (error) {
-agregarMensaje("error", "Error", "No se pudo conectar con el servidor.");
+agregarMensaje("error", "Error", error.message || "No se pudo conectar con el servidor.");
 } finally {
 setLoading(false);
 }
@@ -476,12 +587,11 @@ const userId = getUserId();
 setEstado("Cargando perfil...");
 
 try {
-const response = await fetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-const data = await response.json();
-renderPerfilEnSide(data);
+const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+renderPerfilTexto(data);
 } catch (error) {
 sideTitle.textContent = "Perfil";
-sideContent.textContent = "No se pudo cargar el perfil.";
+sideContent.textContent = error.message || "No se pudo cargar el perfil.";
 } finally {
 setEstado("");
 }
@@ -493,12 +603,11 @@ const userId = getUserId();
 setEstado("Cargando memoria...");
 
 try {
-const response = await fetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-const data = await response.json();
-renderMemoriaEnSide(data);
+const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
+renderMemoriaTexto(data);
 } catch (error) {
 sideTitle.textContent = "Memoria";
-sideContent.textContent = "No se pudo cargar la memoria.";
+sideContent.textContent = error.message || "No se pudo cargar la memoria.";
 } finally {
 setEstado("");
 }
@@ -510,12 +619,11 @@ const userId = getUserId();
 setEstado("Cargando panel de memoria...");
 
 try {
-const response = await fetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
-const data = await response.json();
+const data = await apiFetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
 renderPanelMemoria(data);
 } catch (error) {
 sideTitle.textContent = "Panel de memoria";
-sideContent.textContent = "No se pudo cargar el panel.";
+sideContent.textContent = error.message || "No se pudo cargar el panel.";
 } finally {
 setEstado("");
 }
@@ -531,22 +639,115 @@ if (!ok) return;
 setEstado("Borrando memoria...");
 
 try {
-const response = await fetch(`/memory-clear?userId=${encodeURIComponent(userId)}`, {
+await apiFetch(`/memory-clear?userId=${encodeURIComponent(userId)}`, {
 method: "DELETE"
 });
-
-const data = await response.json();
-
-if (!response.ok) {
-agregarMensaje("error", "Error", "No se pudo borrar la memoria.");
-return;
-}
 
 agregarMensaje("sistema", "Sistema", `Memoria borrada para ${userId}.`);
 sideTitle.textContent = "Memoria / Perfil";
 sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
 } catch (error) {
-agregarMensaje("error", "Error", "No se pudo conectar para borrar memoria.");
+agregarMensaje("error", "Error", error.message || "No se pudo borrar la memoria.");
+} finally {
+setEstado("");
+}
+}
+
+async function borrarRegistro(table, id) {
+const ok = confirm(`¿Borrar este registro de ${table}?`);
+if (!ok) return;
+
+setEstado("Borrando registro...");
+
+try {
+await apiFetch(`/memory/${table}/${id}?userId=${encodeURIComponent(getUserId())}`, {
+method: "DELETE"
+});
+
+await verPanelMemoria();
+} catch (error) {
+agregarMensaje("error", "Error", error.message || "No se pudo borrar el registro.");
+} finally {
+setEstado("");
+}
+}
+
+async function editarPerfil(id, valorActual) {
+const nuevoValor = prompt("Editar valor del perfil:", valorActual);
+if (nuevoValor === null) return;
+
+const clean = nuevoValor.trim();
+if (!clean) return;
+
+setEstado("Editando perfil...");
+
+try {
+await apiFetch(`/memory/profile/${id}`, {
+method: "PATCH",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+valor: clean,
+userId: getUserId()
+})
+});
+
+await verPanelMemoria();
+} catch (error) {
+agregarMensaje("error", "Error", error.message || "No se pudo editar el perfil.");
+} finally {
+setEstado("");
+}
+}
+
+async function editarMemoria(table, id, valorActual) {
+const nuevoValor = prompt("Editar recuerdo:", valorActual);
+if (nuevoValor === null) return;
+
+const clean = nuevoValor.trim();
+if (!clean) return;
+
+setEstado("Editando memoria...");
+
+try {
+await apiFetch(`/memory/message/${table}/${id}`, {
+method: "PATCH",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+mensaje: clean
+})
+});
+
+await verPanelMemoria();
+} catch (error) {
+agregarMensaje("error", "Error", error.message || "No se pudo editar la memoria.");
+} finally {
+setEstado("");
+}
+}
+
+async function fijarMemoria(sourceTable, id) {
+setEstado("Fijando recuerdo importante...");
+
+try {
+await apiFetch(`/memory/pin`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+sourceTable,
+id,
+userId: getUserId()
+})
+});
+
+await verPanelMemoria();
+} catch (error) {
+agregarMensaje("error", "Error", error.message || "No se pudo fijar la memoria.");
 } finally {
 setEstado("");
 }
