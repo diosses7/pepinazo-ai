@@ -171,6 +171,88 @@ valor: match[1].trim()
 return extracted;
 }
 
+function extractProfileDataSmart(message) {
+const text = normalizeText(message);
+const extracted = [];
+
+function add(clave, valor) {
+const clean = normalizeText(valor)
+.replace(/[.!,;:]+$/g, "")
+.trim();
+
+if (!clean) return;
+
+extracted.push({ clave, valor: clean });
+}
+
+let match =
+text.match(/\bme llamo\s+([A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,40})/i) ||
+text.match(/\bpuedes llamarme\s+([A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,40})/i) ||
+text.match(/\bsoy\s+([A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,40})$/i);
+
+if (match && match[1]) {
+add("nombre", match[1]);
+}
+
+match =
+text.match(/\bmi proyecto es\s+(.+)/i) ||
+text.match(/\bestoy creando\s+(.+)/i) ||
+text.match(/\bestoy haciendo\s+(.+)/i) ||
+text.match(/\bestoy trabajando en\s+(.+)/i);
+
+if (match && match[1]) {
+add("proyecto", match[1]);
+}
+
+match =
+text.match(/\bmi objetivo es\s+(.+)/i) ||
+text.match(/\bmi meta es\s+(.+)/i) ||
+text.match(/\bquiero lograr\s+(.+)/i) ||
+text.match(/\bquiero crear\s+(.+)/i);
+
+if (match && match[1]) {
+add("objetivo", match[1]);
+}
+
+match =
+text.match(/\bprefiero\s+(.+)/i) ||
+text.match(/\bno me gusta\s+(.+)/i) ||
+text.match(/\bme gusta que\s+(.+)/i);
+
+if (match && match[1]) {
+add("preferencia", match[1]);
+}
+
+match =
+text.match(/\bvivo en\s+(.+)/i) ||
+text.match(/\bestoy en\s+([A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,50})/i);
+
+if (match && match[1]) {
+add("ciudad", match[1]);
+}
+
+match =
+text.match(/\btrabajo en\s+(.+)/i) ||
+text.match(/\btrabajo como\s+(.+)/i);
+
+if (match && match[1]) {
+add("trabajo", match[1]);
+}
+
+const unique = [];
+const seen = new Set();
+
+for (const item of extracted) {
+const key = `${item.clave}::${item.valor.toLowerCase()}`;
+if (!seen.has(key)) {
+seen.add(key);
+unique.push(item);
+}
+}
+
+return unique;
+}
+
 async function upsertProfileValue(idUsuario, clave, valor) {
 try {
 if (!hasSupabaseConfig()) {
@@ -255,7 +337,9 @@ body: String(error)
 }
 
 async function saveExtractedProfile(idUsuario, message) {
-const extracted = extractProfileData(message);
+const extractedClassic = extractProfileData(message);
+const extractedSmart = extractProfileDataSmart(message);
+const extracted = [...extractedClassic, ...extractedSmart];
 
 for (const item of extracted) {
 const result = await upsertProfileValue(idUsuario, item.clave, item.valor);
@@ -624,3 +708,4 @@ return res.status(500).json({ reply: "Error en servidor." });
 app.listen(PORT, "0.0.0.0", () => {
 console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
+
