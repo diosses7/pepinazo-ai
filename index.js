@@ -256,55 +256,16 @@ return unique;
 async function upsertProfileValue(idUsuario, clave, valor) {
 try {
 if (!hasSupabaseConfig()) {
-return { ok: false, status: 500, body: "Faltan variables de Supabase" };
-}
-
-const queryUrl =
-`${SUPABASE_URL}/rest/v1/${PROFILE_TABLE}` +
-`?select=id,clave,valor` +
-`&${USER_COLUMN}=eq.${encodeURIComponent(idUsuario)}` +
-`&clave=eq.${encodeURIComponent(clave)}` +
-`&limit=1`;
-
-const existingRes = await fetch(queryUrl, {
-method: "GET",
-headers: {
-apikey: SUPABASE_KEY,
-Authorization: `Bearer ${SUPABASE_KEY}`,
-"Content-Type": "application/json"
-}
-});
-
-const existingText = await existingRes.text();
-const existingRows = safeJsonParse(existingText, []);
-
-if (Array.isArray(existingRows) && existingRows.length > 0) {
-const patchUrl =
-`${SUPABASE_URL}/rest/v1/${PROFILE_TABLE}` +
-`?${USER_COLUMN}=eq.${encodeURIComponent(idUsuario)}` +
-`&clave=eq.${encodeURIComponent(clave)}`;
-
-const patchRes = await fetch(patchUrl, {
-method: "PATCH",
-headers: {
-apikey: SUPABASE_KEY,
-Authorization: `Bearer ${SUPABASE_KEY}`,
-"Content-Type": "application/json",
-Prefer: "return=representation"
-},
-body: JSON.stringify({ valor })
-});
-
-const patchBody = await patchRes.text();
-
 return {
-ok: patchRes.ok,
-status: patchRes.status,
-body: patchBody
+ok: false,
+status: 500,
+body: "Faltan variables de Supabase"
 };
 }
 
-const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/${PROFILE_TABLE}`, {
+const response = await fetch(
+`${SUPABASE_URL}/rest/v1/${PROFILE_TABLE}`,
+{
 method: "POST",
 headers: {
 apikey: SUPABASE_KEY,
@@ -317,17 +278,19 @@ body: JSON.stringify({
 clave,
 valor
 })
-});
+}
+);
 
-const insertBody = await insertRes.text();
+const body = await response.text();
 
 return {
-ok: insertRes.ok,
-status: insertRes.status,
-body: insertBody
+ok: response.ok,
+status: response.status,
+body
 };
 } catch (error) {
-console.log("UPSERT PROFILE ERROR:", error);
+console.log("INSERT PROFILE ERROR:", error);
+
 return {
 ok: false,
 status: 500,
