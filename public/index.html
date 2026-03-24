@@ -4,24 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pepinazo AI</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    rel="stylesheet"
+  />
+
   <style>
     :root {
       --bg: #060c16;
       --bg-2: #0b1220;
-      --card: #0f1728;
-      --card-2: #121c31;
+      --card: rgba(15, 23, 40, 0.82);
+      --card-2: rgba(18, 28, 49, 0.9);
       --line: rgba(255,255,255,0.08);
       --line-2: rgba(255,255,255,0.05);
       --text: #edf3ff;
       --muted: #8a9bbb;
       --primary: #2f80ff;
-      --primary-2: #5b9cff;
+      --primary-2: #7c3aed;
       --success: #1fbf75;
       --danger: #d85d77;
       --danger-2: #f1738f;
+      --warning: #f59e0b;
       --chip: rgba(255,255,255,0.06);
       --shadow: 0 18px 44px rgba(0,0,0,0.34);
-      --radius: 22px;
+      --radius: 24px;
       --radius-sm: 14px;
     }
 
@@ -34,8 +42,8 @@
       padding: 0;
       font-family: Inter, Arial, sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(47,128,255,0.12), transparent 20%),
-        radial-gradient(circle at top left, rgba(31,191,117,0.06), transparent 14%),
+        radial-gradient(circle at top right, rgba(47,128,255,0.13), transparent 20%),
+        radial-gradient(circle at top left, rgba(124,58,237,0.12), transparent 18%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
       color: var(--text);
       min-height: 100vh;
@@ -46,8 +54,25 @@
     }
 
     .app {
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .glass-soft {
+      background: var(--card-2);
+      border: 1px solid var(--line-2);
+      border-radius: 18px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
     .hero {
@@ -57,6 +82,36 @@
       gap: 18px;
       flex-wrap: wrap;
       margin-bottom: 18px;
+      padding: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: auto -90px -90px auto;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(47,128,255,0.18), transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-icon {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(47,128,255,0.22), rgba(124,58,237,0.24));
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 24px;
     }
 
     .hero h1 {
@@ -64,21 +119,43 @@
       font-size: 44px;
       letter-spacing: -0.03em;
       line-height: 1;
+      background: linear-gradient(90deg, #8ec5ff 0%, #c4b5fd 60%, #ffffff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .hero p {
-      margin: 8px 0 0;
+      margin: 10px 0 0;
       color: var(--muted);
       max-width: 860px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    .glass {
-      background: rgba(15,23,40,0.88);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
+    .hero-balance {
+      min-width: 260px;
+      text-align: right;
+    }
+
+    .hero-balance .label-soft {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hero-balance .value {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: #8ff0bc;
+    }
+
+    .hero-balance .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .status-pill {
@@ -92,6 +169,7 @@
       color: #9de7c4;
       font-size: 13px;
       font-weight: 700;
+      margin-top: 14px;
     }
 
     .dot {
@@ -108,8 +186,8 @@
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
     }
 
     .user-box {
@@ -179,7 +257,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     button {
@@ -225,15 +303,97 @@
       font-size: 12px;
     }
 
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      padding: 18px;
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-top .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #d9e6ff;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     .layout {
       display: grid;
       grid-template-columns: 1.55fr 0.95fr;
       gap: 18px;
     }
 
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 1120px) {
       .layout {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 18px;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+      }
+
+      .hero-balance {
+        text-align: left;
+      }
+
+      .input-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      .finance-actions,
+      .finance-mini-grid,
+      .opportunities-grid {
+        grid-template-columns: 1fr !important;
       }
     }
 
@@ -246,13 +406,16 @@
 
     .chat-panel,
     .side-panel,
-    .finance-panel {
+    .finance-panel,
+    .opportunities-panel,
+    .insight-panel {
       padding: 18px;
     }
 
     .panel-head,
     .side-top,
-    .finance-top {
+    .finance-top,
+    .op-head {
       display: flex;
       justify-content: space-between;
       gap: 10px;
@@ -263,7 +426,8 @@
 
     .panel-head h2,
     .side-top h2,
-    .finance-top h2 {
+    .finance-top h2,
+    .op-head h2 {
       margin: 0;
       font-size: 26px;
       letter-spacing: -0.02em;
@@ -271,7 +435,8 @@
 
     .panel-head p,
     .side-top p,
-    .finance-top p {
+    .finance-top p,
+    .op-head p {
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 13px;
@@ -384,6 +549,15 @@
       font-size: 13px;
     }
 
+    .finance-chart-wrap {
+      height: 240px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
     .finance-balance-card {
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
@@ -442,6 +616,30 @@
     .mini-card .v {
       font-size: 22px;
       font-weight: 700;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .insight-box {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .insight-box .t {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .insight-box .v {
+      font-size: 18px;
+      font-weight: 800;
     }
 
     .side-top h2 {
@@ -584,6 +782,41 @@
       line-height: 1.45;
     }
 
+    .opportunities-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .op-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .op-card .op-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .op-card h4 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .op-card p {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -668,17 +901,31 @@
 </head>
 <body>
   <div class="app">
-    <div class="hero">
+    <div class="hero glass">
       <div>
-        <h1>Pepinazo AI</h1>
-        <p>
-          Memoria persistente, perfil inteligente y panel editable. Ahora sí parece una app seria
-          y no un experimento con cafeína.
-        </p>
+        <div class="hero-title">
+          <div class="hero-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <div>
+            <h1>Pepinazo AI</h1>
+            <p>
+              Memoria persistente, perfil inteligente, panel editable y una cara por fin más digna.
+              Ya no parece un experimento con cafeína; ahora parece uno con presupuesto.
+            </p>
+          </div>
+        </div>
+
+        <div class="status-pill">
+          <span class="dot"></span>
+          Backend conectado
+        </div>
       </div>
-      <div class="status-pill">
-        <span class="dot"></span>
-        Backend conectado
+
+      <div class="hero-balance">
+        <div class="label-soft">Balance Pepinazo Finance</div>
+        <div class="value" id="heroMoneyTotal">$0</div>
+        <div class="sub">Control rápido de caja mientras mañana seguimos con el monstruo serio.</div>
       </div>
     </div>
 
@@ -690,12 +937,58 @@
       <div class="mini">Usa siempre el mismo userId para no fabricar amnesia artificial.</div>
     </div>
 
+    <div class="dashboard-grid">
+      <div class="stat-card glass-soft">
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Memoria reciente</div>
+            <div class="stat-value" id="statRecentCount">0</div>
+          </div>
+          <div class="icon"><i class="fas fa-brain"></i></div>
+        </div>
+        <div class="stat-sub">Recuerdos de corto plazo detectados.</div>
+      </div>
+
+      <div class="stat-card glass-soft">
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Memoria importante</div>
+            <div class="stat-value" id="statImportantCount">0</div>
+          </div>
+          <div class="icon"><i class="fas fa-thumbtack"></i></div>
+        </div>
+        <div class="stat-sub">Recuerdos fijados o de largo plazo.</div>
+      </div>
+
+      <div class="stat-card glass-soft">
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Campos de perfil</div>
+            <div class="stat-value" id="statProfileCount">0</div>
+          </div>
+          <div class="icon"><i class="fas fa-id-badge"></i></div>
+        </div>
+        <div class="stat-sub">Perfil estable actualmente visible.</div>
+      </div>
+
+      <div class="stat-card glass-soft">
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Estado del sistema</div>
+            <div class="stat-value" style="color:#8ff0bc;">OK</div>
+          </div>
+          <div class="icon"><i class="fas fa-satellite-dish"></i></div>
+        </div>
+        <div class="stat-sub">UI renovada sin tocar el backend.</div>
+      </div>
+    </div>
+
     <div class="toolbar">
-      <button class="btn" onclick="verPerfil()">Ver perfil</button>
-      <button class="btn" onclick="verMemoria()">Ver memoria</button>
-      <button class="btn" onclick="verPanelMemoria()">Panel memoria</button>
-      <button class="btn" onclick="limpiarChat()">Limpiar chat</button>
-      <button class="btn danger" onclick="borrarMemoria()">Borrar memoria</button>
+      <button class="btn" onclick="verPerfil()"><i class="fas fa-user"></i> Ver perfil</button>
+      <button class="btn" onclick="verMemoria()"><i class="fas fa-brain"></i> Ver memoria</button>
+      <button class="btn" onclick="verPanelMemoria()"><i class="fas fa-table-columns"></i> Panel memoria</button>
+      <button class="btn" onclick="limpiarChat()"><i class="fas fa-broom"></i> Limpiar chat</button>
+      <button class="btn danger" onclick="borrarMemoria()"><i class="fas fa-trash"></i> Borrar memoria</button>
     </div>
 
     <div class="layout">
@@ -718,7 +1011,7 @@
           <div id="estado" class="status-line"></div>
 
           <div class="footer-note">
-            Pepinazo ya conversa con backend real. Ahora sí, el muñeco dejó de ser decoración.
+            Pepinazo ya conversa con backend real. O sea, todavía no domina el planeta, pero ya dejó de ser decoración.
           </div>
         </div>
 
@@ -726,8 +1019,12 @@
           <div class="finance-top">
             <div>
               <h2>Pepinazo Finance</h2>
-              <p>Registro rápido manual de caja, depósitos y retiros, con look más tipo app financiera.</p>
+              <p>Registro rápido manual de caja, depósitos y retiros, ahora con look más fintech.</p>
             </div>
+          </div>
+
+          <div class="finance-chart-wrap">
+            <canvas id="financeChart"></canvas>
           </div>
 
           <div class="finance-balance-card">
@@ -749,6 +1046,38 @@
             <div class="mini-card">
               <div class="k">Total retiros</div>
               <div class="v" id="moneyWithdrawals">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="opportunities-panel glass">
+          <div class="op-head">
+            <div>
+              <h2>Oportunidades</h2>
+              <p>Base visual para futuras ideas de negocio, inversión y ecommerce.</p>
+            </div>
+          </div>
+
+          <div class="opportunities-grid">
+            <div class="op-card">
+              <div class="op-icon"><i class="fas fa-home"></i></div>
+              <h4>Propiedades</h4>
+              <p>Espacio listo para análisis de plusvalía, arriendo y patrimonio.</p>
+              <button class="btn small">Próximamente</button>
+            </div>
+
+            <div class="op-card">
+              <div class="op-icon"><i class="fas fa-chart-line"></i></div>
+              <h4>Inversiones</h4>
+              <p>Base preparada para VOO, QQQ, BTC, ETH y panel estilo Fintual.</p>
+              <button class="btn small">Próximamente</button>
+            </div>
+
+            <div class="op-card">
+              <div class="op-icon"><i class="fas fa-store"></i></div>
+              <h4>Ecommerce</h4>
+              <p>Bloque listo para conectar productos, radar de mercado y automatización.</p>
+              <button class="btn small">Próximamente</button>
             </div>
           </div>
         </div>
@@ -776,8 +1105,35 @@
           <div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
 
           <div class="mini">
-            Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra
-            amnesia selectiva.
+            Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra amnesia selectiva.
+          </div>
+        </div>
+
+        <div class="insight-panel glass">
+          <div class="op-head">
+            <div>
+              <h2>Resumen rápido</h2>
+              <p>Lectura visual corta para no nadar en puro texto eterno.</p>
+            </div>
+          </div>
+
+          <div class="insight-grid">
+            <div class="insight-box">
+              <div class="t">User ID activo</div>
+              <div class="v" id="insightUserId">usuario1</div>
+            </div>
+            <div class="insight-box">
+              <div class="t">Último filtro</div>
+              <div class="v" id="insightFiltro">todo</div>
+            </div>
+            <div class="insight-box">
+              <div class="t">Chat</div>
+              <div class="v">Online</div>
+            </div>
+            <div class="insight-box">
+              <div class="t">Backend</div>
+              <div class="v" style="color:#8ff0bc;">Conectado</div>
+            </div>
           </div>
         </div>
       </div>
@@ -818,6 +1174,8 @@
     let ultimoPanel = null;
     let filtroActual = "todo";
     let modalMode = "textarea";
+    let financeChart = null;
+
     let financeState = {
       balance: 0,
       deposits: 0,
@@ -831,11 +1189,15 @@
 
     function saveUserId() {
       localStorage.setItem(STORAGE_KEY, getUserId());
+      const insightUser = document.getElementById("insightUserId");
+      if (insightUser) insightUser.textContent = getUserId();
     }
 
     function loadUserId() {
       const saved = localStorage.getItem(STORAGE_KEY);
       userIdInput.value = saved || "usuario1";
+      const insightUser = document.getElementById("insightUserId");
+      if (insightUser) insightUser.textContent = getUserId();
     }
 
     function formatMoney(value) {
@@ -869,12 +1231,68 @@
 
     function renderFinance() {
       const balanceEl = document.getElementById("moneyTotal");
+      const heroBalanceEl = document.getElementById("heroMoneyTotal");
       const depositsEl = document.getElementById("moneyDeposits");
       const withdrawalsEl = document.getElementById("moneyWithdrawals");
 
       if (balanceEl) balanceEl.textContent = formatMoney(financeState.balance);
+      if (heroBalanceEl) heroBalanceEl.textContent = formatMoney(financeState.balance);
       if (depositsEl) depositsEl.textContent = formatMoney(financeState.deposits);
       if (withdrawalsEl) withdrawalsEl.textContent = formatMoney(financeState.withdrawals);
+
+      renderFinanceChart();
+    }
+
+    function renderFinanceChart() {
+      const canvas = document.getElementById("financeChart");
+      if (!canvas || typeof Chart === "undefined") return;
+
+      const ctx = canvas.getContext("2d");
+
+      if (financeChart) {
+        financeChart.destroy();
+      }
+
+      financeChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Balance", "Depósitos", "Retiros"],
+          datasets: [
+            {
+              label: "CLP",
+              data: [
+                Math.max(financeState.balance, 0),
+                financeState.deposits,
+                financeState.withdrawals
+              ],
+              backgroundColor: [
+                "rgba(47,128,255,0.75)",
+                "rgba(31,191,117,0.75)",
+                "rgba(216,93,119,0.75)"
+              ],
+              borderRadius: 12
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#c8d5ef" },
+              grid: { color: "rgba(255,255,255,0.05)" }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: "#c8d5ef" },
+              grid: { color: "rgba(255,255,255,0.05)" }
+            }
+          }
+        }
+      });
     }
 
     function setEstado(texto) {
@@ -942,6 +1360,8 @@
 
     function setFiltro(filtro) {
       filtroActual = filtro;
+      const insightFiltro = document.getElementById("insightFiltro");
+      if (insightFiltro) insightFiltro.textContent = filtro;
 
       document.querySelectorAll(".filter-btn").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.filter === filtro);
@@ -1101,9 +1521,24 @@
       return false;
     }
 
+    function actualizarStatsPanel(data) {
+      const recent = Array.isArray(data.memoria_reciente) ? data.memoria_reciente.length : 0;
+      const important = Array.isArray(data.memoria_importante) ? data.memoria_importante.length : 0;
+      const profile = Array.isArray(data.perfil_usuario) ? data.perfil_usuario.length : 0;
+
+      const statRecent = document.getElementById("statRecentCount");
+      const statImportant = document.getElementById("statImportantCount");
+      const statProfile = document.getElementById("statProfileCount");
+
+      if (statRecent) statRecent.textContent = recent;
+      if (statImportant) statImportant.textContent = important;
+      if (statProfile) statProfile.textContent = profile;
+    }
+
     function renderPanelMemoria(data) {
       ultimoPanel = data;
       sideTitle.textContent = "Panel de memoria";
+      actualizarStatsPanel(data);
 
       const perfiles = Array.isArray(data.perfil_usuario)
         ? data.perfil_usuario.filter(shouldShowProfileItem)
@@ -1375,6 +1810,7 @@
             agregarMensaje("sistema", "Sistema", `Memoria borrada para ${getUserId()}.`);
             sideTitle.textContent = "Memoria / Perfil";
             sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
+            actualizarStatsPanel({ memoria_reciente: [], memoria_importante: [], perfil_usuario: [] });
             cerrarModal();
           } catch (error) {
             agregarMensaje("error", "Error", error.message || "No se pudo borrar la memoria.");
