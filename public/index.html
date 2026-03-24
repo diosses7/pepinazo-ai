@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pepinazo AI</title>
+  <title>Pepinazo AI – Panel Fintech</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link
@@ -13,24 +13,23 @@
 
   <style>
     :root {
-      --bg: #060c16;
-      --bg-2: #0b1220;
-      --card: rgba(15, 23, 40, 0.82);
-      --card-2: rgba(18, 28, 49, 0.9);
-      --line: rgba(255,255,255,0.08);
-      --line-2: rgba(255,255,255,0.05);
-      --text: #edf3ff;
-      --muted: #8a9bbb;
-      --primary: #2f80ff;
-      --primary-2: #7c3aed;
-      --success: #1fbf75;
-      --danger: #d85d77;
-      --danger-2: #f1738f;
-      --warning: #f59e0b;
-      --chip: rgba(255,255,255,0.06);
-      --shadow: 0 18px 44px rgba(0,0,0,0.34);
+      --bg: #040814;
+      --bg-2: #020617;
+      --card: rgba(12, 18, 32, 0.92);
+      --card-2: rgba(15, 23, 42, 0.96);
+      --line: rgba(148, 163, 184, 0.24);
+      --line-soft: rgba(148, 163, 184, 0.12);
+      --text: #e8eefc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-2: #2563eb;
+      --violet: #7c3aed;
+      --success: #22c55e;
+      --danger: #f87171;
+      --warning: #fbbf24;
       --radius: 24px;
-      --radius-sm: 14px;
+      --radius-sm: 18px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
     }
 
     * {
@@ -40,21 +39,21 @@
     html, body {
       margin: 0;
       padding: 0;
-      font-family: Inter, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(47,128,255,0.13), transparent 20%),
-        radial-gradient(circle at top left, rgba(124,58,237,0.12), transparent 18%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-      color: var(--text);
       min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 30%),
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 28%),
+        linear-gradient(180deg, #050816 0%, #020617 60%, #000000 100%);
     }
 
     body {
-      padding: 22px;
+      padding: 18px;
     }
 
     .app {
-      max-width: 1440px;
+      max-width: 1300px;
       margin: 0 auto;
     }
 
@@ -67,12 +66,10 @@
       box-shadow: var(--shadow);
     }
 
-    .glass-soft {
+    .soft {
       background: var(--card-2);
-      border: 1px solid var(--line-2);
-      border-radius: 18px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
     }
 
     .hero {
@@ -80,21 +77,26 @@
       justify-content: space-between;
       align-items: flex-end;
       gap: 18px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
       padding: 24px;
-      overflow: hidden;
+      margin-bottom: 18px;
       position: relative;
+      overflow: hidden;
     }
 
-    .hero::before {
+    .hero::after {
       content: "";
       position: absolute;
-      inset: auto -90px -90px auto;
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, rgba(47,128,255,0.18), transparent 60%);
+      width: 280px;
+      height: 280px;
+      right: -80px;
+      bottom: -120px;
+      background: radial-gradient(circle, rgba(59,130,246,0.25), transparent 65%);
       pointer-events: none;
+    }
+
+    .hero-left {
+      position: relative;
+      z-index: 1;
     }
 
     .hero-title {
@@ -104,22 +106,22 @@
     }
 
     .hero-icon {
-      width: 54px;
-      height: 54px;
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
       display: grid;
       place-items: center;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(47,128,255,0.22), rgba(124,58,237,0.24));
-      border: 1px solid rgba(255,255,255,0.08);
       font-size: 24px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--violet));
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.45);
     }
 
     .hero h1 {
       margin: 0;
-      font-size: 44px;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      background: linear-gradient(90deg, #8ec5ff 0%, #c4b5fd 60%, #ffffff 100%);
+      font-size: 38px;
+      letter-spacing: -0.04em;
+      background: linear-gradient(90deg, #dbeafe 0%, #a5b4fc 45%, #ffffff 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -127,49 +129,24 @@
 
     .hero p {
       margin: 10px 0 0;
+      max-width: 700px;
       color: var(--muted);
-      max-width: 860px;
+      font-size: 14px;
       line-height: 1.6;
-    }
-
-    .hero-balance {
-      min-width: 260px;
-      text-align: right;
-    }
-
-    .hero-balance .label-soft {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .hero-balance .value {
-      font-size: 40px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.03em;
-      color: #8ff0bc;
-    }
-
-    .hero-balance .sub {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
     }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(31,191,117,0.12);
-      border: 1px solid rgba(31,191,117,0.18);
-      color: #9de7c4;
-      font-size: 13px;
-      font-weight: 700;
       margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      color: #bbf7d0;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .dot {
@@ -177,224 +154,41 @@
       height: 8px;
       border-radius: 999px;
       background: var(--success);
-      box-shadow: 0 0 12px rgba(31,191,117,0.7);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.85);
     }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      padding: 16px 18px;
-      margin-bottom: 18px;
+    .hero-right {
+      min-width: 250px;
+      position: relative;
+      z-index: 1;
+      text-align: right;
     }
 
-    .user-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .label {
+    .hero-balance-label {
       color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    input, textarea {
-      font-family: inherit;
-    }
-
-    #userId, #msg, .modal-input, .modal-textarea, .finance-input {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      outline: none;
-      transition: 0.2s ease;
-    }
-
-    #userId {
-      min-width: 220px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-    }
-
-    #msg {
-      width: 100%;
-      padding: 15px 16px;
-      border-radius: 16px;
-      font-size: 15px;
-    }
-
-    .finance-input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-size: 14px;
-    }
-
-    #userId:focus,
-    #msg:focus,
-    .modal-input:focus,
-    .modal-textarea:focus,
-    .finance-input:focus {
-      border-color: rgba(47,128,255,0.5);
-      box-shadow: 0 0 0 3px rgba(47,128,255,0.14);
-    }
-
-    #userId::placeholder,
-    #msg::placeholder,
-    .finance-input::placeholder,
-    .modal-input::placeholder,
-    .modal-textarea::placeholder {
-      color: #8ea0c6;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    button {
-      border: none;
-      cursor: pointer;
-      transition: 0.18s ease;
-      font-weight: 700;
-    }
-
-    .btn {
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .btn.primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      border: none;
-      color: white;
-    }
-
-    .btn.primary:hover {
-      filter: brightness(1.05);
-    }
-
-    .btn.danger {
-      background: linear-gradient(135deg, var(--danger), var(--danger-2));
-      border: none;
-      color: white;
-    }
-
-    .btn.small {
-      padding: 8px 10px;
-      border-radius: 10px;
       font-size: 12px;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .stat-card {
-      padding: 18px;
-    }
-
-    .stat-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .stat-top .icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: #d9e6ff;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       margin-bottom: 6px;
     }
 
-    .stat-value {
-      font-size: 28px;
+    .hero-balance {
+      font-size: 40px;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.05em;
+      color: #bbf7d0;
     }
 
-    .stat-sub {
-      font-size: 12px;
-      color: var(--muted);
+    .hero-balance-sub {
       margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 1.55fr 0.95fr;
+      grid-template-columns: 1.45fr 1fr;
       gap: 18px;
-    }
-
-    @media (max-width: 1200px) {
-      .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 1120px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 700px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding: 18px;
-      }
-
-      .hero h1 {
-        font-size: 34px;
-      }
-
-      .hero-balance {
-        text-align: left;
-      }
-
-      .input-row {
-        grid-template-columns: 1fr !important;
-      }
-
-      .finance-actions,
-      .finance-mini-grid,
-      .opportunities-grid {
-        grid-template-columns: 1fr !important;
-      }
     }
 
     .left-col,
@@ -404,246 +198,91 @@
       gap: 18px;
     }
 
-    .chat-panel,
-    .side-panel,
-    .finance-panel,
-    .opportunities-panel,
-    .insight-panel {
+    .section {
       padding: 18px;
     }
 
-    .panel-head,
-    .side-top,
-    .finance-top,
-    .op-head {
+    .section-head {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
       align-items: flex-start;
-      flex-wrap: wrap;
+      gap: 12px;
       margin-bottom: 14px;
     }
 
-    .panel-head h2,
-    .side-top h2,
-    .finance-top h2,
-    .op-head h2 {
+    .section-head h2 {
       margin: 0;
-      font-size: 26px;
-      letter-spacing: -0.02em;
+      font-size: 22px;
+      letter-spacing: -0.03em;
     }
 
-    .panel-head p,
-    .side-top p,
-    .finance-top p,
-    .op-head p {
-      margin: 6px 0 0;
+    .section-head p {
+      margin: 4px 0 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
     }
 
-    #chat {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      border-radius: 18px;
-      min-height: 430px;
-      max-height: 540px;
-      overflow-y: auto;
-      padding: 16px;
-      scroll-behavior: smooth;
-    }
-
-    .mensaje {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-
-    .autor {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 6px;
-    }
-
-    .bubble {
-      border-radius: 18px;
-      padding: 13px 14px;
-      max-width: 88%;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-      border: 1px solid transparent;
-    }
-
-    .usuario {
-      align-items: flex-end;
-    }
-
-    .usuario .autor {
-      color: #a8bcff;
-      text-align: right;
-    }
-
-    .usuario .bubble {
-      background: rgba(47,128,255,0.16);
-      border-color: rgba(47,128,255,0.22);
-    }
-
-    .bot {
-      align-items: flex-start;
-    }
-
-    .bot .autor {
-      color: #ffffff;
-    }
-
-    .bot .bubble {
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(255,255,255,0.08);
-    }
-
-    .error {
-      align-items: flex-start;
-    }
-
-    .error .autor {
-      color: #ffabc0;
-    }
-
-    .error .bubble {
-      background: rgba(216,93,119,0.15);
-      border-color: rgba(216,93,119,0.24);
-    }
-
-    .sistema {
+    .tag {
+      display: inline-flex;
       align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(59,130,246,0.14);
+      border: 1px solid rgba(59,130,246,0.22);
+      color: #dbeafe;
+      white-space: nowrap;
     }
 
-    .sistema .autor {
-      color: #d4b4ff;
-    }
-
-    .sistema .bubble {
-      background: rgba(170,120,255,0.12);
-      border-color: rgba(170,120,255,0.2);
-      max-width: 100%;
-      text-align: center;
-    }
-
-    .input-row {
+    .kpi-grid {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      margin-top: 14px;
+      margin-bottom: 14px;
     }
 
-    .status-line {
-      min-height: 18px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .finance-chart-wrap {
-      height: 240px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
+    .kpi-card {
+      padding: 14px;
       border-radius: 18px;
-      padding: 12px;
-      margin-bottom: 14px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(10,14,26,0.98));
+      border: 1px solid var(--line-soft);
     }
 
-    .finance-balance-card {
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-
-    .finance-balance-label {
-      font-size: 13px;
+    .kpi-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .finance-balance {
-      font-size: 52px;
+    .kpi-value {
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.04em;
-      line-height: 1;
-      margin-bottom: 10px;
     }
 
-    .finance-sub {
-      font-size: 14px;
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 11px;
       color: var(--muted);
-      line-height: 1.5;
     }
 
-    .finance-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 14px;
+    .kpi-positive {
+      color: #bbf7d0;
     }
 
-    .finance-mini-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 14px;
+    .kpi-warning {
+      color: #fde68a;
     }
 
-    .mini-card {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .mini-card .k {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .mini-card .v {
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    .insight-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .insight-box {
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .insight-box .t {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .insight-box .v {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .side-top h2 {
-      font-size: 22px;
+    .kpi-info {
+      color: #bfdbfe;
     }
 
     .filter-bar {
@@ -654,255 +293,349 @@
     }
 
     .filter-btn {
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.92);
       color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
     }
 
     .filter-btn.active {
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      background: linear-gradient(135deg, var(--primary), var(--violet));
       border-color: transparent;
-      color: white;
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.35);
     }
 
-    #sideContent {
-      max-height: 620px;
-      overflow-y: auto;
-      padding-right: 4px;
+    .filter-btn:hover {
+      transform: translateY(-1px);
     }
 
-    .section-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
+    .chart-wrap {
+      height: 260px;
+      padding: 12px;
       border-radius: 18px;
+      background: rgba(8, 13, 24, 0.92);
+      border: 1px solid var(--line-soft);
+    }
+
+    .double-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .subcard {
       padding: 14px;
-      margin-bottom: 12px;
+      border-radius: 18px;
+      background: rgba(8, 13, 24, 0.9);
+      border: 1px solid var(--line-soft);
     }
 
-    .section-card h3 {
-      margin: 0 0 10px;
+    .subcard h3 {
+      margin: 0 0 6px;
       font-size: 13px;
-      letter-spacing: 0.04em;
-      color: #dce5ff;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
+      color: #cbd5e1;
     }
 
-    .summary-box {
-      background: rgba(255,255,255,0.035);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      white-space: pre-wrap;
-      line-height: 1.55;
-    }
-
-    .memory-item,
-    .profile-item {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line-2);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-
-    .memory-text,
-    .profile-text {
-      line-height: 1.5;
-      margin-bottom: 8px;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-
-    .memory-meta,
-    .profile-meta {
+    .subcard p {
+      margin: 0 0 10px;
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 8px;
+      line-height: 1.5;
     }
 
-    .item-actions {
+    .mini-chart {
+      height: 180px;
+    }
+
+    .list {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .item-actions button {
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
-
-    .item-actions .pin {
-      background: rgba(31,191,117,0.12);
-      color: #9fe8c6;
-      border-color: rgba(31,191,117,0.18);
-    }
-
-    .item-actions .danger {
-      background: rgba(216,93,119,0.13);
-      color: #ffb3c3;
-      border-color: rgba(216,93,119,0.2);
-    }
-
-    .tag {
-      display: inline-flex;
+    .list-row {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: var(--chip);
-      color: #dfe7ff;
-      font-size: 11px;
-      font-weight: 800;
-      margin-left: 6px;
-    }
-
-    .empty-state {
-      color: var(--muted);
-      font-size: 14px;
-      padding-top: 4px;
-    }
-
-    .mini {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .footer-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .opportunities-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-    }
-
-    .op-card {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      border-radius: 18px;
-      padding: 16px;
-    }
-
-    .op-card .op-icon {
-      width: 44px;
-      height: 44px;
+      padding: 10px 12px;
       border-radius: 14px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 12px;
-      background: rgba(255,255,255,0.06);
-    }
-
-    .op-card h4 {
-      margin: 0 0 6px;
-      font-size: 18px;
-    }
-
-    .op-card p {
-      margin: 0 0 14px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.08);
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
     }
 
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 7, 16, 0.72);
-      backdrop-filter: blur(8px);
-      display: none;
+    .list-row strong {
+      font-weight: 700;
+    }
+
+    .value-positive {
+      color: #86efac;
+      font-weight: 700;
+    }
+
+    .value-negative {
+      color: #fca5a5;
+      font-weight: 700;
+    }
+
+    .value-neutral {
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+
+    #chat {
+      min-height: 280px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(8, 13, 24, 0.94);
+      border: 1px solid var(--line-soft);
+    }
+
+    .mensaje {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .autor {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .bubble {
+      max-width: 86%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      border: 1px solid transparent;
+    }
+
+    .usuario {
+      align-items: flex-end;
+    }
+
+    .usuario .autor {
+      text-align: right;
+      color: #bfdbfe;
+    }
+
+    .usuario .bubble {
+      background: rgba(37, 99, 235, 0.22);
+      border-color: rgba(96, 165, 250, 0.35);
+    }
+
+    .bot {
+      align-items: flex-start;
+    }
+
+    .bot .autor {
+      color: #f8fafc;
+    }
+
+    .bot .bubble {
+      background: rgba(15, 23, 42, 0.92);
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    .sistema {
+      align-items: center;
+    }
+
+    .sistema .bubble {
+      max-width: 100%;
+      text-align: center;
+      background: rgba(124, 58, 237, 0.14);
+      border-color: rgba(167, 139, 250, 0.3);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    #msg {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(8, 13, 24, 0.94);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    #msg::placeholder {
+      color: #64748b;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--violet));
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.28);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-line {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .summary-box {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(8, 13, 24, 0.92);
+      border: 1px dashed rgba(148, 163, 184, 0.2);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .market-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(8, 13, 24, 0.92);
+      border: 1px solid var(--line-soft);
+    }
+
+    .market-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .market-card .value {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .market-card .sub {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 18px;
-      z-index: 9999;
-    }
-
-    .modal-backdrop.show {
-      display: flex;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 540px;
-      border-radius: 22px;
-      background: #10192c;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      padding: 18px;
-    }
-
-    .modal h3 {
-      margin: 0 0 8px;
-      font-size: 22px;
-    }
-
-    .modal p {
-      margin: 0 0 14px;
+      gap: 6px;
+      min-height: 74px;
+      border-radius: 18px;
+      border: 1px solid var(--line-soft);
+      background: rgba(8, 13, 24, 0.92);
       color: var(--muted);
-      line-height: 1.5;
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    .modal-input,
-    .modal-textarea {
-      width: 100%;
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-size: 14px;
+    .nav-btn.active {
+      color: #dbeafe;
+      border-color: rgba(59,130,246,0.24);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
     }
 
-    .modal-textarea {
-      min-height: 120px;
-      resize: vertical;
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
     }
 
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
+    @media (max-width: 760px) {
+      body {
+        padding: 12px;
+      }
 
-    .hidden {
-      display: none !important;
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-right {
+        text-align: left;
+      }
+
+      .kpi-grid,
+      .double-grid,
+      .market-grid,
+      .footer-nav {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero-balance {
+        font-size: 34px;
+      }
     }
 
     ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
+      width: 8px;
+      height: 8px;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.11);
+      background: rgba(148, 163, 184, 0.3);
       border-radius: 999px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.18);
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="hero glass">
-      <div>
+    <header class="hero glass">
+      <div class="hero-left">
         <div class="hero-title">
           <div class="hero-icon">
             <i class="fas fa-rocket"></i>
@@ -910,94 +643,108 @@
           <div>
             <h1>Pepinazo AI</h1>
             <p>
-              Memoria persistente, perfil inteligente, panel editable y una cara por fin más digna.
-              Ya no parece un experimento con cafeína; ahora parece uno con presupuesto.
+              Panel financiero oscuro, limpio y tipo fintech para leer tu Excel, mostrar
+              gastos diarios, semanales, mensuales, inversiones y un radar de mercado sin
+              que todo parezca un PowerPoint que sufrió abandono infantil.
             </p>
           </div>
         </div>
 
         <div class="status-pill">
           <span class="dot"></span>
-          Backend conectado
+          Backend conectado y arquitectura lista para Excel
         </div>
       </div>
 
-      <div class="hero-balance">
-        <div class="label-soft">Balance Pepinazo Finance</div>
-        <div class="value" id="heroMoneyTotal">$0</div>
-        <div class="sub">Control rápido de caja mientras mañana seguimos con el monstruo serio.</div>
+      <div class="hero-right">
+        <div class="hero-balance-label">Balance general</div>
+        <div class="hero-balance" id="heroBalance">$3.800.000</div>
+        <div class="hero-balance-sub">Actualizable desde tu backend y tu Excel real</div>
       </div>
-    </div>
+    </header>
 
-    <div class="topbar glass">
-      <div class="user-box">
-        <div class="label">User ID</div>
-        <input id="userId" type="text" placeholder="ej: diego-1" autocomplete="off" />
-      </div>
-      <div class="mini">Usa siempre el mismo userId para no fabricar amnesia artificial.</div>
-    </div>
-
-    <div class="dashboard-grid">
-      <div class="stat-card glass-soft">
-        <div class="stat-top">
-          <div>
-            <div class="stat-label">Memoria reciente</div>
-            <div class="stat-value" id="statRecentCount">0</div>
-          </div>
-          <div class="icon"><i class="fas fa-brain"></i></div>
-        </div>
-        <div class="stat-sub">Recuerdos de corto plazo detectados.</div>
-      </div>
-
-      <div class="stat-card glass-soft">
-        <div class="stat-top">
-          <div>
-            <div class="stat-label">Memoria importante</div>
-            <div class="stat-value" id="statImportantCount">0</div>
-          </div>
-          <div class="icon"><i class="fas fa-thumbtack"></i></div>
-        </div>
-        <div class="stat-sub">Recuerdos fijados o de largo plazo.</div>
-      </div>
-
-      <div class="stat-card glass-soft">
-        <div class="stat-top">
-          <div>
-            <div class="stat-label">Campos de perfil</div>
-            <div class="stat-value" id="statProfileCount">0</div>
-          </div>
-          <div class="icon"><i class="fas fa-id-badge"></i></div>
-        </div>
-        <div class="stat-sub">Perfil estable actualmente visible.</div>
-      </div>
-
-      <div class="stat-card glass-soft">
-        <div class="stat-top">
-          <div>
-            <div class="stat-label">Estado del sistema</div>
-            <div class="stat-value" style="color:#8ff0bc;">OK</div>
-          </div>
-          <div class="icon"><i class="fas fa-satellite-dish"></i></div>
-        </div>
-        <div class="stat-sub">UI renovada sin tocar el backend.</div>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <button class="btn" onclick="verPerfil()"><i class="fas fa-user"></i> Ver perfil</button>
-      <button class="btn" onclick="verMemoria()"><i class="fas fa-brain"></i> Ver memoria</button>
-      <button class="btn" onclick="verPanelMemoria()"><i class="fas fa-table-columns"></i> Panel memoria</button>
-      <button class="btn" onclick="limpiarChat()"><i class="fas fa-broom"></i> Limpiar chat</button>
-      <button class="btn danger" onclick="borrarMemoria()"><i class="fas fa-trash"></i> Borrar memoria</button>
-    </div>
-
-    <div class="layout">
-      <div class="left-col">
-        <div class="chat-panel glass">
-          <div class="panel-head">
+    <main class="layout">
+      <section class="left-col">
+        <section class="section glass">
+          <div class="section-head">
             <div>
-              <h2>Conversación</h2>
-              <p>Chat conectado al backend real y usando memoria persistente.</p>
+              <h2>Panel financiero</h2>
+              <p>
+                KPIs principales, gráfico por período, categorías y vista consolidada de inversiones.
+              </p>
+            </div>
+            <div class="tag">
+              <i class="fa-solid fa-file-excel"></i>
+              Excel Ready
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">Gasto mensual</div>
+              <div class="kpi-value" id="kpiMes">$450.000</div>
+              <div class="kpi-sub">+12% vs mes anterior</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Ingreso mensual</div>
+              <div class="kpi-value kpi-positive" id="kpiIngreso">$4.250.000</div>
+              <div class="kpi-sub">Flujo consolidado hogar</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Ahorro estimado</div>
+              <div class="kpi-value kpi-info" id="kpiAhorro">$1.120.000</div>
+              <div class="kpi-sub">Antes de extras y ajustes</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">Inversiones</div>
+              <div class="kpi-value kpi-warning" id="kpiInv">$12.800.000</div>
+              <div class="kpi-sub">Rentab. anual <span id="kpiRentab">12,5%</span></div>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <button class="filter-btn active" data-period="dia">Diario</button>
+            <button class="filter-btn" data-period="semana">Semanal</button>
+            <button class="filter-btn" data-period="mes">Mensual</button>
+            <button class="filter-btn" data-period="anio">Anual</button>
+            <button class="filter-btn" data-period="inv">Inversiones</button>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="chartPrincipal"></canvas>
+          </div>
+
+          <div class="double-grid">
+            <div class="subcard">
+              <h3>Gastos por categoría</h3>
+              <p>
+                Top categorías del período activo. Luego esto puede venir directo desde tu Excel.
+              </p>
+              <div class="mini-chart">
+                <canvas id="chartCategorias"></canvas>
+              </div>
+            </div>
+
+            <div class="subcard">
+              <h3>Inversiones</h3>
+              <p>
+                AFP, APV, VOO, QQQ, BTC y ETH en un solo panel. Menos caos, más dignidad.
+              </p>
+              <div class="mini-chart">
+                <canvas id="chartInversiones"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section glass">
+          <div class="section-head">
+            <div>
+              <h2>Chat Pepinazo</h2>
+              <p>Conectado al backend. Si falla, responde sin romper la interfaz.</p>
             </div>
           </div>
 
@@ -1005,970 +752,563 @@
 
           <div class="input-row">
             <input id="msg" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
-            <button id="btn" class="btn primary" onclick="enviar()">Enviar</button>
+            <button id="btnSend" class="btn">Enviar</button>
           </div>
 
           <div id="estado" class="status-line"></div>
+        </section>
+      </section>
 
-          <div class="footer-note">
-            Pepinazo ya conversa con backend real. O sea, todavía no domina el planeta, pero ya dejó de ser decoración.
-          </div>
-        </div>
-
-        <div class="finance-panel glass">
-          <div class="finance-top">
+      <section class="right-col">
+        <section class="section glass">
+          <div class="section-head">
             <div>
-              <h2>Pepinazo Finance</h2>
-              <p>Registro rápido manual de caja, depósitos y retiros, ahora con look más fintech.</p>
+              <h2>Perfil y memoria</h2>
+              <p>Resumen ejecutivo de lo que luego se poblará con memoria persistente.</p>
             </div>
           </div>
 
-          <div class="finance-chart-wrap">
-            <canvas id="financeChart"></canvas>
+          <div class="summary-box" id="summaryBox">
+Pepinazo sabe que quieres:
+- Un panel financiero tipo fintech oscuro y limpio.
+- Gastos diarios, semanales, mensuales y anuales.
+- Inversiones agrupadas: AFP, APV, VOO, QQQ, BTC, ETH.
+- Integración con Excel como fuente principal.
+- Radar futuro de mercado y automatización.
           </div>
+        </section>
 
-          <div class="finance-balance-card">
-            <div class="finance-balance-label">Balance actual</div>
-            <div class="finance-balance" id="moneyTotal">$0</div>
-            <div class="finance-sub">Lleva tu control económico simple mientras el monstruo sigue mutando.</div>
-
-            <div class="finance-actions">
-              <button class="btn primary" onclick="abrirDeposito()">Depositar</button>
-              <button class="btn" onclick="abrirRetiro()">Retirar</button>
-            </div>
-          </div>
-
-          <div class="finance-mini-grid">
-            <div class="mini-card">
-              <div class="k">Total depósitos</div>
-              <div class="v" id="moneyDeposits">$0</div>
-            </div>
-            <div class="mini-card">
-              <div class="k">Total retiros</div>
-              <div class="v" id="moneyWithdrawals">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="opportunities-panel glass">
-          <div class="op-head">
-            <div>
-              <h2>Oportunidades</h2>
-              <p>Base visual para futuras ideas de negocio, inversión y ecommerce.</p>
-            </div>
-          </div>
-
-          <div class="opportunities-grid">
-            <div class="op-card">
-              <div class="op-icon"><i class="fas fa-home"></i></div>
-              <h4>Propiedades</h4>
-              <p>Espacio listo para análisis de plusvalía, arriendo y patrimonio.</p>
-              <button class="btn small">Próximamente</button>
-            </div>
-
-            <div class="op-card">
-              <div class="op-icon"><i class="fas fa-chart-line"></i></div>
-              <h4>Inversiones</h4>
-              <p>Base preparada para VOO, QQQ, BTC, ETH y panel estilo Fintual.</p>
-              <button class="btn small">Próximamente</button>
-            </div>
-
-            <div class="op-card">
-              <div class="op-icon"><i class="fas fa-store"></i></div>
-              <h4>Ecommerce</h4>
-              <p>Bloque listo para conectar productos, radar de mercado y automatización.</p>
-              <button class="btn small">Próximamente</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-col">
-        <div class="side-panel glass">
-          <div class="side-top">
-            <div>
-              <h2 id="sideTitle">Perfil resumen</h2>
-              <p>Panel editable de memoria, perfil y resumen maestro.</p>
-            </div>
-          </div>
-
-          <div class="filter-bar">
-            <button class="filter-btn active" data-filter="todo" onclick="setFiltro('todo')">Todo</button>
-            <button class="filter-btn" data-filter="perfil" onclick="setFiltro('perfil')">Perfil</button>
-            <button class="filter-btn" data-filter="reciente" onclick="setFiltro('reciente')">Reciente</button>
-            <button class="filter-btn" data-filter="importante" onclick="setFiltro('importante')">Importante</button>
-            <button class="filter-btn" data-filter="proyecto" onclick="setFiltro('proyecto')">Proyectos</button>
-            <button class="filter-btn" data-filter="objetivo" onclick="setFiltro('objetivo')">Objetivos</button>
-            <button class="filter-btn" data-filter="preferencia" onclick="setFiltro('preferencia')">Preferencias</button>
-          </div>
-
-          <div id="sideContent">Aquí aparecerá el perfil, memoria y panel resumido.</div>
-
-          <div class="mini">
-            Consejo poco glamoroso pero útil: usa siempre el mismo userId para que Pepinazo no sufra amnesia selectiva.
-          </div>
-        </div>
-
-        <div class="insight-panel glass">
-          <div class="op-head">
+        <section class="section glass">
+          <div class="section-head">
             <div>
               <h2>Resumen rápido</h2>
-              <p>Lectura visual corta para no nadar en puro texto eterno.</p>
+              <p>Lectura en 5 segundos para no pensar como Excel abierto a las 3 AM.</p>
             </div>
           </div>
 
-          <div class="insight-grid">
-            <div class="insight-box">
-              <div class="t">User ID activo</div>
-              <div class="v" id="insightUserId">usuario1</div>
+          <div class="list">
+            <div class="list-row">
+              <span><strong>Balance simulado</strong></span>
+              <span class="value-positive" id="insightBalance">$3.800.000</span>
             </div>
-            <div class="insight-box">
-              <div class="t">Último filtro</div>
-              <div class="v" id="insightFiltro">todo</div>
+            <div class="list-row">
+              <span><strong>Mes más caro</strong></span>
+              <span class="value-neutral">Marzo</span>
             </div>
-            <div class="insight-box">
-              <div class="t">Chat</div>
-              <div class="v">Online</div>
+            <div class="list-row">
+              <span><strong>Mayor fuga</strong></span>
+              <span class="value-negative">Autopistas</span>
             </div>
-            <div class="insight-box">
-              <div class="t">Backend</div>
-              <div class="v" style="color:#8ff0bc;">Conectado</div>
+            <div class="list-row">
+              <span><strong>Activo fuerte</strong></span>
+              <span class="value-neutral">AFP + VOO</span>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </section>
 
-  <div id="modalBackdrop" class="modal-backdrop">
-    <div class="modal">
-      <h3 id="modalTitle">Editar</h3>
-      <p id="modalDescription">Haz cambios aquí.</p>
-      <input id="modalInput" class="modal-input hidden" type="text" />
-      <textarea id="modalTextarea" class="modal-textarea"></textarea>
-      <div class="modal-actions">
-        <button class="btn" onclick="cerrarModal()">Cancelar</button>
-        <button id="modalConfirmBtn" class="btn primary">Guardar</button>
+        <section class="section glass">
+          <div class="section-head">
+            <div>
+              <h2>Mercado</h2>
+              <p>
+                Módulo preparado para conectar ETF, crypto, dólar, UF y noticias relevantes.
+              </p>
+            </div>
+            <div class="tag">
+              <i class="fa-solid fa-chart-line"></i>
+              Market Radar
+            </div>
+          </div>
+
+          <div class="market-grid">
+            <div class="market-card">
+              <div class="label">VOO</div>
+              <div class="value value-positive" id="marketVOO">+0,8%</div>
+              <div class="sub">Variación simulada</div>
+            </div>
+
+            <div class="market-card">
+              <div class="label">QQQ</div>
+              <div class="value value-positive" id="marketQQQ">+1,2%</div>
+              <div class="sub">Tecnología fuerte</div>
+            </div>
+
+            <div class="market-card">
+              <div class="label">Bitcoin</div>
+              <div class="value value-negative" id="marketBTC">-0,6%</div>
+              <div class="sub">Alta volatilidad, clásico show</div>
+            </div>
+
+            <div class="market-card">
+              <div class="label">Dólar</div>
+              <div class="value value-neutral" id="marketUSD">$948</div>
+              <div class="sub">Simulado / pendiente backend</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section glass">
+          <div class="section-head">
+            <div>
+              <h2>Movimientos y alertas</h2>
+              <p>Atajos para después enchufar automatización real.</p>
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="list-row">
+              <span>Gasto semanal subió</span>
+              <span class="value-negative">+9%</span>
+            </div>
+            <div class="list-row">
+              <span>Aporte ETF este mes</span>
+              <span class="value-positive">$60.000</span>
+            </div>
+            <div class="list-row">
+              <span>Compra crypto menor</span>
+              <span class="value-neutral">$5.000</span>
+            </div>
+            <div class="list-row">
+              <span>Estado Excel</span>
+              <span class="value-positive">Listo para conectar</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <section class="footer-nav glass">
+      <div class="nav-btn active">
+        <i class="fa-solid fa-house"></i>
+        <span>Inicio</span>
       </div>
-    </div>
+      <div class="nav-btn">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Gastos</span>
+      </div>
+      <div class="nav-btn">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Inversión</span>
+      </div>
+      <div class="nav-btn">
+        <i class="fa-solid fa-brain"></i>
+        <span>Análisis</span>
+      </div>
+      <div class="nav-btn">
+        <i class="fa-solid fa-bars"></i>
+        <span>Menú</span>
+      </div>
+    </section>
   </div>
 
   <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("msg");
-    const btn = document.getElementById("btn");
-    const estado = document.getElementById("estado");
-    const sideTitle = document.getElementById("sideTitle");
-    const sideContent = document.getElementById("sideContent");
-    const userIdInput = document.getElementById("userId");
-    const modalBackdrop = document.getElementById("modalBackdrop");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDescription = document.getElementById("modalDescription");
-    const modalTextarea = document.getElementById("modalTextarea");
-    const modalInput = document.getElementById("modalInput");
-    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+    const chatEl = document.getElementById("chat");
+    const msgEl = document.getElementById("msg");
+    const btnSend = document.getElementById("btnSend");
+    const estadoEl = document.getElementById("estado");
 
-    const STORAGE_KEY = "pepinazo_user_id";
-    const FINANCE_KEY = "pepinazo_finance_state";
+    let currentPeriod = "dia";
+    let chartPrincipal = null;
+    let chartCategorias = null;
+    let chartInversiones = null;
 
-    let ultimoPanel = null;
-    let filtroActual = "todo";
-    let modalMode = "textarea";
-    let financeChart = null;
-
-    let financeState = {
-      balance: 0,
-      deposits: 0,
-      withdrawals: 0
-    };
-
-    function getUserId() {
-      const value = userIdInput.value.trim();
-      return value || "usuario1";
-    }
-
-    function saveUserId() {
-      localStorage.setItem(STORAGE_KEY, getUserId());
-      const insightUser = document.getElementById("insightUserId");
-      if (insightUser) insightUser.textContent = getUserId();
-    }
-
-    function loadUserId() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      userIdInput.value = saved || "usuario1";
-      const insightUser = document.getElementById("insightUserId");
-      if (insightUser) insightUser.textContent = getUserId();
-    }
-
-    function formatMoney(value) {
-      return "$" + Number(value || 0).toLocaleString("es-CL");
-    }
-
-    function loadFinanceState() {
+    function safeCurrency(value) {
       try {
-        const saved = localStorage.getItem(FINANCE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          financeState = {
-            balance: Number(parsed.balance || 0),
-            deposits: Number(parsed.deposits || 0),
-            withdrawals: Number(parsed.withdrawals || 0)
-          };
-        }
-      } catch {
-        financeState = {
-          balance: 0,
-          deposits: 0,
-          withdrawals: 0
-        };
+        return new Intl.NumberFormat("es-CL", {
+          style: "currency",
+          currency: "CLP",
+          maximumFractionDigits: 0
+        }).format(value);
+      } catch (error) {
+        return "$" + Number(value || 0).toLocaleString("es-CL");
       }
-      renderFinance();
     }
 
-    function saveFinanceState() {
-      localStorage.setItem(FINANCE_KEY, JSON.stringify(financeState));
+    function addMessage(tipo, autor, texto) {
+      const wrap = document.createElement("div");
+      wrap.className = "mensaje " + tipo;
+
+      const a = document.createElement("div");
+      a.className = "autor";
+      a.textContent = autor;
+
+      const b = document.createElement("div");
+      b.className = "bubble";
+      b.textContent = texto;
+
+      wrap.appendChild(a);
+      wrap.appendChild(b);
+      chatEl.appendChild(wrap);
+      chatEl.scrollTop = chatEl.scrollHeight;
     }
 
-    function renderFinance() {
-      const balanceEl = document.getElementById("moneyTotal");
-      const heroBalanceEl = document.getElementById("heroMoneyTotal");
-      const depositsEl = document.getElementById("moneyDeposits");
-      const withdrawalsEl = document.getElementById("moneyWithdrawals");
+    addMessage("sistema", "Pepinazo", "Hola. Panel cargado. Listo para conversar y mostrar tus finanzas sin convertir el frontend en una sopa de errores.");
 
-      if (balanceEl) balanceEl.textContent = formatMoney(financeState.balance);
-      if (heroBalanceEl) heroBalanceEl.textContent = formatMoney(financeState.balance);
-      if (depositsEl) depositsEl.textContent = formatMoney(financeState.deposits);
-      if (withdrawalsEl) withdrawalsEl.textContent = formatMoney(financeState.withdrawals);
+    async function sendMessage() {
+      const text = msgEl.value.trim();
+      if (!text) return;
 
-      renderFinanceChart();
+      addMessage("usuario", "Tú", text);
+      msgEl.value = "";
+      estadoEl.textContent = "Pepinazo pensando...";
+      btnSend.disabled = true;
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: text,
+            userId: "diego"
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Respuesta HTTP inválida");
+        }
+
+        const data = await response.json();
+        const reply =
+          data.reply ||
+          data.message ||
+          data.output_text ||
+          "Mensaje recibido, pero el backend no devolvió texto usable.";
+
+        addMessage("bot", "Pepinazo", reply);
+        estadoEl.textContent = "Conectado al backend.";
+      } catch (error) {
+        addMessage(
+          "bot",
+          "Pepinazo",
+          "No pude traer respuesta real del backend en este intento. La interfaz sigue viva, que ya es más digno que muchos proyectos prematuros."
+        );
+        estadoEl.textContent = "Error de conexión con /api/chat";
+        console.error(error);
+      } finally {
+        btnSend.disabled = false;
+      }
     }
 
-    function renderFinanceChart() {
-      const canvas = document.getElementById("financeChart");
-      if (!canvas || typeof Chart === "undefined") return;
+    btnSend.addEventListener("click", sendMessage);
+    msgEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    function getPeriodData(period) {
+      const map = {
+        dia: {
+          title: "Gastos diarios (últimos 7 días)",
+          labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+          data: [12000, 9000, 15000, 8000, 11000, 13000, 10000]
+        },
+        semana: {
+          title: "Gastos semanales (último mes)",
+          labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
+          data: [85000, 92000, 78000, 97000]
+        },
+        mes: {
+          title: "Gastos mensuales (últimos 6 meses)",
+          labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+          data: [320000, 280000, 410000, 390000, 360000, 420000]
+        },
+        anio: {
+          title: "Gastos anuales",
+          labels: ["2022", "2023", "2024", "2025"],
+          data: [3500000, 4100000, 4800000, 5200000]
+        },
+        inv: {
+          title: "Aportes / evolución inversiones",
+          labels: ["AFP", "APV", "VOO", "QQQ", "BTC", "ETH"],
+          data: [5000000, 3000000, 2000000, 1500000, 800000, 600000]
+        }
+      };
+
+      return map[period] || map.dia;
+    }
+
+    function getCategoryData(period) {
+      const map = {
+        dia: {
+          labels: ["Bencina", "Café", "Peaje", "Mini compra", "Otros"],
+          data: [12000, 6000, 7000, 5000, 3000]
+        },
+        semana: {
+          labels: ["Autopistas", "Supermercado", "Bencina", "Colegio", "Otros"],
+          data: [30000, 26000, 22000, 18000, 12000]
+        },
+        mes: {
+          labels: ["Supermercado", "Autopistas", "Colegio", "Bencina", "Otros"],
+          data: [120000, 95000, 78000, 64000, 43000]
+        },
+        anio: {
+          labels: ["Vivienda", "Educación", "Transporte", "Comida", "Otros"],
+          data: [1800000, 1200000, 900000, 800000, 500000]
+        },
+        inv: {
+          labels: ["VOO", "QQQ", "BTC", "ETH", "APV"],
+          data: [35, 20, 15, 5, 25]
+        }
+      };
+
+      return map[period] || map.dia;
+    }
+
+    function baseOptions() {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 600
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: "#020617",
+            titleColor: "#e8eefc",
+            bodyColor: "#e8eefc",
+            padding: 10,
+            cornerRadius: 10
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: "#94a3b8"
+            },
+            grid: {
+              color: "rgba(148,163,184,0.08)"
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: "#94a3b8"
+            },
+            grid: {
+              color: "rgba(148,163,184,0.08)"
+            }
+          }
+        }
+      };
+    }
+
+    function renderPrincipalChart() {
+      const canvas = document.getElementById("chartPrincipal");
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      const cfg = getPeriodData(currentPeriod);
+
+      if (chartPrincipal) chartPrincipal.destroy();
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+      gradient.addColorStop(0, "rgba(59,130,246,0.50)");
+      gradient.addColorStop(1, "rgba(59,130,246,0.02)");
+
+      const isInvestments = currentPeriod === "inv";
+
+      chartPrincipal = new Chart(ctx, {
+        type: isInvestments ? "bar" : "line",
+        data: {
+          labels: cfg.labels,
+          datasets: [
+            {
+              label: "Monto",
+              data: cfg.data,
+              borderColor: "#60a5fa",
+              backgroundColor: isInvestments ? "rgba(96,165,250,0.75)" : gradient,
+              fill: !isInvestments,
+              tension: 0.35,
+              borderWidth: 2,
+              borderRadius: isInvestments ? 12 : 0
+            }
+          ]
+        },
+        options: {
+          ...baseOptions(),
+          plugins: {
+            ...baseOptions().plugins,
+            title: {
+              display: true,
+              text: cfg.title,
+              color: "#e8eefc",
+              font: {
+                size: 13,
+                weight: "600"
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderCategoryChart() {
+      const canvas = document.getElementById("chartCategorias");
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      const cfg = getCategoryData(currentPeriod);
+
+      if (chartCategorias) chartCategorias.destroy();
+
+      chartCategorias = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: cfg.labels,
+          datasets: [
+            {
+              data: cfg.data,
+              backgroundColor: [
+                "#3b82f6",
+                "#7c3aed",
+                "#22c55e",
+                "#f59e0b",
+                "#f87171"
+              ],
+              borderRadius: 10
+            }
+          ]
+        },
+        options: {
+          ...baseOptions(),
+          indexAxis: "y"
+        }
+      });
+    }
+
+    function renderInvestmentChart() {
+      const canvas = document.getElementById("chartInversiones");
+      if (!canvas) return;
 
       const ctx = canvas.getContext("2d");
 
-      if (financeChart) {
-        financeChart.destroy();
-      }
+      if (chartInversiones) chartInversiones.destroy();
 
-      financeChart = new Chart(ctx, {
-        type: "bar",
+      chartInversiones = new Chart(ctx, {
+        type: "doughnut",
         data: {
-          labels: ["Balance", "Depósitos", "Retiros"],
+          labels: ["AFP", "APV", "VOO", "QQQ", "BTC", "ETH"],
           datasets: [
             {
-              label: "CLP",
-              data: [
-                Math.max(financeState.balance, 0),
-                financeState.deposits,
-                financeState.withdrawals
-              ],
+              data: [5000000, 3000000, 2000000, 1500000, 800000, 600000],
               backgroundColor: [
-                "rgba(47,128,255,0.75)",
-                "rgba(31,191,117,0.75)",
-                "rgba(216,93,119,0.75)"
+                "#3b82f6",
+                "#7c3aed",
+                "#22c55e",
+                "#f59e0b",
+                "#f87171",
+                "#a855f7"
               ],
-              borderRadius: 12
+              borderWidth: 0
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          cutout: "62%",
           plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: {
-              ticks: { color: "#c8d5ef" },
-              grid: { color: "rgba(255,255,255,0.05)" }
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#94a3b8",
+                boxWidth: 10
+              }
             },
-            y: {
-              beginAtZero: true,
-              ticks: { color: "#c8d5ef" },
-              grid: { color: "rgba(255,255,255,0.05)" }
+            tooltip: {
+              backgroundColor: "#020617",
+              titleColor: "#e8eefc",
+              bodyColor: "#e8eefc"
             }
           }
         }
       });
     }
 
-    function setEstado(texto) {
-      estado.textContent = texto || "";
-    }
+    function updateKPIs() {
+      const period = currentPeriod;
 
-    function escapeHtml(text) {
-      return String(text || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function encodeForAttr(value) {
-      return encodeURIComponent(String(value ?? ""));
-    }
-
-    function decodeFromAttr(value) {
-      try {
-        return decodeURIComponent(value);
-      } catch {
-        return String(value || "");
-      }
-    }
-
-    function agregarMensaje(tipo, autor, texto) {
-      const wrapper = document.createElement("div");
-      wrapper.className = `mensaje ${tipo}`;
-
-      const autorEl = document.createElement("div");
-      autorEl.className = "autor";
-      autorEl.textContent = autor;
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = texto;
-
-      wrapper.appendChild(autorEl);
-      wrapper.appendChild(bubble);
-      chat.appendChild(wrapper);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function limpiarChat() {
-      chat.innerHTML = "";
-      agregarMensaje("sistema", "Sistema", `Chat limpiado para ${getUserId()}. La memoria persistente sigue intacta.`);
-    }
-
-    function setLoading(isLoading) {
-      input.disabled = isLoading;
-      btn.disabled = isLoading;
-      userIdInput.disabled = isLoading;
-
-      if (isLoading) {
-        btn.textContent = "Pensando...";
-        setEstado("Pepinazo está pensando...");
-      } else {
-        btn.textContent = "Enviar";
-        setEstado("");
-        input.focus();
-      }
-    }
-
-    function setFiltro(filtro) {
-      filtroActual = filtro;
-      const insightFiltro = document.getElementById("insightFiltro");
-      if (insightFiltro) insightFiltro.textContent = filtro;
-
-      document.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.filter === filtro);
-      });
-
-      if (ultimoPanel) {
-        renderPanelMemoria(ultimoPanel);
-      }
-    }
-
-    function abrirModal({
-      title,
-      description,
-      value = "",
-      confirmText = "Guardar",
-      onConfirm,
-      inputType = "textarea",
-      hideField = false
-    }) {
-      modalTitle.textContent = title;
-      modalDescription.textContent = description;
-      modalConfirmBtn.textContent = confirmText;
-      modalBackdrop.classList.add("show");
-      modalMode = inputType;
-
-      modalInput.classList.add("hidden");
-      modalTextarea.classList.add("hidden");
-
-      if (!hideField) {
-        if (inputType === "input") {
-          modalInput.classList.remove("hidden");
-          modalInput.value = value;
-          modalInput.focus();
-        } else {
-          modalTextarea.classList.remove("hidden");
-          modalTextarea.value = value;
-          modalTextarea.focus();
+      const values = {
+        dia: {
+          mes: 450000,
+          ingreso: 4250000,
+          ahorro: 1120000,
+          balance: 3800000
+        },
+        semana: {
+          mes: 440000,
+          ingreso: 4250000,
+          ahorro: 1150000,
+          balance: 3815000
+        },
+        mes: {
+          mes: 460000,
+          ingreso: 4250000,
+          ahorro: 1090000,
+          balance: 3760000
+        },
+        anio: {
+          mes: 5200000,
+          ingreso: 51000000,
+          ahorro: 12800000,
+          balance: 39300000
+        },
+        inv: {
+          mes: 60000,
+          ingreso: 4250000,
+          ahorro: 1200000,
+          balance: 12800000
         }
-      } else {
-        modalInput.value = "";
-        modalTextarea.value = "";
-      }
-
-      modalConfirmBtn.onclick = async () => {
-        const currentValue = hideField
-          ? ""
-          : modalMode === "input"
-            ? modalInput.value
-            : modalTextarea.value;
-
-        await onConfirm(currentValue);
       };
+
+      const v = values[period] || values.dia;
+
+      document.getElementById("kpiMes").textContent = safeCurrency(v.mes);
+      document.getElementById("kpiIngreso").textContent = safeCurrency(v.ingreso);
+      document.getElementById("kpiAhorro").textContent = safeCurrency(v.ahorro);
+      document.getElementById("kpiInv").textContent = safeCurrency(12800000);
+      document.getElementById("heroBalance").textContent = safeCurrency(v.balance);
+      document.getElementById("insightBalance").textContent = safeCurrency(v.balance);
     }
 
-    function cerrarModal() {
-      modalBackdrop.classList.remove("show");
-      modalInput.value = "";
-      modalTextarea.value = "";
-      modalInput.classList.add("hidden");
-      modalTextarea.classList.remove("hidden");
-      modalConfirmBtn.onclick = null;
-      modalMode = "textarea";
+    function renderAll() {
+      updateKPIs();
+      renderPrincipalChart();
+      renderCategoryChart();
+      renderInvestmentChart();
     }
 
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) {
-        cerrarModal();
-      }
-    });
-
-    async function apiFetch(url, options = {}) {
-      const response = await fetch(url, options);
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        const msg = data?.error || data?.reply || "Error del servidor";
-        throw new Error(msg);
-      }
-
-      return data;
-    }
-
-    function renderPerfilTexto(data) {
-      sideTitle.textContent = "Perfil";
-
-      const partes = [];
-
-      if (data.perfil_resumen?.resumen) {
-        partes.push("PERFIL RESUMEN");
-        partes.push(data.perfil_resumen.resumen);
-        partes.push("");
-      }
-
-      if (Array.isArray(data.perfil_usuario) && data.perfil_usuario.length) {
-        partes.push("PERFIL USUARIO");
-        for (const item of data.perfil_usuario) {
-          partes.push(`- ${item.clave}: ${item.valor}`);
-        }
-      } else {
-        partes.push("Sin perfil guardado.");
-      }
-
-      sideContent.textContent = partes.join("\n");
-    }
-
-    function renderMemoriaTexto(data) {
-      sideTitle.textContent = "Memoria";
-
-      const partes = [];
-
-      partes.push("MEMORIA RECIENTE");
-      if (Array.isArray(data.memoria) && data.memoria.length) {
-        for (const item of data.memoria) {
-          partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
-        }
-      } else {
-        partes.push("Sin memoria reciente.");
-      }
-
-      partes.push("");
-      partes.push("MEMORIA IMPORTANTE");
-
-      if (Array.isArray(data.memoria_larga) && data.memoria_larga.length) {
-        for (const item of data.memoria_larga) {
-          partes.push(`- [${item.tipo || "contexto"}] ${item.mensaje}`);
-        }
-      } else {
-        partes.push("Sin memoria importante.");
-      }
-
-      sideContent.textContent = partes.join("\n");
-    }
-
-    function shouldShowProfileItem(item) {
-      if (filtroActual === "todo" || filtroActual === "perfil") return true;
-      if (filtroActual === "proyecto" && item.clave === "proyecto") return true;
-      if (filtroActual === "objetivo" && item.clave === "objetivo") return true;
-      if (filtroActual === "preferencia" && item.clave === "preferencia") return true;
-      return false;
-    }
-
-    function shouldShowRecentItem(item) {
-      if (filtroActual === "todo" || filtroActual === "reciente") return true;
-      if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
-      if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
-      if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
-      if (filtroActual === "perfil" && item.tipo === "perfil") return true;
-      return false;
-    }
-
-    function shouldShowLongItem(item) {
-      if (filtroActual === "todo" || filtroActual === "importante") return true;
-      if (filtroActual === "proyecto" && item.tipo === "proyecto") return true;
-      if (filtroActual === "objetivo" && item.tipo === "objetivo") return true;
-      if (filtroActual === "preferencia" && item.tipo === "preferencia") return true;
-      if (filtroActual === "perfil" && item.tipo === "perfil") return true;
-      return false;
-    }
-
-    function actualizarStatsPanel(data) {
-      const recent = Array.isArray(data.memoria_reciente) ? data.memoria_reciente.length : 0;
-      const important = Array.isArray(data.memoria_importante) ? data.memoria_importante.length : 0;
-      const profile = Array.isArray(data.perfil_usuario) ? data.perfil_usuario.length : 0;
-
-      const statRecent = document.getElementById("statRecentCount");
-      const statImportant = document.getElementById("statImportantCount");
-      const statProfile = document.getElementById("statProfileCount");
-
-      if (statRecent) statRecent.textContent = recent;
-      if (statImportant) statImportant.textContent = important;
-      if (statProfile) statProfile.textContent = profile;
-    }
-
-    function renderPanelMemoria(data) {
-      ultimoPanel = data;
-      sideTitle.textContent = "Panel de memoria";
-      actualizarStatsPanel(data);
-
-      const perfiles = Array.isArray(data.perfil_usuario)
-        ? data.perfil_usuario.filter(shouldShowProfileItem)
-        : [];
-
-      const recientes = Array.isArray(data.memoria_reciente)
-        ? data.memoria_reciente.filter(shouldShowRecentItem)
-        : [];
-
-      const importantes = Array.isArray(data.memoria_importante)
-        ? data.memoria_importante.filter(shouldShowLongItem)
-        : [];
-
-      let html = "";
-
-      html += `
-        <div class="section-card">
-          <h3>User ID</h3>
-          <div>${escapeHtml(data.userId || getUserId())}</div>
-        </div>
-      `;
-
-      if (data.perfil_resumen?.resumen && (filtroActual === "todo" || filtroActual === "perfil")) {
-        html += `
-          <div class="section-card">
-            <h3>Perfil maestro</h3>
-            <div class="summary-box">${escapeHtml(data.perfil_resumen.resumen)}</div>
-            <div class="item-actions" style="margin-top:10px;">
-              <button onclick="verPanelMemoria()">Refrescar</button>
-            </div>
-          </div>
-        `;
-      }
-
-      if (
-        filtroActual === "todo" ||
-        filtroActual === "perfil" ||
-        filtroActual === "proyecto" ||
-        filtroActual === "objetivo" ||
-        filtroActual === "preferencia"
-      ) {
-        html += `<div class="section-card"><h3>Perfil estable</h3>`;
-
-        if (perfiles.length) {
-          for (const item of perfiles) {
-            html += `
-              <div class="profile-item">
-                <div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
-                <div class="profile-meta">ID: ${item.id || ""}</div>
-                <div class="item-actions">
-                  <button onclick="editarPerfil(${item.id}, '${encodeForAttr(item.valor)}')">Editar</button>
-                  <button class="danger" onclick="confirmarBorrado('perfil_usuario', ${item.id})">Borrar</button>
-                </div>
-              </div>
-            `;
-          }
-        } else {
-          html += `<div class="empty-state">No hay registros para este filtro.</div>`;
-        }
-
-        html += `</div>`;
-      }
-
-      if (
-        filtroActual === "todo" ||
-        filtroActual === "reciente" ||
-        filtroActual === "proyecto" ||
-        filtroActual === "objetivo" ||
-        filtroActual === "preferencia" ||
-        filtroActual === "perfil"
-      ) {
-        html += `<div class="section-card"><h3>Memoria reciente</h3>`;
-
-        if (recientes.length) {
-          for (const item of recientes) {
-            html += `
-              <div class="memory-item">
-                <div class="memory-text">${escapeHtml(item.mensaje)}</div>
-                <div class="memory-meta">
-                  ID: ${item.id || ""}
-                  <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
-                </div>
-                <div class="item-actions">
-                  <button onclick="editarMemoria('memoria', ${item.id}, '${encodeForAttr(item.mensaje)}')">Editar</button>
-                  <button class="pin" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
-                  <button class="danger" onclick="confirmarBorrado('memoria', ${item.id})">Borrar</button>
-                </div>
-              </div>
-            `;
-          }
-        } else {
-          html += `<div class="empty-state">No hay memoria reciente para este filtro.</div>`;
-        }
-
-        html += `</div>`;
-      }
-
-      if (
-        filtroActual === "todo" ||
-        filtroActual === "importante" ||
-        filtroActual === "proyecto" ||
-        filtroActual === "objetivo" ||
-        filtroActual === "preferencia" ||
-        filtroActual === "perfil"
-      ) {
-        html += `<div class="section-card"><h3>Memoria importante</h3>`;
-
-        if (importantes.length) {
-          for (const item of importantes) {
-            html += `
-              <div class="memory-item">
-                <div class="memory-text">${escapeHtml(item.mensaje)}</div>
-                <div class="memory-meta">
-                  ID: ${item.id || ""}
-                  <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
-                </div>
-                <div class="item-actions">
-                  <button onclick="editarMemoria('memoria_larga', ${item.id}, '${encodeForAttr(item.mensaje)}')">Editar</button>
-                  <button class="danger" onclick="confirmarBorrado('memoria_larga', ${item.id})">Borrar</button>
-                </div>
-              </div>
-            `;
-          }
-        } else {
-          html += `<div class="empty-state">No hay memoria importante para este filtro.</div>`;
-        }
-
-        html += `</div>`;
-      }
-
-      sideContent.innerHTML = html;
-    }
-
-    function abrirDeposito() {
-      abrirModal({
-        title: "Registrar depósito",
-        description: "Ingresa el monto que quieres sumar al registro financiero.",
-        value: "",
-        confirmText: "Depositar",
-        inputType: "input",
-        onConfirm: async (valor) => {
-          const monto = Number(String(valor).replace(/[^\d.-]/g, ""));
-          if (!monto || monto <= 0) return;
-
-          financeState.balance += monto;
-          financeState.deposits += monto;
-          saveFinanceState();
-          renderFinance();
-          cerrarModal();
-        }
-      });
-    }
-
-    function abrirRetiro() {
-      abrirModal({
-        title: "Registrar retiro",
-        description: "Ingresa el monto que quieres restar del registro financiero.",
-        value: "",
-        confirmText: "Retirar",
-        inputType: "input",
-        onConfirm: async (valor) => {
-          const monto = Number(String(valor).replace(/[^\d.-]/g, ""));
-          if (!monto || monto <= 0) return;
-
-          financeState.balance -= monto;
-          financeState.withdrawals += monto;
-          saveFinanceState();
-          renderFinance();
-          cerrarModal();
-        }
-      });
-    }
-
-    async function enviar() {
-      const message = input.value.trim();
-      if (!message) return;
-
-      saveUserId();
-      const userId = getUserId();
-
-      agregarMensaje("usuario", "Tú", message);
-      input.value = "";
-      setLoading(true);
-
-      try {
-        const data = await apiFetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message, userId })
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentPeriod = btn.dataset.period;
+        document.querySelectorAll(".filter-btn").forEach((b) => {
+          b.classList.toggle("active", b === btn);
         });
-
-        agregarMensaje("bot", "Pepinazo", data.reply || "Sin respuesta");
-
-        if (data.profile_summary) {
-          sideTitle.textContent = "Perfil resumen";
-          sideContent.textContent = data.profile_summary;
-        }
-      } catch (error) {
-        agregarMensaje("error", "Error", error.message || "No se pudo conectar con el servidor.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    async function verPerfil() {
-      saveUserId();
-      const userId = getUserId();
-      setEstado("Cargando perfil...");
-
-      try {
-        const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-        renderPerfilTexto(data);
-      } catch (error) {
-        sideTitle.textContent = "Perfil";
-        sideContent.textContent = error.message || "No se pudo cargar el perfil.";
-      } finally {
-        setEstado("");
-      }
-    }
-
-    async function verMemoria() {
-      saveUserId();
-      const userId = getUserId();
-      setEstado("Cargando memoria...");
-
-      try {
-        const data = await apiFetch(`/prueba-de-memoria?userId=${encodeURIComponent(userId)}`);
-        renderMemoriaTexto(data);
-      } catch (error) {
-        sideTitle.textContent = "Memoria";
-        sideContent.textContent = error.message || "No se pudo cargar la memoria.";
-      } finally {
-        setEstado("");
-      }
-    }
-
-    async function verPanelMemoria() {
-      saveUserId();
-      const userId = getUserId();
-      setEstado("Cargando panel de memoria...");
-
-      try {
-        const data = await apiFetch(`/memory-panel?userId=${encodeURIComponent(userId)}`);
-        renderPanelMemoria(data);
-      } catch (error) {
-        sideTitle.textContent = "Panel de memoria";
-        sideContent.textContent = error.message || "No se pudo cargar el panel.";
-      } finally {
-        setEstado("");
-      }
-    }
-
-    async function borrarMemoria() {
-      abrirModal({
-        title: "Borrar toda la memoria",
-        description: `Se borrará toda la memoria de ${getUserId()}. Esto incluye memoria reciente, importante, perfil y resumen.`,
-        confirmText: "Borrar todo",
-        hideField: true,
-        onConfirm: async () => {
-          setEstado("Borrando memoria...");
-
-          try {
-            await apiFetch(`/memory-clear?userId=${encodeURIComponent(getUserId())}`, {
-              method: "DELETE"
-            });
-
-            agregarMensaje("sistema", "Sistema", `Memoria borrada para ${getUserId()}.`);
-            sideTitle.textContent = "Memoria / Perfil";
-            sideContent.textContent = "Memoria borrada. Vuelve a cargar perfil o memoria.";
-            actualizarStatsPanel({ memoria_reciente: [], memoria_importante: [], perfil_usuario: [] });
-            cerrarModal();
-          } catch (error) {
-            agregarMensaje("error", "Error", error.message || "No se pudo borrar la memoria.");
-          } finally {
-            setEstado("");
-          }
-        }
+        renderAll();
       });
-    }
-
-    function confirmarBorrado(table, id) {
-      abrirModal({
-        title: "Confirmar borrado",
-        description: `¿Seguro que quieres borrar este registro de ${table}?`,
-        confirmText: "Borrar",
-        hideField: true,
-        onConfirm: async () => {
-          setEstado("Borrando registro...");
-
-          try {
-            await apiFetch(`/memory/${table}/${id}?userId=${encodeURIComponent(getUserId())}`, {
-              method: "DELETE"
-            });
-
-            cerrarModal();
-            await verPanelMemoria();
-          } catch (error) {
-            agregarMensaje("error", "Error", error.message || "No se pudo borrar el registro.");
-          } finally {
-            setEstado("");
-          }
-        }
-      });
-    }
-
-    async function editarPerfil(id, valorActualCodificado) {
-      const valorActual = decodeFromAttr(valorActualCodificado);
-
-      abrirModal({
-        title: "Editar perfil",
-        description: "Modifica este valor del perfil sin romper la memoria existente.",
-        value: valorActual,
-        confirmText: "Guardar cambios",
-        inputType: "textarea",
-        onConfirm: async (nuevoValor) => {
-          const clean = nuevoValor.trim();
-          if (!clean) return;
-
-          setEstado("Editando perfil...");
-
-          try {
-            await apiFetch(`/memory/profile/${id}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                valor: clean,
-                userId: getUserId()
-              })
-            });
-
-            cerrarModal();
-            await verPanelMemoria();
-          } catch (error) {
-            agregarMensaje("error", "Error", error.message || "No se pudo editar el perfil.");
-          } finally {
-            setEstado("");
-          }
-        }
-      });
-    }
-
-    async function editarMemoria(table, id, valorActualCodificado) {
-      const valorActual = decodeFromAttr(valorActualCodificado);
-
-      abrirModal({
-        title: "Editar recuerdo",
-        description: "Cambia este recuerdo directamente desde el panel.",
-        value: valorActual,
-        confirmText: "Guardar cambios",
-        inputType: "textarea",
-        onConfirm: async (nuevoValor) => {
-          const clean = nuevoValor.trim();
-          if (!clean) return;
-
-          setEstado("Editando memoria...");
-
-          try {
-            await apiFetch(`/memory/message/${table}/${id}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                mensaje: clean,
-                userId: getUserId()
-              })
-            });
-
-            cerrarModal();
-            await verPanelMemoria();
-          } catch (error) {
-            agregarMensaje("error", "Error", error.message || "No se pudo editar la memoria.");
-          } finally {
-            setEstado("");
-          }
-        }
-      });
-    }
-
-    async function fijarMemoria(sourceTable, id) {
-      setEstado("Fijando recuerdo importante...");
-
-      try {
-        await apiFetch(`/memory/pin`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            sourceTable,
-            id,
-            userId: getUserId()
-          })
-        });
-
-        await verPanelMemoria();
-      } catch (error) {
-        agregarMensaje("error", "Error", error.message || "No se pudo fijar la memoria.");
-      } finally {
-        setEstado("");
-      }
-    }
-
-    input.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" && !btn.disabled) {
-        enviar();
-      }
     });
 
-    modalInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        modalConfirmBtn.click();
-      }
+    window.addEventListener("load", () => {
+      renderAll();
     });
 
-    userIdInput.addEventListener("change", saveUserId);
-    userIdInput.addEventListener("blur", saveUserId);
+    /*
+      AQUÍ LUEGO CONECTAS TU EXCEL REAL
 
-    loadUserId();
-    loadFinanceState();
+      IDEA:
+      1. Backend lee Excel con xlsx
+      2. Backend expone endpoint como /api/finance-data
+      3. Frontend reemplaza getPeriodData() y getCategoryData()
+         por datos reales traídos con fetch()
 
-    agregarMensaje(
-      "bot",
-      "Pepinazo",
-      `Hola. Ya estoy conectado al backend y listo para conversar contigo. User ID actual: ${getUserId()}.`
-    );
+      Ejemplo futuro:
+      const res = await fetch('/api/finance-data');
+      const financeData = await res.json();
+    */
   </script>
 </body>
 </html>
