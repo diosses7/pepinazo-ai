@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -644,6 +643,10 @@
       flex-wrap: wrap;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
@@ -785,6 +788,7 @@
     <div class="modal">
       <h3 id="modalTitle">Editar</h3>
       <p id="modalDescription">Haz cambios aquí.</p>
+      <input id="modalInput" class="modal-input hidden" type="text" />
       <textarea id="modalTextarea" class="modal-textarea"></textarea>
       <div class="modal-actions">
         <button class="btn" onclick="cerrarModal()">Cancelar</button>
@@ -805,6 +809,7 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalDescription = document.getElementById("modalDescription");
     const modalTextarea = document.getElementById("modalTextarea");
+    const modalInput = document.getElementById("modalInput");
     const modalConfirmBtn = document.getElementById("modalConfirmBtn");
 
     const STORAGE_KEY = "pepinazo_user_id";
@@ -812,6 +817,7 @@
 
     let ultimoPanel = null;
     let filtroActual = "todo";
+    let modalMode = "textarea";
     let financeState = {
       balance: 0,
       deposits: 0,
@@ -884,6 +890,18 @@
         .replaceAll("'", "&#039;");
     }
 
+    function encodeForAttr(value) {
+      return encodeURIComponent(String(value ?? ""));
+    }
+
+    function decodeFromAttr(value) {
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return String(value || "");
+      }
+    }
+
     function agregarMensaje(tipo, autor, texto) {
       const wrapper = document.createElement("div");
       wrapper.className = `mensaje ${tipo}`;
@@ -934,27 +952,58 @@
       }
     }
 
-    function abrirModal({ title, description, value = "", confirmText = "Guardar", onConfirm, inputType = "textarea" }) {
+    function abrirModal({
+      title,
+      description,
+      value = "",
+      confirmText = "Guardar",
+      onConfirm,
+      inputType = "textarea",
+      hideField = false
+    }) {
       modalTitle.textContent = title;
       modalDescription.textContent = description;
-      modalTextarea.style.display = "block";
-      modalTextarea.value = value;
-      modalTextarea.className = inputType === "input" ? "modal-input" : "modal-textarea";
       modalConfirmBtn.textContent = confirmText;
       modalBackdrop.classList.add("show");
-      modalTextarea.focus();
+      modalMode = inputType;
+
+      modalInput.classList.add("hidden");
+      modalTextarea.classList.add("hidden");
+
+      if (!hideField) {
+        if (inputType === "input") {
+          modalInput.classList.remove("hidden");
+          modalInput.value = value;
+          modalInput.focus();
+        } else {
+          modalTextarea.classList.remove("hidden");
+          modalTextarea.value = value;
+          modalTextarea.focus();
+        }
+      } else {
+        modalInput.value = "";
+        modalTextarea.value = "";
+      }
 
       modalConfirmBtn.onclick = async () => {
-        await onConfirm(modalTextarea.value);
+        const currentValue = hideField
+          ? ""
+          : modalMode === "input"
+            ? modalInput.value
+            : modalTextarea.value;
+
+        await onConfirm(currentValue);
       };
     }
 
     function cerrarModal() {
       modalBackdrop.classList.remove("show");
+      modalInput.value = "";
       modalTextarea.value = "";
-      modalTextarea.className = "modal-textarea";
-      modalTextarea.style.display = "block";
+      modalInput.classList.add("hidden");
+      modalTextarea.classList.remove("hidden");
       modalConfirmBtn.onclick = null;
+      modalMode = "textarea";
     }
 
     modalBackdrop.addEventListener("click", (e) => {
@@ -1105,7 +1154,7 @@
                 <div class="profile-text"><strong>${escapeHtml(item.clave)}:</strong> ${escapeHtml(item.valor)}</div>
                 <div class="profile-meta">ID: ${item.id || ""}</div>
                 <div class="item-actions">
-                  <button onclick="editarPerfil(${item.id}, ${JSON.stringify(item.valor)})">Editar</button>
+                  <button onclick="editarPerfil(${item.id}, '${encodeForAttr(item.valor)}')">Editar</button>
                   <button class="danger" onclick="confirmarBorrado('perfil_usuario', ${item.id})">Borrar</button>
                 </div>
               </div>
@@ -1138,7 +1187,7 @@
                   <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
                 </div>
                 <div class="item-actions">
-                  <button onclick="editarMemoria('memoria', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+                  <button onclick="editarMemoria('memoria', ${item.id}, '${encodeForAttr(item.mensaje)}')">Editar</button>
                   <button class="pin" onclick="fijarMemoria('memoria', ${item.id})">Fijar</button>
                   <button class="danger" onclick="confirmarBorrado('memoria', ${item.id})">Borrar</button>
                 </div>
@@ -1172,7 +1221,7 @@
                   <span class="tag">${escapeHtml(item.tipo || "contexto")}</span>
                 </div>
                 <div class="item-actions">
-                  <button onclick="editarMemoria('memoria_larga', ${item.id}, ${JSON.stringify(item.mensaje)})">Editar</button>
+                  <button onclick="editarMemoria('memoria_larga', ${item.id}, '${encodeForAttr(item.mensaje)}')">Editar</button>
                   <button class="danger" onclick="confirmarBorrado('memoria_larga', ${item.id})">Borrar</button>
                 </div>
               </div>
@@ -1310,13 +1359,11 @@
     }
 
     async function borrarMemoria() {
-      modalTextarea.style.display = "none";
-
       abrirModal({
         title: "Borrar toda la memoria",
         description: `Se borrará toda la memoria de ${getUserId()}. Esto incluye memoria reciente, importante, perfil y resumen.`,
-        value: "",
         confirmText: "Borrar todo",
+        hideField: true,
         onConfirm: async () => {
           setEstado("Borrando memoria...");
 
@@ -1339,13 +1386,11 @@
     }
 
     function confirmarBorrado(table, id) {
-      modalTextarea.style.display = "none";
-
       abrirModal({
         title: "Confirmar borrado",
         description: `¿Seguro que quieres borrar este registro de ${table}?`,
-        value: "",
         confirmText: "Borrar",
+        hideField: true,
         onConfirm: async () => {
           setEstado("Borrando registro...");
 
@@ -1365,14 +1410,15 @@
       });
     }
 
-    async function editarPerfil(id, valorActual) {
-      modalTextarea.style.display = "block";
+    async function editarPerfil(id, valorActualCodificado) {
+      const valorActual = decodeFromAttr(valorActualCodificado);
 
       abrirModal({
         title: "Editar perfil",
         description: "Modifica este valor del perfil sin romper la memoria existente.",
         value: valorActual,
         confirmText: "Guardar cambios",
+        inputType: "textarea",
         onConfirm: async (nuevoValor) => {
           const clean = nuevoValor.trim();
           if (!clean) return;
@@ -1402,14 +1448,15 @@
       });
     }
 
-    async function editarMemoria(table, id, valorActual) {
-      modalTextarea.style.display = "block";
+    async function editarMemoria(table, id, valorActualCodificado) {
+      const valorActual = decodeFromAttr(valorActualCodificado);
 
       abrirModal({
         title: "Editar recuerdo",
         description: "Cambia este recuerdo directamente desde el panel.",
         value: valorActual,
         confirmText: "Guardar cambios",
+        inputType: "textarea",
         onConfirm: async (nuevoValor) => {
           const clean = nuevoValor.trim();
           if (!clean) return;
@@ -1423,7 +1470,8 @@
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
-                mensaje: clean
+                mensaje: clean,
+                userId: getUserId()
               })
             });
 
@@ -1465,6 +1513,12 @@
     input.addEventListener("keydown", function (event) {
       if (event.key === "Enter" && !btn.disabled) {
         enviar();
+      }
+    });
+
+    modalInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        modalConfirmBtn.click();
       }
     });
 
