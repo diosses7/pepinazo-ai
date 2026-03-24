@@ -2,1313 +2,1643 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pepinazo AI – Panel Fintech</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pepinazo AI</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
 
   <style>
     :root {
-      --bg: #040814;
-      --bg-2: #020617;
-      --card: rgba(12, 18, 32, 0.92);
-      --card-2: rgba(15, 23, 42, 0.96);
-      --line: rgba(148, 163, 184, 0.24);
-      --line-soft: rgba(148, 163, 184, 0.12);
-      --text: #e8eefc;
-      --muted: #94a3b8;
-      --primary: #3b82f6;
-      --primary-2: #2563eb;
-      --violet: #7c3aed;
-      --success: #22c55e;
-      --danger: #f87171;
-      --warning: #fbbf24;
-      --radius: 24px;
-      --radius-sm: 18px;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+      --bg: #020617;
+      --bg-2: #030712;
+      --bg-3: #07101f;
+      --surface: rgba(8, 15, 30, 0.82);
+      --surface-2: rgba(10, 19, 36, 0.9);
+      --surface-3: rgba(255, 255, 255, 0.03);
+      --line: rgba(255, 255, 255, 0.07);
+      --line-soft: rgba(255, 255, 255, 0.04);
+      --text: #eef4ff;
+      --muted: #8b9bb7;
+      --muted-2: #6e7f9f;
+      --primary: #7c9cff;
+      --primary-2: #4f7cff;
+      --accent: #9b8cff;
+      --success: #23c483;
+      --danger: #ff6b7a;
+      --warning: #ffb84d;
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.42);
+      --shadow-md: 0 14px 32px rgba(0, 0, 0, 0.32);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --nav-h: 88px;
+      --content-w: 1240px;
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 30%),
-        radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 28%),
-        linear-gradient(180deg, #050816 0%, #020617 60%, #000000 100%);
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      padding: 18px;
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(79, 124, 255, 0.14), transparent 26%),
+        radial-gradient(circle at top right, rgba(155, 140, 255, 0.10), transparent 24%),
+        linear-gradient(180deg, #030712 0%, #020617 35%, #02050d 100%);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);
     }
 
-    .app {
-      max-width: 1300px;
+    .app-shell {
+      max-width: var(--content-w);
       margin: 0 auto;
+      padding: 18px 16px 0;
     }
 
-    .glass {
-      background: var(--card);
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding-top: 6px;
+    }
+
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
-    .soft {
-      background: var(--card-2);
-      border: 1px solid var(--line-soft);
-      border-radius: var(--radius-sm);
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(124, 156, 255, 0.22);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .brand-pill {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+      box-shadow: 0 10px 28px rgba(79, 124, 255, 0.34);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-copy p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 85% 20%, rgba(124, 156, 255, 0.20), transparent 26%),
+        radial-gradient(circle at 10% 90%, rgba(155, 140, 255, 0.12), transparent 30%),
+        linear-gradient(180deg, rgba(10, 19, 36, 0.94), rgba(5, 11, 24, 0.94));
+      box-shadow: var(--shadow-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .hero-top {
       display: flex;
+      align-items: flex-start;
       justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .hero-title-wrap {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(124, 156, 255, 0.10);
+      border: 1px solid rgba(124, 156, 255, 0.18);
+      color: #c7d5ff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+    }
+
+    .hero-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 680px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: 0.2s ease;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .pill-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(124, 156, 255, 0.22);
+    }
+
+    .pill-btn.primary {
+      background: linear-gradient(135deg, rgba(79, 124, 255, 0.96), rgba(124, 156, 255, 0.96));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 18px 38px rgba(79, 124, 255, 0.25);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .chart-card,
+    .balance-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-card {
+      padding: 14px 14px 8px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted-2);
+      font-weight: 800;
+    }
+
+    .period-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-soft);
+    }
+
+    .period-tab {
+      min-width: 44px;
+      height: 32px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .period-tab.active {
+      background: rgba(124, 156, 255, 0.16);
+      color: #dce5ff;
+    }
+
+    .chart-meta {
+      display: flex;
       align-items: flex-end;
-      gap: 18px;
-      padding: 24px;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chart-balance h2 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+    }
+
+    .chart-balance p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .trend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(35, 196, 131, 0.10);
+      color: #baf3d8;
+      border: 1px solid rgba(35, 196, 131, 0.16);
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .chart-wrap {
+      flex: 1;
+      min-height: 180px;
+      position: relative;
+    }
+
+    .balance-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 280px;
       position: relative;
       overflow: hidden;
     }
 
-    .hero::after {
-      content: "";
+    .balance-glow {
       position: absolute;
-      width: 280px;
-      height: 280px;
-      right: -80px;
-      bottom: -120px;
-      background: radial-gradient(circle, rgba(59,130,246,0.25), transparent 65%);
+      right: -40px;
+      bottom: -50px;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79, 124, 255, 0.22), transparent 70%);
       pointer-events: none;
     }
 
-    .hero-left {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-title {
+    .status-row {
       display: flex;
       align-items: center;
-      gap: 14px;
-    }
-
-    .hero-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 24px;
-      color: white;
-      background: linear-gradient(135deg, var(--primary), var(--violet));
-      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.45);
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: 38px;
-      letter-spacing: -0.04em;
-      background: linear-gradient(90deg, #dbeafe 0%, #a5b4fc 45%, #ffffff 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero p {
-      margin: 10px 0 0;
-      max-width: 700px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 14px;
-      padding: 10px 14px;
+      padding: 9px 11px;
       border-radius: 999px;
-      background: rgba(34, 197, 94, 0.08);
-      border: 1px solid rgba(34, 197, 94, 0.28);
-      color: #bbf7d0;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(35, 196, 131, 0.11);
+      border: 1px solid rgba(35, 196, 131, 0.14);
+      color: #bbf7d7;
+      width: fit-content;
+    }
+
+    .status-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 14px rgba(35, 196, 131, 0.6);
+    }
+
+    .mini-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      color: var(--muted);
       font-size: 12px;
       font-weight: 700;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--success);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.85);
-    }
-
-    .hero-right {
-      min-width: 250px;
+    .balance-main {
       position: relative;
-      z-index: 1;
-      text-align: right;
+      z-index: 2;
     }
 
-    .hero-balance-label {
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.12em;
+    .balance-main .label {
+      margin: 0 0 8px;
+      font-size: 11px;
       text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted-2);
+      font-weight: 800;
+    }
+
+    .balance-main .value {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      font-weight: 900;
+      color: #dff7ea;
+    }
+
+    .balance-main .caption {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .balance-stats {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .mini-stat {
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .mini-stat .k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted-2);
+      font-weight: 800;
       margin-bottom: 6px;
     }
 
-    .hero-balance {
-      font-size: 40px;
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      color: #bbf7d0;
-    }
-
-    .hero-balance-sub {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 1.45fr 1fr;
-      gap: 18px;
-    }
-
-    .left-col,
-    .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    .mini-stat .v {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
     }
 
     .section {
-      padding: 18px;
+      margin-top: 18px;
     }
 
     .section-head {
       display: flex;
+      align-items: flex-end;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
+      gap: 16px;
       margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .section-head h2 {
       margin: 0;
-      font-size: 22px;
-      letter-spacing: -0.03em;
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 900;
     }
 
     .section-head p {
-      margin: 4px 0 0;
+      margin: 7px 0 0;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 14px;
+      max-width: 720px;
     }
 
-    .tag {
-      display: inline-flex;
+    .section-actions {
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      background: rgba(59,130,246,0.14);
-      border: 1px solid rgba(59,130,246,0.22);
-      color: #dbeafe;
-      white-space: nowrap;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .kpi-grid {
+    .grid-4 {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .kpi-card,
+    .panel-card,
+    .list-card {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-md);
     }
 
     .kpi-card {
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(10,14,26,0.98));
-      border: 1px solid var(--line-soft);
+      padding: 16px;
+      min-height: 145px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
     }
 
-    .kpi-label {
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .kpi-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124, 156, 255, 0.12);
+      border: 1px solid rgba(124, 156, 255, 0.12);
+      color: #d8e1ff;
+      font-size: 16px;
+    }
+
+    .kpi-name {
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.11em;
-      color: var(--muted);
-      margin-bottom: 6px;
+      letter-spacing: 0.15em;
+      color: var(--muted-2);
+      font-weight: 800;
     }
 
     .kpi-value {
-      font-size: 24px;
-      font-weight: 800;
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1;
       letter-spacing: -0.04em;
+      font-weight: 900;
     }
 
     .kpi-sub {
-      margin-top: 6px;
-      font-size: 11px;
       color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
     }
 
-    .kpi-positive {
-      color: #bbf7d0;
+    .delta-up {
+      color: #9cf2c6;
     }
 
-    .kpi-warning {
-      color: #fde68a;
+    .delta-down {
+      color: #ffb0b7;
     }
 
-    .kpi-info {
-      color: #bfdbfe;
+    .panel-card {
+      padding: 16px;
     }
 
-    .filter-bar {
+    .panel-card.large {
+      min-height: 360px;
+    }
+
+    .panel-title-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 12px;
     }
 
-    .filter-btn {
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      background: rgba(15, 23, 42, 0.92);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.18s ease;
-    }
-
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--primary), var(--violet));
-      border-color: transparent;
-      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.35);
-    }
-
-    .filter-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .chart-wrap {
-      height: 260px;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(8, 13, 24, 0.92);
-      border: 1px solid var(--line-soft);
-    }
-
-    .double-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .subcard {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(8, 13, 24, 0.9);
-      border: 1px solid var(--line-soft);
-    }
-
-    .subcard h3 {
-      margin: 0 0 6px;
-      font-size: 13px;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: #cbd5e1;
-    }
-
-    .subcard p {
-      margin: 0 0 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .mini-chart {
-      height: 180px;
-    }
-
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .list-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.08);
-      font-size: 13px;
-    }
-
-    .list-row strong {
-      font-weight: 700;
-    }
-
-    .value-positive {
-      color: #86efac;
-      font-weight: 700;
-    }
-
-    .value-negative {
-      color: #fca5a5;
-      font-weight: 700;
-    }
-
-    .value-neutral {
-      color: #cbd5e1;
-      font-weight: 700;
-    }
-
-    #chat {
-      min-height: 280px;
-      max-height: 360px;
-      overflow-y: auto;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(8, 13, 24, 0.94);
-      border: 1px solid var(--line-soft);
-    }
-
-    .mensaje {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-
-    .autor {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      padding: 0 4px;
-    }
-
-    .bubble {
-      max-width: 86%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      border: 1px solid transparent;
-    }
-
-    .usuario {
-      align-items: flex-end;
-    }
-
-    .usuario .autor {
-      text-align: right;
-      color: #bfdbfe;
-    }
-
-    .usuario .bubble {
-      background: rgba(37, 99, 235, 0.22);
-      border-color: rgba(96, 165, 250, 0.35);
-    }
-
-    .bot {
-      align-items: flex-start;
-    }
-
-    .bot .autor {
-      color: #f8fafc;
-    }
-
-    .bot .bubble {
-      background: rgba(15, 23, 42, 0.92);
-      border-color: rgba(148, 163, 184, 0.18);
-    }
-
-    .sistema {
-      align-items: center;
-    }
-
-    .sistema .bubble {
-      max-width: 100%;
-      text-align: center;
-      background: rgba(124, 58, 237, 0.14);
-      border-color: rgba(167, 139, 250, 0.3);
-    }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    #msg {
-      width: 100%;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      background: rgba(8, 13, 24, 0.94);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 12px 14px;
-      outline: none;
-      font-size: 14px;
-    }
-
-    #msg::placeholder {
-      color: #64748b;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      color: white;
-      background: linear-gradient(135deg, var(--primary), var(--violet));
-      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.28);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .status-line {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 12px;
-      min-height: 18px;
-    }
-
-    .summary-box {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(8, 13, 24, 0.92);
-      border: 1px dashed rgba(148, 163, 184, 0.2);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-
-    .market-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .market-card {
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(8, 13, 24, 0.92);
-      border: 1px solid var(--line-soft);
-    }
-
-    .market-card .label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.11em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .market-card .value {
-      font-size: 20px;
+    .panel-title {
+      margin: 0;
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
     }
 
-    .market-card .sub {
-      margin-top: 4px;
-      font-size: 11px;
+    .panel-sub {
+      margin: 4px 0 0;
       color: var(--muted);
+      font-size: 13px;
     }
 
-    .footer-nav {
+    .chart-box {
+      height: 280px;
+      position: relative;
+    }
+
+    .list-card {
+      padding: 8px;
+    }
+
+    .list-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      transition: 0.2s ease;
+    }
+
+    .list-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .list-item + .list-item {
+      margin-top: 4px;
+    }
+
+    .list-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      color: #dbe5ff;
+      border: 1px solid var(--line-soft);
+      font-size: 15px;
+    }
+
+    .list-copy {
+      min-width: 0;
+    }
+
+    .list-copy h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-copy p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-value {
+      text-align: right;
+    }
+
+    .list-value strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .list-value span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .quick-card {
+      padding: 16px;
+      min-height: 120px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .quick-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124, 156, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .quick-card i {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124, 156, 255, 0.12);
+      color: #dbe5ff;
+      border: 1px solid rgba(124, 156, 255, 0.12);
+    }
+
+    .quick-card h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .quick-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .footer-space {
+      height: 24px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      width: min(calc(100% - 20px), 760px);
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(4, 10, 22, 0.84);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.45);
+      padding: 10px 12px;
+      z-index: 200;
+    }
+
+    .bottom-nav-inner {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-top: 18px;
-      padding: 12px;
+      gap: 8px;
     }
 
-    .nav-btn {
+    .nav-item {
+      min-height: 58px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      min-height: 74px;
-      border-radius: 18px;
-      border: 1px solid var(--line-soft);
-      background: rgba(8, 13, 24, 0.92);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
-    .nav-btn.active {
-      color: #dbeafe;
-      border-color: rgba(59,130,246,0.24);
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+    .nav-item i {
+      font-size: 16px;
     }
 
-    @media (max-width: 1100px) {
-      .layout {
+    .nav-item.active {
+      background: rgba(124, 156, 255, 0.12);
+      border-color: rgba(124, 156, 255, 0.14);
+      color: #e7edff;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+
+    .hide-mobile {
+      display: inline;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .grid-4,
+      .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-grid {
         grid-template-columns: 1fr;
+      }
+
+      .balance-card {
+        min-height: auto;
       }
     }
 
     @media (max-width: 760px) {
-      body {
-        padding: 12px;
+      .app-shell {
+        padding: 14px 12px 0;
+      }
+
+      .topbar {
+        gap: 10px;
+      }
+
+      .brand-copy p {
+        display: none;
       }
 
       .hero {
+        padding: 14px;
+      }
+
+      .hero-top,
+      .section-head,
+      .chart-meta,
+      .card-topline,
+      .panel-title-row {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .hero-right {
-        text-align: left;
+      .hero-actions,
+      .section-actions {
+        width: 100%;
       }
 
-      .kpi-grid,
-      .double-grid,
-      .market-grid,
-      .footer-nav {
+      .pill-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .grid-4,
+      .grid-2,
+      .quick-grid {
         grid-template-columns: 1fr;
       }
 
-      .hero h1 {
-        font-size: 32px;
+      .balance-stats {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .hero-balance {
-        font-size: 34px;
+      .chart-card {
+        min-height: 250px;
+      }
+
+      .chart-box {
+        height: 240px;
+      }
+
+      .bottom-nav {
+        width: calc(100% - 16px);
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        border-radius: 22px;
+      }
+
+      .nav-item span {
+        font-size: 10px;
       }
     }
 
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
+    @media (max-width: 420px) {
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+      }
 
-    ::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.3);
-      border-radius: 999px;
+      .brand-pill {
+        padding: 8px 10px;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+      }
+
+      .brand-copy h1 {
+        font-size: 15px;
+      }
+
+      .balance-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-item {
+        min-height: 54px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="hero glass">
-      <div class="hero-left">
-        <div class="hero-title">
-          <div class="hero-icon">
-            <i class="fas fa-rocket"></i>
-          </div>
-          <div>
-            <h1>Pepinazo AI</h1>
-            <p>
-              Panel financiero oscuro, limpio y tipo fintech para leer tu Excel, mostrar
-              gastos diarios, semanales, mensuales, inversiones y un radar de mercado sin
-              que todo parezca un PowerPoint que sufrió abandono infantil.
-            </p>
-          </div>
-        </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" aria-label="Menú">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
 
-        <div class="status-pill">
-          <span class="dot"></span>
-          Backend conectado y arquitectura lista para Excel
+      <div class="brand-pill">
+        <div class="brand-mark">
+          <i class="fa-solid fa-rocket"></i>
+        </div>
+        <div class="brand-copy">
+          <h1>Pepinazo AI</h1>
+          <p>Panel fintech oscuro para Excel, métricas, inversión y automatización</p>
         </div>
       </div>
 
-      <div class="hero-right">
-        <div class="hero-balance-label">Balance general</div>
-        <div class="hero-balance" id="heroBalance">$3.800.000</div>
-        <div class="hero-balance-sub">Actualizable desde tu backend y tu Excel real</div>
+      <div class="topbar-right">
+        <button class="icon-btn" aria-label="Buscar">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="icon-btn" aria-label="Notificaciones">
+          <i class="fa-regular fa-bell"></i>
+        </button>
       </div>
     </header>
 
-    <main class="layout">
-      <section class="left-col">
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Panel financiero</h2>
-              <p>
-                KPIs principales, gráfico por período, categorías y vista consolidada de inversiones.
-              </p>
-            </div>
-            <div class="tag">
-              <i class="fa-solid fa-file-excel"></i>
-              Excel Ready
+    <section class="hero">
+      <div class="hero-top">
+        <div class="hero-title-wrap">
+          <div class="eyebrow">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>Fintech OS</span>
+          </div>
+          <h2 class="hero-title">Tu plata, tus datos y tu radar en un panel que sí se ve serio.</h2>
+          <p class="hero-subtitle">
+            Lectura de Excel, KPIs, gastos por período, inversiones y base lista para automatización.
+            Ahora sí con cara de app y no de PowerPoint con insomnio.
+          </p>
+        </div>
+
+        <div class="hero-actions">
+          <button class="pill-btn primary">
+            <i class="fa-solid fa-file-excel"></i>
+            Conectar Excel
+          </button>
+          <button class="pill-btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Automatizar
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="chart-card">
+          <div class="card-topline">
+            <div class="card-label">Balance total</div>
+            <div class="period-tabs">
+              <button class="period-tab active" data-period="7d">7D</button>
+              <button class="period-tab" data-period="1m">1M</button>
+              <button class="period-tab" data-period="3m">3M</button>
+              <button class="period-tab" data-period="1y">1Y</button>
             </div>
           </div>
 
-          <div class="kpi-grid">
-            <div class="kpi-card">
-              <div class="kpi-label">Gasto mensual</div>
-              <div class="kpi-value" id="kpiMes">$450.000</div>
-              <div class="kpi-sub">+12% vs mes anterior</div>
+          <div class="chart-meta">
+            <div class="chart-balance">
+              <h2 id="heroBalance">$3.800.000</h2>
+              <p>Actualizable desde backend, Excel y futuros conectores de mercado</p>
             </div>
 
-            <div class="kpi-card">
-              <div class="kpi-label">Ingreso mensual</div>
-              <div class="kpi-value kpi-positive" id="kpiIngreso">$4.250.000</div>
-              <div class="kpi-sub">Flujo consolidado hogar</div>
+            <div class="trend-chip">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+8,4% este mes</span>
             </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Ahorro estimado</div>
-              <div class="kpi-value kpi-info" id="kpiAhorro">$1.120.000</div>
-              <div class="kpi-sub">Antes de extras y ajustes</div>
-            </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Inversiones</div>
-              <div class="kpi-value kpi-warning" id="kpiInv">$12.800.000</div>
-              <div class="kpi-sub">Rentab. anual <span id="kpiRentab">12,5%</span></div>
-            </div>
-          </div>
-
-          <div class="filter-bar">
-            <button class="filter-btn active" data-period="dia">Diario</button>
-            <button class="filter-btn" data-period="semana">Semanal</button>
-            <button class="filter-btn" data-period="mes">Mensual</button>
-            <button class="filter-btn" data-period="anio">Anual</button>
-            <button class="filter-btn" data-period="inv">Inversiones</button>
           </div>
 
           <div class="chart-wrap">
-            <canvas id="chartPrincipal"></canvas>
+            <canvas id="heroChart"></canvas>
           </div>
+        </div>
 
-          <div class="double-grid">
-            <div class="subcard">
-              <h3>Gastos por categoría</h3>
-              <p>
-                Top categorías del período activo. Luego esto puede venir directo desde tu Excel.
-              </p>
-              <div class="mini-chart">
-                <canvas id="chartCategorias"></canvas>
-              </div>
+        <aside class="balance-card">
+          <div class="balance-glow"></div>
+
+          <div class="status-row">
+            <div class="status-pill">
+              <span class="dot"></span>
+              <span>Backend conectado</span>
             </div>
 
-            <div class="subcard">
-              <h3>Inversiones</h3>
-              <p>
-                AFP, APV, VOO, QQQ, BTC y ETH en un solo panel. Menos caos, más dignidad.
-              </p>
-              <div class="mini-chart">
-                <canvas id="chartInversiones"></canvas>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Chat Pepinazo</h2>
-              <p>Conectado al backend. Si falla, responde sin romper la interfaz.</p>
+            <div class="mini-tag">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Excel ready</span>
             </div>
           </div>
 
-          <div id="chat"></div>
-
-          <div class="input-row">
-            <input id="msg" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
-            <button id="btnSend" class="btn">Enviar</button>
+          <div class="balance-main">
+            <p class="label">Disponible consolidado</p>
+            <h3 class="value">$3.800.000</h3>
+            <p class="caption">
+              Panel preparado para leer ingresos, gastos, inversión y flujo total sin romper tu backend actual.
+            </p>
           </div>
 
-          <div id="estado" class="status-line"></div>
-        </section>
-      </section>
-
-      <section class="right-col">
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Perfil y memoria</h2>
-              <p>Resumen ejecutivo de lo que luego se poblará con memoria persistente.</p>
+          <div class="balance-stats">
+            <div class="mini-stat">
+              <div class="k">Ingresos</div>
+              <div class="v">$4.250.000</div>
+            </div>
+            <div class="mini-stat">
+              <div class="k">Gastos</div>
+              <div class="v">$450.000</div>
+            </div>
+            <div class="mini-stat">
+              <div class="k">Invertido</div>
+              <div class="v">$1.350.000</div>
+            </div>
+            <div class="mini-stat">
+              <div class="k">Liquidez</div>
+              <div class="v">68%</div>
             </div>
           </div>
-
-          <div class="summary-box" id="summaryBox">
-Pepinazo sabe que quieres:
-- Un panel financiero tipo fintech oscuro y limpio.
-- Gastos diarios, semanales, mensuales y anuales.
-- Inversiones agrupadas: AFP, APV, VOO, QQQ, BTC, ETH.
-- Integración con Excel como fuente principal.
-- Radar futuro de mercado y automatización.
-          </div>
-        </section>
-
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Resumen rápido</h2>
-              <p>Lectura en 5 segundos para no pensar como Excel abierto a las 3 AM.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-row">
-              <span><strong>Balance simulado</strong></span>
-              <span class="value-positive" id="insightBalance">$3.800.000</span>
-            </div>
-            <div class="list-row">
-              <span><strong>Mes más caro</strong></span>
-              <span class="value-neutral">Marzo</span>
-            </div>
-            <div class="list-row">
-              <span><strong>Mayor fuga</strong></span>
-              <span class="value-negative">Autopistas</span>
-            </div>
-            <div class="list-row">
-              <span><strong>Activo fuerte</strong></span>
-              <span class="value-neutral">AFP + VOO</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Mercado</h2>
-              <p>
-                Módulo preparado para conectar ETF, crypto, dólar, UF y noticias relevantes.
-              </p>
-            </div>
-            <div class="tag">
-              <i class="fa-solid fa-chart-line"></i>
-              Market Radar
-            </div>
-          </div>
-
-          <div class="market-grid">
-            <div class="market-card">
-              <div class="label">VOO</div>
-              <div class="value value-positive" id="marketVOO">+0,8%</div>
-              <div class="sub">Variación simulada</div>
-            </div>
-
-            <div class="market-card">
-              <div class="label">QQQ</div>
-              <div class="value value-positive" id="marketQQQ">+1,2%</div>
-              <div class="sub">Tecnología fuerte</div>
-            </div>
-
-            <div class="market-card">
-              <div class="label">Bitcoin</div>
-              <div class="value value-negative" id="marketBTC">-0,6%</div>
-              <div class="sub">Alta volatilidad, clásico show</div>
-            </div>
-
-            <div class="market-card">
-              <div class="label">Dólar</div>
-              <div class="value value-neutral" id="marketUSD">$948</div>
-              <div class="sub">Simulado / pendiente backend</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section glass">
-          <div class="section-head">
-            <div>
-              <h2>Movimientos y alertas</h2>
-              <p>Atajos para después enchufar automatización real.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-row">
-              <span>Gasto semanal subió</span>
-              <span class="value-negative">+9%</span>
-            </div>
-            <div class="list-row">
-              <span>Aporte ETF este mes</span>
-              <span class="value-positive">$60.000</span>
-            </div>
-            <div class="list-row">
-              <span>Compra crypto menor</span>
-              <span class="value-neutral">$5.000</span>
-            </div>
-            <div class="list-row">
-              <span>Estado Excel</span>
-              <span class="value-positive">Listo para conectar</span>
-            </div>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <section class="footer-nav glass">
-      <div class="nav-btn active">
-        <i class="fa-solid fa-house"></i>
-        <span>Inicio</span>
-      </div>
-      <div class="nav-btn">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Gastos</span>
-      </div>
-      <div class="nav-btn">
-        <i class="fa-solid fa-chart-pie"></i>
-        <span>Inversión</span>
-      </div>
-      <div class="nav-btn">
-        <i class="fa-solid fa-brain"></i>
-        <span>Análisis</span>
-      </div>
-      <div class="nav-btn">
-        <i class="fa-solid fa-bars"></i>
-        <span>Menú</span>
+        </aside>
       </div>
     </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>KPIs financieros</h2>
+          <p>Resumen rápido por período con jerarquía visual limpia y más app, menos bloque de cemento.</p>
+        </div>
+
+        <div class="section-actions">
+          <button class="pill-btn">
+            <i class="fa-solid fa-calendar-days"></i>
+            Marzo 2026
+          </button>
+          <button class="pill-btn">
+            <i class="fa-solid fa-filter"></i>
+            Filtrar
+          </button>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-name">Gasto mensual</div>
+            </div>
+            <div class="kpi-icon"><i class="fa-solid fa-credit-card"></i></div>
+          </div>
+          <div>
+            <p class="kpi-value">$450.000</p>
+            <div class="kpi-sub delta-up">+12% vs mes anterior</div>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-name">Ingreso mensual</div>
+            </div>
+            <div class="kpi-icon"><i class="fa-solid fa-wallet"></i></div>
+          </div>
+          <div>
+            <p class="kpi-value">$4.250.000</p>
+            <div class="kpi-sub delta-up">+4% este período</div>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-name">Invertido</div>
+            </div>
+            <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
+          </div>
+          <div>
+            <p class="kpi-value">$1.350.000</p>
+            <div class="kpi-sub">VOO, QQQ, BTC y caja</div>
+          </div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-name">Ahorro neto</div>
+            </div>
+            <div class="kpi-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          </div>
+          <div>
+            <p class="kpi-value">$920.000</p>
+            <div class="kpi-sub delta-down">-3% vs objetivo</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="grid-2">
+        <article class="panel-card large">
+          <div class="panel-title-row">
+            <div>
+              <h3 class="panel-title">Gastos por período</h3>
+              <p class="panel-sub">Vista semanal y mensual para detectar fugas, picos y gastos hormiga.</p>
+            </div>
+            <button class="pill-btn">
+              <i class="fa-solid fa-chart-column"></i>
+              Ver detalle
+            </button>
+          </div>
+
+          <div class="chart-box">
+            <canvas id="expenseChart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel-card large">
+          <div class="panel-title-row">
+            <div>
+              <h3 class="panel-title">Distribución de categorías</h3>
+              <p class="panel-sub">Resumen útil para Excel, automatización y presupuesto real.</p>
+            </div>
+            <button class="pill-btn">
+              <i class="fa-solid fa-layer-group"></i>
+              Consolidado
+            </button>
+          </div>
+
+          <div class="chart-box">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="grid-2">
+        <article class="list-card">
+          <div class="panel-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+            <div class="panel-title-row" style="padding: 8px 8px 0;">
+              <div>
+                <h3 class="panel-title">Últimos movimientos</h3>
+                <p class="panel-sub">Entradas simuladas hasta conectar tu Excel real.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-gas-pump"></i></div>
+            <div class="list-copy">
+              <h4>Bencina</h4>
+              <p>Hoy · categoría transporte</p>
+            </div>
+            <div class="list-value">
+              <strong>-$48.000</strong>
+              <span>Tarjeta</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-house"></i></div>
+            <div class="list-copy">
+              <h4>Arriendo depto</h4>
+              <p>Ayer · ingreso automático</p>
+            </div>
+            <div class="list-value">
+              <strong>+$420.000</strong>
+              <span>Transferencia</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="list-copy">
+              <h4>Colegio</h4>
+              <p>Hace 2 días · educación</p>
+            </div>
+            <div class="list-value">
+              <strong>-$185.000</strong>
+              <span>PAC</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-bitcoin-sign"></i></div>
+            <div class="list-copy">
+              <h4>Aporte BTC</h4>
+              <p>Hace 3 días · inversión</p>
+            </div>
+            <div class="list-value">
+              <strong>-$10.000</strong>
+              <span>Fintual</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+            <div class="list-copy">
+              <h4>Supermercado</h4>
+              <p>Hace 3 días · consumo base</p>
+            </div>
+            <div class="list-value">
+              <strong>-$96.000</strong>
+              <span>Débito</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="list-card">
+          <div class="panel-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+            <div class="panel-title-row" style="padding: 8px 8px 0;">
+              <div>
+                <h3 class="panel-title">Radar rápido</h3>
+                <p class="panel-sub">Base visual para mercado, negocios, ecommerce y automatización futura.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="list-copy">
+              <h4>ETF base</h4>
+              <p>VOO estable como núcleo</p>
+            </div>
+            <div class="list-value">
+              <strong>Prioridad alta</strong>
+              <span>Portafolio</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="list-copy">
+              <h4>QQQ táctico</h4>
+              <p>Aporte variable según caja</p>
+            </div>
+            <div class="list-value">
+              <strong>Seguimiento</strong>
+              <span>Growth</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-store"></i></div>
+            <div class="list-copy">
+              <h4>Ecommerce</h4>
+              <p>Conectar productos y análisis web</p>
+            </div>
+            <div class="list-value">
+              <strong>En roadmap</strong>
+              <span>Mavencia</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="list-copy">
+              <h4>Agente AI</h4>
+              <p>Automatización y perfil inteligente</p>
+            </div>
+            <div class="list-value">
+              <strong>Siguiente fase</strong>
+              <span>Pepinazo</span>
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-icon"><i class="fa-solid fa-file-waveform"></i></div>
+            <div class="list-copy">
+              <h4>Excel vivo</h4>
+              <p>Sincronización de gastos e ingresos</p>
+            </div>
+            <div class="list-value">
+              <strong>Listo base</strong>
+              <span>Backend</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Accesos rápidos</h2>
+          <p>Diseño preparado para seguir creciendo sin rehacer el backend cada tres metros de drama.</p>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <article class="quick-card">
+          <i class="fa-solid fa-file-excel"></i>
+          <h4>Subir Excel</h4>
+          <p>Leer gastos diarios, ingresos y categorías desde tu archivo real.</p>
+        </article>
+
+        <article class="quick-card">
+          <i class="fa-solid fa-chart-line"></i>
+          <h4>Inversiones</h4>
+          <p>Consolidar VOO, QQQ, BTC, ETH y seguimiento del portafolio.</p>
+        </article>
+
+        <article class="quick-card">
+          <i class="fa-solid fa-globe"></i>
+          <h4>Radar mercado</h4>
+          <p>Búsqueda de productos, negocios y oportunidades para ecommerce.</p>
+        </article>
+
+        <article class="quick-card">
+          <i class="fa-solid fa-brain"></i>
+          <h4>Perfil inteligente</h4>
+          <p>Siguiente módulo para memoria útil, contexto y automatización real.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="footer-space"></div>
   </div>
 
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <div class="bottom-nav-inner">
+      <button class="nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Panel</span>
+      </button>
+      <button class="nav-item">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Gastos</span>
+      </button>
+      <button class="nav-item">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Inversión</span>
+      </button>
+      <button class="nav-item">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI</span>
+      </button>
+      <button class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>Ajustes</span>
+      </button>
+    </div>
+  </nav>
+
   <script>
-    const chatEl = document.getElementById("chat");
-    const msgEl = document.getElementById("msg");
-    const btnSend = document.getElementById("btnSend");
-    const estadoEl = document.getElementById("estado");
+    let heroChart;
+    let expenseChart;
+    let categoryChart;
 
-    let currentPeriod = "dia";
-    let chartPrincipal = null;
-    let chartCategorias = null;
-    let chartInversiones = null;
-
-    function safeCurrency(value) {
-      try {
-        return new Intl.NumberFormat("es-CL", {
-          style: "currency",
-          currency: "CLP",
-          maximumFractionDigits: 0
-        }).format(value);
-      } catch (error) {
-        return "$" + Number(value || 0).toLocaleString("es-CL");
+    const heroSeries = {
+      "7d": {
+        labels: ["L", "M", "M", "J", "V", "S", "D"],
+        values: [3320000, 3380000, 3350000, 3490000, 3560000, 3650000, 3800000],
+        balance: "$3.800.000"
+      },
+      "1m": {
+        labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
+        values: [3180000, 3320000, 3510000, 3800000],
+        balance: "$3.800.000"
+      },
+      "3m": {
+        labels: ["Ene", "Feb", "Mar"],
+        values: [2900000, 3330000, 3800000],
+        balance: "$3.800.000"
+      },
+      "1y": {
+        labels: ["Abr", "Jun", "Ago", "Oct", "Dic", "Feb", "Mar"],
+        values: [2100000, 2250000, 2470000, 2660000, 3010000, 3440000, 3800000],
+        balance: "$3.800.000"
       }
+    };
+
+    function moneyCLP(value) {
+      return "$" + Number(value).toLocaleString("es-CL");
     }
 
-    function addMessage(tipo, autor, texto) {
-      const wrap = document.createElement("div");
-      wrap.className = "mensaje " + tipo;
+    function createHeroChart(period = "7d") {
+      const ctx = document.getElementById("heroChart").getContext("2d");
+      const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+      gradient.addColorStop(0, "rgba(124, 156, 255, 0.35)");
+      gradient.addColorStop(1, "rgba(124, 156, 255, 0.00)");
 
-      const a = document.createElement("div");
-      a.className = "autor";
-      a.textContent = autor;
+      const data = heroSeries[period];
 
-      const b = document.createElement("div");
-      b.className = "bubble";
-      b.textContent = texto;
+      if (heroChart) heroChart.destroy();
 
-      wrap.appendChild(a);
-      wrap.appendChild(b);
-      chatEl.appendChild(wrap);
-      chatEl.scrollTop = chatEl.scrollHeight;
-    }
-
-    addMessage("sistema", "Pepinazo", "Hola. Panel cargado. Listo para conversar y mostrar tus finanzas sin convertir el frontend en una sopa de errores.");
-
-    async function sendMessage() {
-      const text = msgEl.value.trim();
-      if (!text) return;
-
-      addMessage("usuario", "Tú", text);
-      msgEl.value = "";
-      estadoEl.textContent = "Pepinazo pensando...";
-      btnSend.disabled = true;
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: text,
-            userId: "diego"
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error("Respuesta HTTP inválida");
-        }
-
-        const data = await response.json();
-        const reply =
-          data.reply ||
-          data.message ||
-          data.output_text ||
-          "Mensaje recibido, pero el backend no devolvió texto usable.";
-
-        addMessage("bot", "Pepinazo", reply);
-        estadoEl.textContent = "Conectado al backend.";
-      } catch (error) {
-        addMessage(
-          "bot",
-          "Pepinazo",
-          "No pude traer respuesta real del backend en este intento. La interfaz sigue viva, que ya es más digno que muchos proyectos prematuros."
-        );
-        estadoEl.textContent = "Error de conexión con /api/chat";
-        console.error(error);
-      } finally {
-        btnSend.disabled = false;
-      }
-    }
-
-    btnSend.addEventListener("click", sendMessage);
-    msgEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    function getPeriodData(period) {
-      const map = {
-        dia: {
-          title: "Gastos diarios (últimos 7 días)",
-          labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
-          data: [12000, 9000, 15000, 8000, 11000, 13000, 10000]
-        },
-        semana: {
-          title: "Gastos semanales (último mes)",
-          labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
-          data: [85000, 92000, 78000, 97000]
-        },
-        mes: {
-          title: "Gastos mensuales (últimos 6 meses)",
-          labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
-          data: [320000, 280000, 410000, 390000, 360000, 420000]
-        },
-        anio: {
-          title: "Gastos anuales",
-          labels: ["2022", "2023", "2024", "2025"],
-          data: [3500000, 4100000, 4800000, 5200000]
-        },
-        inv: {
-          title: "Aportes / evolución inversiones",
-          labels: ["AFP", "APV", "VOO", "QQQ", "BTC", "ETH"],
-          data: [5000000, 3000000, 2000000, 1500000, 800000, 600000]
-        }
-      };
-
-      return map[period] || map.dia;
-    }
-
-    function getCategoryData(period) {
-      const map = {
-        dia: {
-          labels: ["Bencina", "Café", "Peaje", "Mini compra", "Otros"],
-          data: [12000, 6000, 7000, 5000, 3000]
-        },
-        semana: {
-          labels: ["Autopistas", "Supermercado", "Bencina", "Colegio", "Otros"],
-          data: [30000, 26000, 22000, 18000, 12000]
-        },
-        mes: {
-          labels: ["Supermercado", "Autopistas", "Colegio", "Bencina", "Otros"],
-          data: [120000, 95000, 78000, 64000, 43000]
-        },
-        anio: {
-          labels: ["Vivienda", "Educación", "Transporte", "Comida", "Otros"],
-          data: [1800000, 1200000, 900000, 800000, 500000]
-        },
-        inv: {
-          labels: ["VOO", "QQQ", "BTC", "ETH", "APV"],
-          data: [35, 20, 15, 5, 25]
-        }
-      };
-
-      return map[period] || map.dia;
-    }
-
-    function baseOptions() {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: {
-          duration: 600
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            backgroundColor: "#020617",
-            titleColor: "#e8eefc",
-            bodyColor: "#e8eefc",
-            padding: 10,
-            cornerRadius: 10
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: "#94a3b8"
-            },
-            grid: {
-              color: "rgba(148,163,184,0.08)"
-            }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: "#94a3b8"
-            },
-            grid: {
-              color: "rgba(148,163,184,0.08)"
-            }
-          }
-        }
-      };
-    }
-
-    function renderPrincipalChart() {
-      const canvas = document.getElementById("chartPrincipal");
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-      const cfg = getPeriodData(currentPeriod);
-
-      if (chartPrincipal) chartPrincipal.destroy();
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-      gradient.addColorStop(0, "rgba(59,130,246,0.50)");
-      gradient.addColorStop(1, "rgba(59,130,246,0.02)");
-
-      const isInvestments = currentPeriod === "inv";
-
-      chartPrincipal = new Chart(ctx, {
-        type: isInvestments ? "bar" : "line",
+      heroChart = new Chart(ctx, {
+        type: "line",
         data: {
-          labels: cfg.labels,
+          labels: data.labels,
           datasets: [
             {
-              label: "Monto",
-              data: cfg.data,
-              borderColor: "#60a5fa",
-              backgroundColor: isInvestments ? "rgba(96,165,250,0.75)" : gradient,
-              fill: !isInvestments,
-              tension: 0.35,
-              borderWidth: 2,
-              borderRadius: isInvestments ? 12 : 0
-            }
-          ]
-        },
-        options: {
-          ...baseOptions(),
-          plugins: {
-            ...baseOptions().plugins,
-            title: {
-              display: true,
-              text: cfg.title,
-              color: "#e8eefc",
-              font: {
-                size: 13,
-                weight: "600"
-              }
-            }
-          }
-        }
-      });
-    }
-
-    function renderCategoryChart() {
-      const canvas = document.getElementById("chartCategorias");
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-      const cfg = getCategoryData(currentPeriod);
-
-      if (chartCategorias) chartCategorias.destroy();
-
-      chartCategorias = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: cfg.labels,
-          datasets: [
-            {
-              data: cfg.data,
-              backgroundColor: [
-                "#3b82f6",
-                "#7c3aed",
-                "#22c55e",
-                "#f59e0b",
-                "#f87171"
-              ],
-              borderRadius: 10
-            }
-          ]
-        },
-        options: {
-          ...baseOptions(),
-          indexAxis: "y"
-        }
-      });
-    }
-
-    function renderInvestmentChart() {
-      const canvas = document.getElementById("chartInversiones");
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-
-      if (chartInversiones) chartInversiones.destroy();
-
-      chartInversiones = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["AFP", "APV", "VOO", "QQQ", "BTC", "ETH"],
-          datasets: [
-            {
-              data: [5000000, 3000000, 2000000, 1500000, 800000, 600000],
-              backgroundColor: [
-                "#3b82f6",
-                "#7c3aed",
-                "#22c55e",
-                "#f59e0b",
-                "#f87171",
-                "#a855f7"
-              ],
-              borderWidth: 0
+              data: data.values,
+              borderColor: "#8ea8ff",
+              backgroundColor: gradient,
+              fill: true,
+              tension: 0.42,
+              borderWidth: 2.5,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              pointHoverBackgroundColor: "#dbe5ff",
+              pointHoverBorderColor: "#8ea8ff"
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: "62%",
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
           plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                color: "#94a3b8",
-                boxWidth: 10
-              }
-            },
+            legend: { display: false },
             tooltip: {
-              backgroundColor: "#020617",
-              titleColor: "#e8eefc",
-              bodyColor: "#e8eefc"
+              backgroundColor: "rgba(4, 10, 22, 0.96)",
+              borderColor: "rgba(255,255,255,0.08)",
+              borderWidth: 1,
+              displayColors: false,
+              titleColor: "#eef4ff",
+              bodyColor: "#cfd8ea",
+              padding: 12,
+              callbacks: {
+                label: function(context) {
+                  return " " + moneyCLP(context.raw);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: "#7385a6",
+                font: { size: 11, weight: "700" }
+              },
+              border: { display: false }
+            },
+            y: {
+              grid: {
+                color: "rgba(255,255,255,0.05)",
+                drawBorder: false
+              },
+              ticks: {
+                color: "#7385a6",
+                font: { size: 11, weight: "700" },
+                callback: function(value) {
+                  return "$" + (value / 1000000).toFixed(1) + "M";
+                }
+              },
+              border: { display: false }
+            }
+          }
+        }
+      });
+
+      document.getElementById("heroBalance").textContent = data.balance;
+    }
+
+    function createExpenseChart() {
+      const ctx = document.getElementById("expenseChart").getContext("2d");
+
+      if (expenseChart) expenseChart.destroy();
+
+      expenseChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+          datasets: [
+            {
+              label: "Gasto diario",
+              data: [42000, 58000, 39000, 75000, 64000, 91000, 52000],
+              backgroundColor: "rgba(124, 156, 255, 0.72)",
+              borderRadius: 12,
+              borderSkipped: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "rgba(4, 10, 22, 0.96)",
+              borderColor: "rgba(255,255,255,0.08)",
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  return " " + moneyCLP(context.raw);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: "#7b8ca9",
+                font: { weight: "700" }
+              },
+              border: { display: false }
+            },
+            y: {
+              grid: { color: "rgba(255,255,255,0.05)" },
+              ticks: {
+                color: "#7b8ca9",
+                callback: function(value) {
+                  return "$" + (value / 1000) + "k";
+                }
+              },
+              border: { display: false }
             }
           }
         }
       });
     }
 
-    function updateKPIs() {
-      const period = currentPeriod;
+    function createCategoryChart() {
+      const ctx = document.getElementById("categoryChart").getContext("2d");
 
-      const values = {
-        dia: {
-          mes: 450000,
-          ingreso: 4250000,
-          ahorro: 1120000,
-          balance: 3800000
+      if (categoryChart) categoryChart.destroy();
+
+      categoryChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Vivienda", "Educación", "Transporte", "Supermercado", "Inversión"],
+          datasets: [
+            {
+              data: [34, 18, 14, 22, 12],
+              backgroundColor: [
+                "rgba(124, 156, 255, 0.90)",
+                "rgba(155, 140, 255, 0.88)",
+                "rgba(35, 196, 131, 0.82)",
+                "rgba(255, 184, 77, 0.86)",
+                "rgba(255, 107, 122, 0.82)"
+              ],
+              borderWidth: 0,
+              hoverOffset: 4
+            }
+          ]
         },
-        semana: {
-          mes: 440000,
-          ingreso: 4250000,
-          ahorro: 1150000,
-          balance: 3815000
-        },
-        mes: {
-          mes: 460000,
-          ingreso: 4250000,
-          ahorro: 1090000,
-          balance: 3760000
-        },
-        anio: {
-          mes: 5200000,
-          ingreso: 51000000,
-          ahorro: 12800000,
-          balance: 39300000
-        },
-        inv: {
-          mes: 60000,
-          ingreso: 4250000,
-          ahorro: 1200000,
-          balance: 12800000
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "68%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#c7d2e6",
+                usePointStyle: true,
+                pointStyle: "circle",
+                padding: 18,
+                boxWidth: 10,
+                font: { size: 12, weight: "700" }
+              }
+            },
+            tooltip: {
+              backgroundColor: "rgba(4, 10, 22, 0.96)",
+              borderColor: "rgba(255,255,255,0.08)",
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.label}: ${context.raw}%`;
+                }
+              }
+            }
+          }
         }
-      };
-
-      const v = values[period] || values.dia;
-
-      document.getElementById("kpiMes").textContent = safeCurrency(v.mes);
-      document.getElementById("kpiIngreso").textContent = safeCurrency(v.ingreso);
-      document.getElementById("kpiAhorro").textContent = safeCurrency(v.ahorro);
-      document.getElementById("kpiInv").textContent = safeCurrency(12800000);
-      document.getElementById("heroBalance").textContent = safeCurrency(v.balance);
-      document.getElementById("insightBalance").textContent = safeCurrency(v.balance);
+      });
     }
 
-    function renderAll() {
-      updateKPIs();
-      renderPrincipalChart();
-      renderCategoryChart();
-      renderInvestmentChart();
-    }
-
-    document.querySelectorAll(".filter-btn").forEach((btn) => {
+    document.querySelectorAll(".period-tab").forEach((btn) => {
       btn.addEventListener("click", () => {
-        currentPeriod = btn.dataset.period;
-        document.querySelectorAll(".filter-btn").forEach((b) => {
-          b.classList.toggle("active", b === btn);
-        });
-        renderAll();
+        document.querySelectorAll(".period-tab").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        createHeroChart(btn.dataset.period);
       });
     });
 
-    window.addEventListener("load", () => {
-      renderAll();
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+        item.classList.add("active");
+      });
     });
 
-    /*
-      AQUÍ LUEGO CONECTAS TU EXCEL REAL
-
-      IDEA:
-      1. Backend lee Excel con xlsx
-      2. Backend expone endpoint como /api/finance-data
-      3. Frontend reemplaza getPeriodData() y getCategoryData()
-         por datos reales traídos con fetch()
-
-      Ejemplo futuro:
-      const res = await fetch('/api/finance-data');
-      const financeData = await res.json();
-    */
+    createHeroChart("7d");
+    createExpenseChart();
+    createCategoryChart();
   </script>
 </body>
 </html>
