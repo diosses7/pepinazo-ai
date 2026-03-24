@@ -1,17 +1,20 @@
 {
-"name": "pepinazo-ai",
-"version": "1.0.0",
-"description": "Servidor de IA Pepinazo",
-"main": "index.js",
-"scripts": {
-"start": "node index.js"
-},
-"engines": {
-"node": ">=18"
-},
-"dependencies": {
-"cors": "^2.8.5",
-"dotenv": "^16.4.5",
-"express": "^4.18.2"
-}
+  "name": "pepinazo-ai",
+  "version": "1.0.0",
+  "description": "Pepinazo AI server",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "node-fetch": "^2.6.7",
+    "xlsx": "^0.18.5"
+  }
 }
